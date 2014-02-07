@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 2.6)
 project(HuboCan)
 
+set(LIBRARY_INSTALL_PATH ${CMAKE_INSTALL_PREFIX}/lib)
+set(EXECUTABLE_INSTALL_PATH ${CMAKE_INSTALL_PREFIX}/bin)
+
+set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
 add_subdirectory(HuboCan)
