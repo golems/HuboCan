@@ -13,7 +13,7 @@ add_subdirectory(HuboCan)
 add_subdirectory(HuboCmd)
 add_subdirectory(HuboAgg)
 add_subdirectory(HuboState)
-
+add_subdirectory(HuboRT)
 
 file(GLOB bin_source "src/*.cpp")
 list(SORT bin_source)
