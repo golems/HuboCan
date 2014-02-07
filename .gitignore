@@ -11,3 +11,10 @@
 *.lai
 *.la
 *.a
+
+# Compiled binaries
+bin/*
+
+# Text editor backups
+*~
+*.user
