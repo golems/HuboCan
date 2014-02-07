@@ -40,6 +40,43 @@
 #ifndef HUBOCMD_HPP
 #define HUBOCMD_HPP
 
+#include "include/AchIncludes.h"
+#include <vector>
 
+namespace HuboCmd {
+
+enum error_flag {
+
+    NONE                = 0,
+    INDEX_OUT_OF_BOUNDS = 1,
+    ARRAY_MISMATCH      = 1 >> 1
+
+};
+
+typedef int error_result_t;
+typedef size_t JointIndex;
+typedef std::vector<size_t> IndexArray;
+typedef std::vector<double> ValueArray;
+
+class HuboCmd
+{
+public:
+
+    error_result_t position(JointIndex index, double angle);
+    error_result_t position(IndexArray array, ValueArray angles);
+
+    error_result_t velocity(JointIndex index, double velocity);
+    error_result_t velocity(IndexArray array, ValueArray velocities);
+
+
+
+    error_result_t send();
+
+protected:
+
+
+};
+
+} // HuboCmd
 
 #endif // HUBOCMD_HPP

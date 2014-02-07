@@ -40,6 +40,16 @@
 #ifndef HUBOAGG_HPP
 #define HUBOAGG_HPP
 
+namespace HuboAgg {
 
+class HuboAgg
+{
+public:
+
+protected:
+
+};
+
+} // namespace HuboAgg
 
 #endif // HUBOAGG_HPP

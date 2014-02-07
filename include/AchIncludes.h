@@ -37,15 +37,17 @@
  *   POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef HUBOSTATE_HPP
-#define HUBOSTATE_HPP
+#ifndef ACHINCLUDES_H
+#define ACHINCLUDES_H
 
-class HuboState
-{
-public:
+// Necessary include files for Ach to function
 
-protected:
+#include <stdint.h>
+#include <time.h>
+#include <string.h>
+#include <pthread.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <ach.h>
 
-};
-
-#endif // HUBOSTATE_HPP
+#endif // ACHINCLUDES_H

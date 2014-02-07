@@ -40,6 +40,16 @@
 #ifndef HUBOCAN_HPP
 #define HUBOCAN_HPP
 
+namespace HuboCan {
 
+class HuboCan
+{
+public:
+
+protected:
+
+};
+
+} // namespace HuboCan
 
 #endif // HUBOCAN_HPP
