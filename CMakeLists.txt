@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.6)
 project(HuboCan)
 
+add_definitions("-Wall")
+
 set(LIBRARY_INSTALL_PATH ${CMAKE_INSTALL_PREFIX}/lib)
 set(EXECUTABLE_INSTALL_PATH ${CMAKE_INSTALL_PREFIX}/bin)
 
