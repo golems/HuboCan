@@ -47,7 +47,8 @@ using namespace HuboRT;
 Daemonizer::Daemonizer(size_t safe_stack_size)
 {
     stack_prefault_size = safe_stack_size;
-    lock_directory = "/opt/hubo/rt/lock";
+    _lock_directory = "/opt/hubo/rt/lock";
+    _log_directory = "/opt/hubo/rt/log";
 }
 
 Daemonizer::~Daemonizer()
@@ -55,16 +56,24 @@ Daemonizer::~Daemonizer()
     close();
 }
 
+bool Daemonizer::begin(std::string daemon_name, int priority)
+{
+    return daemonize(daemon_name) && prioritize(priority);
+}
+
 bool Daemonizer::daemonize(std::string daemon_name)
 {
     _daemon_name = daemon_name;
-    int result = hubo_rt_daemonize(daemon_name.c_str(), lock_directory.c_str());
+    int result = hubo_rt_daemonize(daemon_name.c_str(), _lock_directory.c_str(),
+                                   _log_directory.c_str());
     hubo_rt_stack_prefault(stack_prefault_size);
     return result == 0;
 }
 
 bool Daemonizer::prioritize(int priority)
 {
+    hubo_rt_stack_prefault(stack_prefault_size);
+    hubo_rt_lock_memory();
     return hubo_rt_prioritize(priority) == 0;
 }
 
@@ -110,7 +119,7 @@ bool Daemonizer::check(bool condition, std::string message, bool quit_immediatel
     return condition;
 }
 
-bool Daemonizer::close()
+void Daemonizer::close()
 {
-    return hubo_rt_daemon_close(_daemon_name.c_str()) == 0;
+    hubo_rt_daemon_close(_daemon_name.c_str(), _lock_directory.c_str());
 }

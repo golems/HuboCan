@@ -42,22 +42,26 @@
 
 #include <stddef.h>
 
+enum {
+    MAX_FILENAME_SIZE = 512
+};
+
 extern int hubo_rt_sig_quit;
 extern int hubo_rt_sig_usr1;
 extern int hubo_rt_sig_usr2;
 extern int hubo_rt_sig_alarm;
 extern int hubo_rt_sig_child;
 
-int hubo_rt_daemonize(const char* daemon_name, const char *lock_directory);
+int hubo_rt_daemonize(const char* daemon_name, const char *lock_directory, const char *log_directory);
 
 void hubo_rt_redirect_signals();
 
 int hubo_rt_prioritize(int priority);
 
-int hubo_rt_daemon_close(const char* daemon_name);
+int hubo_rt_lock_memory();
 
 void hubo_rt_stack_prefault(size_t stack_size);
 
-void hubo_rt_daemon_assert(int result, int line);
+void hubo_rt_daemon_close(const char* daemon_name, const char *lock_directory);
 
 #endif // HUBORT_C_H

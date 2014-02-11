@@ -50,6 +50,12 @@ public:
 
     Daemonizer(size_t safe_stack_size = 1024*1024);
     ~Daemonizer();
+    
+    /*!
+     * \fn begin(std::string daemon_name, int priority = 40)
+     * \brief Equivalent to daemonize(daemon_name) && prioritize(priority)
+     */
+    bool begin(std::string daemon_name, int priority = 40);
 
     /*!
      * \fn daemonize(std::string daemon_name)
@@ -115,8 +121,15 @@ public:
 
     /*!
      * \fn child_process_exited()
-     * \brief Returns true iff this process has received SIGCHLD
+     * \brief Returns the number of child processes which have quit
      * \return
+     *
+     * Using the GNU/Linux function fork() will spawn child processes.
+     * Whenever a child process quits (with or without error) it will
+     * send a signal SIGCHLD to the process it spawned from. This function
+     * will return a count of how many times this process received a
+     * SIGCHLD which should be indicative of how many times a child
+     * process has quit.
      */
     size_t child_processes_exited() const;
 
@@ -137,7 +150,6 @@ public:
      */
     bool check(bool condition, std::string message, bool quit_immediately=false);
 
-    std::string lock_directory;
     size_t stack_prefault_size;
 
 protected:
@@ -149,12 +161,16 @@ protected:
      *
      * This function is called in Daemonizer's destructor, so there is no need to call
      * this on your own.
+     *
+     * However, this does mean that you need to make sure your Daemonizer
+     * instance is created in either global scope or the scope of your main()
+     * function, or else it might be destructed prematurely.
      */
-    bool close();
+    void close();
 
     std::string _daemon_name;
-
-
+    std::string _lock_directory;
+    std::string _log_directory;
 };
 
 } // namespace HuboRT

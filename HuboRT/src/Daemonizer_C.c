@@ -39,6 +39,7 @@
 
 #include "Daemonizer_C.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <syslog.h>
 #include <fcntl.h>
 #include <sys/types.h>
@@ -48,6 +49,8 @@
 #include <string.h>
 #include <pwd.h>
 #include <signal.h>
+#include <sched.h>
+#include <sys/mman.h>
 
 
 int hubo_rt_sig_quit = 0;
@@ -97,9 +100,25 @@ static void hubo_rt_set_fork_signals()
     signal(SIGCHLD, hubo_rt_forking_sig_handler);
 }
 
+static int safe_make_directory(const char* directory_name)
+{
+    struct stat st = {0};
+    if( stat(directory_name, &st) == -1 )
+    {
+        if( mkdir(directory_name, 0700) != 0 )
+        {
+            syslog( LOG_ERR, "Unable to create locking directory %s, code=%d (%s)",
+                    directory_name, errno, strerror(errno) );
+            return -1;
+        }
+    }
+    return 0;
+}
+
 static pid_t hubo_rt_daemon_fork()
 {
-    pid_t child;
+    pid_t child = fork();
+    hubo_rt_set_fork_signals();
     if( child < 0 ) // Quit and report error if a child could not be made
     {
         syslog(LOG_ERR, "Unable to fork daemon, code=%d (%s)",
@@ -107,7 +126,7 @@ static pid_t hubo_rt_daemon_fork()
         exit(1);
     }
 
-    if( child>0 ) // Quit silently if we get a good Process ID for the child
+    if( child > 0 ) // Quit silently if we get a good Process ID for the child
     {
         // Wait for confirmation from the child
         //  -- The child should send SIGUSR1 which tells us to quit silently
@@ -123,21 +142,24 @@ static pid_t hubo_rt_daemon_fork()
     return child;
 }
 
-int hubo_rt_daemonize(const char *daemon_name, const char *lock_directory)
+int hubo_rt_daemonize(const char *daemon_name, const char *lock_directory,
+                      const char *log_directory)
 {
     syslog(LOG_NOTICE, "Starting daemonization for %s", daemon_name);
 
     hubo_rt_sig_quit = 0;
     hubo_rt_sig_usr1 = 0;
     hubo_rt_sig_usr2 = 0;
+    hubo_rt_sig_alarm = 0;
+    hubo_rt_sig_child = 0;
 
     if( getppid() == 1 ) return 1;
 
-    struct stat st = {0};
-    if( stat(lock_directory, &st) == -1 )
-        mkdir(lock_directory, 0700);
+    int make_dir_error = safe_make_directory(lock_directory);
+    if(make_dir_error != 0)
+        return make_dir_error;
 
-    char lockfile[512];
+    char lockfile[MAX_FILENAME_SIZE];
     sprintf(lockfile, "%s/%s", lock_directory, daemon_name);
     int lfp = open(lockfile, O_RDWR|O_CREAT|O_EXCL, 0640); // lockfile pointer
     if( lfp < 0 )
@@ -145,7 +167,7 @@ int hubo_rt_daemonize(const char *daemon_name, const char *lock_directory)
         syslog( LOG_ERR, "Unable to create lock file %s, code=%d (%s)"
                 " -- Check if daemon already exists!",
                 lockfile, errno, strerror(errno));
-        return -1;
+        return -2;
     }
 
     // Drop the user if one exists
@@ -159,16 +181,66 @@ int hubo_rt_daemonize(const char *daemon_name, const char *lock_directory)
         }
     }
 
-    hubo_rt_set_fork_signals();
+    hubo_rt_daemon_fork();
+    pid_t parent = getppid();
+    kill(parent, SIGUSR1); // Kill the useless parent
+    
+    // Supposedly escaping the terminal might require a double-fork
+    hubo_rt_daemon_fork();
+    parent = getppid();
 
-    pid_t pid, child, sid, parent;
-
-    child = hubo_rt_daemon_fork();
-
-
-
-
-
+    // --- From here on out, we're executing as the final (daemonized) process ---
+    
+    hubo_rt_redirect_signals();
+    
+    // Set user permissions for file creation
+    umask(0);
+    
+    pid_t sid = setsid();
+    if( sid < 0 )
+    {
+        syslog( LOG_ERR, "Unable to create new session, code=%d (%s)",
+               errno, strerror(errno) );
+        return -3;
+    }
+    
+    if( chdir("/") < 0 )
+    {
+        syslog( LOG_ERR, "Unable to change directory, code=%d (%s)",
+                errno, strerror(errno) );
+        return -4;
+    }
+    
+    FILE* fp;
+    fp = fopen(lockfile, "w");
+    fprintf(fp, "%d", sid);
+    fclose(fp);
+    
+    make_dir_error = safe_make_directory(log_directory);
+    if(make_dir_error != 0)
+        return make_dir_error;
+    
+    char output_file[MAX_FILENAME_SIZE];
+    sprintf(output_file, "%s/%s/output", log_directory, daemon_name);
+    char error_file[MAX_FILENAME_SIZE];
+    sprintf(output_file, "%s/%s/error", log_directory, daemon_name);
+    if(     !fopen(output_file, "w") ||
+            !fopen(error_file, "w") )
+    {
+        syslog( LOG_ERR, "Unable to create log files, code=%d (%s)",
+                errno, strerror(errno));
+        return -5;
+    }
+    
+    if(     !freopen(output_file, "w", stdout) ||
+            !freopen(error_file, "w", stderr) )
+    {
+        syslog(LOG_ERR, "Unable to stream output, code=%d (%s)",
+               errno, strerror(errno) );
+        return -6;
+    }
+    
+    kill(parent, SIGUSR1); // Let the parent process know that we're okay
 
     return 0;
 }
@@ -176,6 +248,45 @@ int hubo_rt_daemonize(const char *daemon_name, const char *lock_directory)
 
 int hubo_rt_prioritize(int priority)
 {
-
+    if(priority >= 50)
+    {
+        fprintf(stderr, "You requested an unreasonably high priority of %d\n"
+               " -- The maximum you should use is 50\n"
+               " -- Most real-time applications should be from 30 - 40\n",
+               priority);
+        return -1;
+    }
+    
+    if(priority >= 0)
+    {
+        struct sched_param param;
+        param.sched_priority = priority;
+        if( sched_setscheduler(0, SCHED_FIFO, &param) == -1 )
+        {
+            fprintf(stderr, "Failed to set the scheduling for real-time prioritization!\n");
+            return -2;
+        }
+    }
     return 0;
+}
+
+int hubo_rt_lock_memory()
+{
+    return mlockall( MCL_CURRENT | MCL_FUTURE );
+}
+
+void hubo_rt_stack_prefault(size_t stack_size)
+{
+    unsigned char dummy[stack_size];
+    memset(dummy, 0, stack_size);
+}
+
+void hubo_rt_daemon_close(const char *daemon_name, const char *lock_directory)
+{
+    char lockfile[MAX_FILENAME_SIZE];
+    sprintf(lockfile, "%s/%s", lock_directory, daemon_name);
+    remove( lockfile );
+    fclose( stdout );
+    fclose( stderr );
+    syslog( LOG_NOTICE, "Terminated process %s gracefully", daemon_name);
 }
