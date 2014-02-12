@@ -38,6 +38,7 @@
  */
 
 #include "Daemonizer_C.h"
+#include "HuboRtParams.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <syslog.h>
@@ -100,7 +101,7 @@ static void hubo_rt_set_fork_signals()
     signal(SIGCHLD, hubo_rt_forking_sig_handler);
 }
 
-static int safe_make_directory(const char* directory_name)
+int hubo_rt_safe_make_directory(const char* directory_name)
 {
     struct stat st = {0};
     if( stat(directory_name, &st) == -1 )
@@ -155,7 +156,7 @@ int hubo_rt_daemonize(const char *daemon_name, const char *lock_directory,
 
     if( getppid() == 1 ) return 1;
 
-    int make_dir_error = safe_make_directory(lock_directory);
+    int make_dir_error = hubo_rt_safe_make_directory(lock_directory);
     if(make_dir_error != 0)
         return make_dir_error;
 
@@ -216,7 +217,7 @@ int hubo_rt_daemonize(const char *daemon_name, const char *lock_directory,
     fprintf(fp, "%d", sid);
     fclose(fp);
     
-    make_dir_error = safe_make_directory(log_directory);
+    make_dir_error = hubo_rt_safe_make_directory(log_directory);
     if(make_dir_error != 0)
         return make_dir_error;
     

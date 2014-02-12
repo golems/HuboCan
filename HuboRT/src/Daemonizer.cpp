@@ -39,6 +39,7 @@
 
 #include "Daemonizer.hpp"
 #include "Daemonizer_C.h"
+#include "HuboRtParams.h"
 #include <syslog.h>
 #include <stdlib.h>
 
@@ -47,8 +48,8 @@ using namespace HuboRT;
 Daemonizer::Daemonizer(size_t safe_stack_size)
 {
     stack_prefault_size = safe_stack_size;
-    _lock_directory = "/opt/hubo/rt/lock";
-    _log_directory = "/opt/hubo/rt/log";
+    _lock_directory = hubo_rt_default_lock_dir;
+    _log_directory = hubo_rt_default_log_dir;
 }
 
 Daemonizer::~Daemonizer()
