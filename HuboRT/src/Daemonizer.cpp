@@ -37,11 +37,14 @@
  *   POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "Daemonizer.hpp"
+extern "C" {
 #include "Daemonizer_C.h"
 #include "HuboRtParams.h"
 #include <syslog.h>
 #include <stdlib.h>
+}
+
+#include "Daemonizer.hpp"
 
 using namespace HuboRT;
 
@@ -104,7 +107,7 @@ size_t Daemonizer::alarm() const
 
 bool Daemonizer::check(bool condition, std::string message, bool quit_immediately)
 {
-    if(condition)
+    if(!condition)
     {
         std::string output = "Condition failed in process " + _daemon_name + ": " + message;
         syslog(LOG_ERR, "%s", output.c_str());

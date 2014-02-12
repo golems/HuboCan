@@ -10,7 +10,8 @@ const char hubo_rt_mgr_reply_chan[] = "hubo_rt_mgr_reply";
 /*! Commands available for the process management daemon */
 typedef enum manager_cmd {
     
-    LIST_PROCS=0,           /*!< Dump a list of all registered processes */
+    UNKNOWN_REQUEST=0,
+    LIST_PROCS,             /*!< Dump a list of all registered processes */
     LIST_LOCKED_PROCS,      /*!< Dump a list of all processes which currently have lockfiles */
     LIST_CHANS,             /*!< Dump a list of all registered ach channels */
 //    LIST_OPEN_CHANS,        /*!< Dump a list of all currently open ach channels */
@@ -32,11 +33,9 @@ typedef enum manager_cmd {
     
     REGISTER_NEW_PROC,      /*!< Add a new process to the existing roster of processes */
     UNREGISTER_OLD_PROC,    /*!< Remove a process from the roster */
-//    RESET_PROC_ROSTER,      /*!< Reset the process roster to its default lineup */
     
     REGISTER_NEW_CHAN,      /*!< Add a new ach channel to the existing roster of channels */
     UNREGISTER_OLD_CHAN,    /*!< Remove an ach channel from the roster */
-//    RESET_CHAN_ROSTER,      /*!< Reset the channel roster to its default lineup */
     
     RESET_ROSTERS,          /*!< Reset the process and channel rosters to their default configuration */
     

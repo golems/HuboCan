@@ -1,9 +1,12 @@
 
 
-#include "AchIncludes.h"
-#include "Manager.hpp"
+extern "C" {
 #include "manager_msg.h"
 #include "Daemonizer_C.h"
+#include "AchIncludes.h"
+}
+
+#include "Manager.hpp"
 #include <sstream>
 #include <stdlib.h>
 #include <iostream>
@@ -21,6 +24,10 @@ void Manager::_initialize()
 {
     _rt_lock_dir = hubo_rt_default_lock_dir;
     _rt_log_dir = hubo_rt_default_log_dir;
+    
+    hubo_rt_safe_make_directory(opt_directory.c_str());
+    hubo_rt_safe_make_directory(hubo_directory.c_str());
+    hubo_rt_safe_make_directory(manager_directory.c_str());
     
     _proc_roster = proc_roster_directory;
     hubo_rt_safe_make_directory(_proc_roster.c_str());
@@ -61,14 +68,32 @@ void Manager::launch()
     run();
 }
 
+//double quitSec = 0.5;
+//    struct timespec waitTime;
+//    clock_gettime( ACH_DEFAULT_CLOCK, &waitTime );
+//    int nanoWait = waitTime.tv_nsec + (int)(quitSec*1E9);
+//    waitTime.tv_sec += (int)(nanoWait/1E9);
+//    waitTime.tv_nsec = (int)(nanoWait%((int)1E9));
+//    checkCtrl = ach_get( &chan_hubo_arm_ctrl_right, &H_Arm_Ctrl[RIGHT], sizeof(H_Arm_Ctrl[RIGHT]),
+//                            &fs, &waitTime, ACH_O_LAST | ACH_O_WAIT );
+
 void Manager::run()
 {
     manager_msg_t incoming_msg;
     while(_rt.good())
     {
         size_t fs;
+        double quit_check = 1;
+        struct timespec wait_time;
+        clock_gettime( ACH_DEFAULT_CLOCK, &wait_time );
+        int nano_wait = wait_time.tv_nsec + (int)(quit_check*1E9);
+        wait_time.tv_sec += (int)(nano_wait/1E9);
+        wait_time.tv_nsec = (int)(nano_wait%((int)1E9));
         ach_status_t r = ach_get(&_msg_chan, &incoming_msg, sizeof(manager_msg_t),
-                                 &fs, NULL, ACH_O_WAIT);
+                                 &fs, &wait_time, ACH_O_WAIT);
+        if( ACH_TIMEOUT == r )
+            continue;
+        
         if( ACH_OK != r )
         {
             std::cerr << "Ach error: (" << (int)r << ")" << ach_result_to_string(r) << std::endl;
@@ -108,11 +133,9 @@ void Manager::run()
                 
             case REGISTER_NEW_PROC: register_new_proc(incoming_msg.name);       break;
             case UNREGISTER_OLD_PROC: unregister_old_proc(incoming_msg.name);   break;
-//            case RESET_PROC_ROSTER: reset_proc_roster();                        break;
                 
             case REGISTER_NEW_CHAN: register_new_chan(incoming_msg.name);       break;
             case UNREGISTER_OLD_CHAN: unregister_old_chan(incoming_msg.name);   break;
-//            case RESET_CHAN_ROSTER: reset_chan_roster();                        break;
                 
             case RESET_ROSTERS: reset_rosters();                                break;
                 
@@ -162,6 +185,8 @@ void Manager::_relay_string_array(manager_cmd_t original_req, const StringArray 
         empty_reply.original_req = original_req;
         empty_reply.replyID = 0;
         empty_reply.numReplies = 1;
+        
+        ach_put(&_reply_chan, &empty_reply, sizeof(manager_reply_t));
     }
     else
     {
@@ -175,6 +200,8 @@ void Manager::_relay_string_array(manager_cmd_t original_req, const StringArray 
         {
             replies.replyID = i;
             strcpy(replies.reply, array[i].c_str());
+            
+//            std::cout << array[i] << std::endl;
             
             ach_put(&_reply_chan, &replies, sizeof(manager_reply_t));
         }
@@ -201,8 +228,10 @@ void Manager::run_process(const std::string &name)
     StringArray components;
     if(_split_components(name,components) == 2)
     {
-        _fork_process(components[0], components[1]);
-        _report_no_error(RUN_PROC);
+        if(_fork_process(components[0], components[1]))
+            _report_no_error(RUN_PROC);
+        else
+            _report_no_existence(RUN_PROC);
     }
     else
         _report_malformed_error("Run process should have exactly two components");
@@ -213,7 +242,7 @@ void Manager::run_all_processes()
     StringArray procs = _grab_files_in_dir(_proc_roster);
     for(size_t i=0; i < procs.size(); ++i)
     {
-        _fork_process(procs[i], "");
+        _fork_process_raw(procs[i], "");
     }
     _report_no_error(RUN_ALL_PROCS);
 }
@@ -326,16 +355,28 @@ void Manager::kill_all_processes()
 
 bool Manager::_create_ach_channel_raw(const std::string &name)
 {
-    std::ifstream chan_desc;
-    chan_desc.open( (_chan_roster+"/"+name).c_str() );
-    if(chan_desc.good())
+    std::ifstream chan_file;
+    chan_file.open( (_chan_roster+"/"+name).c_str() );
+    if(chan_file.good())
     {
         size_t count=0, fs=0;
         std::string chan_name;
-        chan_desc >> chan_name >> count >> fs;
-        _create_channel(chan_name, count, fs);
         
-        return true;
+        std::string chan_desc;
+        std::getline(chan_file, chan_desc);
+        StringArray components;
+        if(_split_components(chan_desc, components) >= 3)
+        {
+            chan_name = components[0];
+            count = atoi(components[1].c_str());
+            fs = atoi(components[2].c_str());
+            _create_channel(chan_name, count, fs);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
     else
     {
@@ -345,25 +386,30 @@ bool Manager::_create_ach_channel_raw(const std::string &name)
 
 bool Manager::_close_ach_channel_raw(const std::string &name)
 {
-    std::ifstream chan_desc;
-    chan_desc.open( (_chan_roster+"/"+name).c_str() );
-    if(chan_desc.good())
+    std::ifstream chan_file;
+    chan_file.open( (_chan_roster+"/"+name).c_str() );
+    if(chan_file.good())
     {
-        size_t count=0, fs=0;
-        std::string channel_name;
-        chan_desc >> channel_name >> count >> fs;
+        std::string chan_name;
         
-        std::stringstream command_stream;
-        command_stream << "ach rm " << channel_name;
-        
-        system(command_stream.str().c_str());
-        std::cout << "Closing ach channel " << name << " (" << channel_name << ")" << std::endl;
-        
-        return true;
+        std::string chan_desc;
+        std::getline(chan_file, chan_desc);
+        StringArray components;
+        if(_split_components(chan_desc, components) >= 3)
+        {
+            chan_name = components[0];
+            
+            system( ("ach rm "+chan_name).c_str());
+            
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
     else
     {
-        std::cout << "Could not find a channel associated with '" << name << "' in the roster" << std::endl;
         return false;
     }
 }
@@ -404,9 +450,21 @@ void Manager::close_ach_chan(const std::string &name)
     }
 }
 
-void Manager::register_new_proc(const std::string &name)
+void Manager::close_all_ach_chans()
 {
-    if(_register(_proc_roster, name) == 3)
+    StringArray chans = _grab_files_in_dir(_chan_roster);
+    
+    for(size_t i=0; i < chans.size(); ++i)
+    {
+        _close_ach_channel_raw(chans[i]);
+    }
+    
+    _report_no_error(CLOSE_ALL_ACH_CHANS);
+}
+
+void Manager::register_new_proc(const std::string &name)
+{   
+    if(_register(_proc_roster, name, 3))
     {
         _report_no_error(REGISTER_NEW_PROC);
     }
@@ -424,7 +482,7 @@ void Manager::unregister_old_proc(const std::string &name)
 
 void Manager::register_new_chan(const std::string &name)
 {
-    if(_register(_chan_roster, name) == 4)
+    if(_register(_chan_roster, name, 4))
     {
         _report_no_error(REGISTER_NEW_CHAN);
     }
@@ -434,10 +492,47 @@ void Manager::register_new_chan(const std::string &name)
     }
 }
 
+bool Manager::_register(const std::string &directory,
+                        const std::string &description,
+                        size_t minimum_size)
+{
+    StringArray components;
+    if(_split_components(description, components) < minimum_size)
+        return false;
+    
+    std::ofstream output;
+    output.open( (directory+"/"+components[0]).c_str() );
+    
+    std::cout << "Registered " << components[0] << ": ";
+    for(size_t i=1; i < components.size(); ++i)
+    {
+        output << components[i] << ":";
+        std::cout << components[i] << " | ";
+    }
+    std::cout << std::endl;
+    
+    output.close();
+    
+    return true;
+}
+
 void Manager::unregister_old_chan(const std::string &name)
 {
     _unregister(_chan_roster, name);
     _report_no_error(UNREGISTER_OLD_CHAN);
+}
+
+void Manager::_unregister(const std::string &directory, const std::string &name)
+{
+    StringArray array = _grab_files_in_dir(directory);
+    
+    for(size_t i=0; i < array.size(); ++i)
+    {
+        if( array[i] == name )
+        {
+            remove( (directory+"/"+name).c_str() );
+        }
+    }
 }
 
 void Manager::reset_rosters()
@@ -468,8 +563,236 @@ void Manager::list_configs()
 
 void Manager::save_current_config(const std::string &name)
 {
+    _save_config_raw(name);
+    
+    _report_no_error(SAVE_CONFIG);
+}
+
+void Manager::_save_config_raw(const std::string &name)
+{
     std::ofstream output;
     output.open( (_config_roster+"/"+name).c_str() );
     
-    // TODO: FINISH THIS
+    StringArray procs = _grab_files_in_dir(_proc_roster);
+    for(size_t i=0; i < procs.size(); ++i)
+    {
+        output << "proc:" << _stringify_contents(_proc_roster, procs[i]) << "\n";
+    }
+    
+    StringArray chans = _grab_files_in_dir(_chan_roster);
+    for(size_t i=0; i < chans.size(); ++i)
+    {
+        output << "chan:" << _stringify_contents(_chan_roster, chans[i]) << "\n";
+    }
+    
+    output.close();
+}
+
+std::string Manager::_stringify_contents(const std::string &directory, const std::string &name)
+{
+    std::ifstream input;
+    input.open( (directory+"/"+name).c_str() );
+    
+    std::string result;
+    
+    if(input.good())
+    {
+        std::getline(input, result);
+    }
+    
+    result = name + ":" + result;
+    
+    return result;
+}
+
+void Manager::load_config(const std::string &name)
+{
+    StringArray configs = _grab_files_in_dir(_config_roster);
+    bool config_existed = false;
+    bool correctly_formed = true;
+    for(size_t i=0; i < configs.size(); ++i)
+    {
+        if(name == configs[i])
+        {
+            config_existed = true;
+            
+            correctly_formed = _load_config_raw(name);
+        }
+    }
+    
+    if(config_existed)
+    {
+        if(correctly_formed)
+            _report_no_error(LOAD_CONFIG);
+        else
+            _report_malformed_error("The config file which you requested is malformed");
+    }
+    else
+    {
+        _report_no_existence(LOAD_CONFIG);
+    }
+    
+}
+
+bool Manager::_load_config_raw(const std::string &name)
+{
+    _clear_current_config();
+    
+    std::ifstream config;
+    config.open( (_config_roster+"/"+name).c_str() );
+    
+    while(config.good())
+    {
+        std::string next_line;
+        std::getline(config, next_line);
+        
+        StringArray components;
+        
+        if(_split_components(next_line, components) < 1)
+        {
+            continue;
+        }
+        
+        if(components[0] == "proc" || components[0] == "chan")
+        {
+            std::ofstream output;
+            output.open( (manager_directory+"/"+components[0]).c_str() );
+            
+            for(size_t i=1; i < components.size(); ++i)
+            {
+                output << components[i] << ":";
+            }
+            
+            output.close();
+        }
+    }
+    
+    return true;
+}
+
+
+void Manager::_clear_current_config()
+{
+    _save_config_raw("last_config");
+    
+    StringArray procs = _grab_files_in_dir(_proc_roster);
+    for(size_t i=0; i < procs.size(); ++i)
+    {
+        remove( (_proc_roster+"/"+procs[i]).c_str() );
+    }
+    
+    StringArray chans = _grab_files_in_dir(_chan_roster);
+    for(size_t i=0; i < chans.size(); ++i)
+    {
+        remove( (_chan_roster+"/"+procs[i]).c_str() );
+    }
+}
+
+size_t Manager::_split_components(const std::string &name, StringArray &array)
+{
+    array.resize(0);
+    size_t pos = 0, last_pos=0, count=0;
+    while(std::string::npos != (pos = name.find(":", last_pos)))
+    {
+        ++count;
+        array.push_back(name.substr(last_pos, pos-last_pos));
+        last_pos = pos+1;
+    }
+    
+    return count;
+}
+
+void Manager::_report_no_error(manager_cmd_t original_req)
+{
+    manager_reply_t reply;
+    memset(&reply, 0, sizeof(manager_reply_t));
+    
+    strcpy(reply.reply, "");
+    reply.err = NO_ERROR;
+    reply.original_req = original_req;
+    reply.replyID = 0;
+    reply.numReplies = 1;
+    
+    ach_put(&_reply_chan, &reply, sizeof(manager_reply_t));
+}
+
+void Manager::_report_error(manager_err_t error, const std::string &description)
+{
+    std::cerr << "Failed request (" << (int)error << "): " << description << std::endl;
+    
+    manager_reply_t reply;
+    memset(&reply, 0, sizeof(manager_reply_t));
+    
+    strncpy(reply.reply, description.c_str(), sizeof(reply.reply));
+    reply.err = error;
+    reply.original_req = UNKNOWN_REQUEST;
+    reply.replyID = 0;
+    reply.numReplies = 1;
+    
+    ach_put(&_reply_chan, &reply, sizeof(manager_reply_t));
+}
+
+void Manager::_report_ach_error(const std::string &error_description)
+{
+    _report_error(ACH_ERROR, error_description);
+}
+
+void Manager::_report_malformed_error(const std::string &error_description)
+{
+    _report_error(MALFORMED_REQUEST, error_description);
+}
+
+void Manager::_report_no_existence(manager_cmd_t original_req)
+{
+    _report_error(NONEXISTENT_ENTRY, "");
+}
+
+bool Manager::_fork_process(const std::string &proc_name, const std::string &args)
+{
+    StringArray procs = _grab_files_in_dir(_proc_roster);
+    
+    bool existed = false;
+    for(size_t i=0; i < procs.size(); ++i)
+    {
+        if(procs[i] == proc_name)
+        {
+            existed = true;
+            
+            _fork_process_raw(proc_name, args);
+        }
+    }
+    
+    return existed;
+}
+
+void Manager::_fork_process_raw(const std::string &proc_name, std::string args)
+{
+    std::ifstream proc_file;
+    proc_file.open( (_proc_roster+"/"+proc_name).c_str() );
+    
+    if(proc_file.good())
+    {
+        std::string proc_desc;
+        std::getline(proc_file, proc_desc);
+        StringArray components;
+        if(_split_components(proc_desc, components) < 2)
+        {
+            std::cerr << "Proc named " << proc_name
+                      << " has incorrect number of parameters: " << components.size()
+                      << "\n -- This should equal 2" << std::endl;
+            return;
+        }
+        
+        if(args == "")
+        {
+            args = components[1];
+        }
+        
+        pid_t child = fork();
+        if(child == 0)
+        {
+            system( (components[0] + " " + args).c_str() );
+            exit(0);
+        }
+    }
 }

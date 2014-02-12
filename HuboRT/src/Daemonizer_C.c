@@ -101,18 +101,42 @@ static void hubo_rt_set_fork_signals()
     signal(SIGCHLD, hubo_rt_forking_sig_handler);
 }
 
+static int hubo_rt_make_directory_component(const char* subdirectory)
+{
+//    struct stat st = {0};
+//    if( stat(subdirectory, &st) == -1 )
+//    {
+//        if( mkdir(subdirectory, S_IROTH | S_IXOTH) != 0 )
+//        {
+//            syslog( LOG_ERR, "Unable to create directory %s, code=%d (%s)",
+//                    subdirectory, errno, strerror(errno) );
+//            return -1;
+//        }
+//    }
+//    return 0;
+    
+//    fprintf(stdout, "%s\n", subdirectory);
+    
+//    remove(subdirectory);
+    
+    return 0;
+}
+
 int hubo_rt_safe_make_directory(const char* directory_name)
 {
-    struct stat st = {0};
-    if( stat(directory_name, &st) == -1 )
+    size_t i;
+    for(i=1; i<strlen(directory_name); ++i)
     {
-        if( mkdir(directory_name, 0700) != 0 )
+        if(directory_name[i] == '/')
         {
-            syslog( LOG_ERR, "Unable to create locking directory %s, code=%d (%s)",
-                    directory_name, errno, strerror(errno) );
-            return -1;
+            char subdirectory[MAX_FILENAME_SIZE];
+            strncpy(subdirectory, directory_name, i-1);
+            int result = hubo_rt_make_directory_component(subdirectory);
+            if(result != 0)
+                return result;
         }
     }
+    
     return 0;
 }
 
@@ -157,6 +181,10 @@ int hubo_rt_daemonize(const char *daemon_name, const char *lock_directory,
     if( getppid() == 1 ) return 1;
 
     int make_dir_error = hubo_rt_safe_make_directory(lock_directory);
+    if(make_dir_error != 0)
+        return make_dir_error;
+    
+    make_dir_error = hubo_rt_safe_make_directory(log_directory);
     if(make_dir_error != 0)
         return make_dir_error;
 
@@ -216,10 +244,6 @@ int hubo_rt_daemonize(const char *daemon_name, const char *lock_directory,
     fp = fopen(lockfile, "w");
     fprintf(fp, "%d", sid);
     fclose(fp);
-    
-    make_dir_error = hubo_rt_safe_make_directory(log_directory);
-    if(make_dir_error != 0)
-        return make_dir_error;
     
     char output_file[MAX_FILENAME_SIZE];
     sprintf(output_file, "%s/%s/output", log_directory, daemon_name);

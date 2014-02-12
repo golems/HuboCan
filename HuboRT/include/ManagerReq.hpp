@@ -3,7 +3,10 @@
 
 #include <string>
 #include <vector>
+
+extern "C" {
 #include "manager_msg.h"
+}
 
 namespace HuboRT {
 
@@ -34,14 +37,12 @@ public:
                                        const std::string& full_process_path,
                                        const std::string& default_args = "");
     manager_err_t unregister_old_process(const std::string& list_name);
-//    manager_err_t reset_process_roster();
     
     manager_err_t register_new_channel(const std::string& list_name,
                                        const std::string& ach_channel_name,
                                        size_t message_count = 10,
                                        size_t nominal_size = 4096);
     manager_err_t unregister_old_channel(const std::string& list_name);
-//    manager_err_t reset_channel_roster();
     
     manager_err_t reset_rosters();
     

@@ -7,7 +7,7 @@ file(GLOB lib_source "src/*.cpp" "src/*.c" "include/*.hpp" "include/*.h")
 list(SORT lib_source)
 
 add_library(${library_name} SHARED ${lib_source})
-
+target_link_libraries(${library_name} ach)
 
 file(GLOB unit_tests_source "test/*.cpp")
 LIST(SORT unit_tests_source)
@@ -18,7 +18,7 @@ foreach(utest_src_file ${unit_tests_source})
     get_filename_component(test_base ${utest_src_file} NAME_WE)
     message(STATUS "Adding test ${test_base}")
     add_executable(${test_base} ${utest_src_file})
-    target_link_libraries(${test_base} ${PROJECT_NAME} ${OpenSceneGraph_LIBRARIES})
+    target_link_libraries(${test_base} ${library_name} ach rt)
     add_test(${test_base} ${EXECUTABLE_OUTPUT_PATH}/${test_base})
     add_custom_target(${test_base}.run ${test_base} ${ARGN})
     add_dependencies(check ${test_base})

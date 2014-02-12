@@ -4,12 +4,17 @@
 #include <string>
 #include <vector>
 #include "Daemonizer.hpp"
-#include "manager_msg.h"
 
-#include "ach.h"
+extern "C" {
+#include "manager_msg.h"
+#include "AchIncludes.h"
+}
 
 namespace HuboRT {
 
+const std::string opt_directory = "/opt";
+const std::string hubo_directory = "/opt/hubo";
+const std::string manager_directory = "/opt/hubo/mgr";
 const std::string proc_roster_directory = "/opt/hubo/mgr/proc";
 const std::string chan_roster_directory = "/opt/hubo/mgr/chan";
 const std::string config_directory = "/opt/hubo/mgr/configs";
@@ -35,7 +40,6 @@ public:
     void launch();
     void run();
     
-protected:
     
     // Begin: Callback functions
     void list_processes();
@@ -77,6 +81,8 @@ protected:
     // End: Callback functions
     
     
+protected:
+    
     // Begin: Utility functions
     virtual void _initialize();
     virtual void _create_channel(const std::string& channel_name,
@@ -85,18 +91,24 @@ protected:
     size_t _split_components(const std::string& name, StringArray& array);
     StringArray _grab_files_in_dir(const std::string& directory);
     void _relay_string_array(manager_cmd_t original_req, const StringArray& array);
-    void _fork_process(const std::string& proc_name, const std::string& args);
+    bool _fork_process(const std::string& proc_name, const std::string& args);
+    void _fork_process_raw(const std::string& proc_name, std::string args);
     void _stop_process_raw(const std::string &name);
     void _kill_process_raw(const std::string &name);
     bool _create_ach_channel_raw(const std::string& name);
     bool _close_ach_channel_raw(const std::string& name);
-    size_t _register(const std::string& directory, const std::string& description);
+    bool _register(const std::string& directory, const std::string& description, size_t minimum_size);
     void _unregister(const std::string& directory, const std::string& name);
+    std::string _stringify_contents(const std::string& directory, const std::string& name);
+    bool _load_config_raw(const std::string& name);
+    void _save_config_raw(const std::string& name);
+    void _clear_current_config();
     // End: Utility functions
     
     // Begin: Report functions    
     void _report_ach_error(const std::string& error_description);
     void _report_malformed_error(const std::string& error_description);
+    void _report_error(manager_err_t error, const std::string& description);
     void _report_no_existence(manager_cmd_t original_req);
     void _report_no_error(manager_cmd_t original_req);
     // End: Report functions
