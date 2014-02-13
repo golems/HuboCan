@@ -103,21 +103,20 @@ static void hubo_rt_set_fork_signals()
 
 static int hubo_rt_make_directory_component(const char* subdirectory)
 {
-//    struct stat st = {0};
-//    if( stat(subdirectory, &st) == -1 )
-//    {
-//        if( mkdir(subdirectory, S_IROTH | S_IXOTH) != 0 )
-//        {
-//            syslog( LOG_ERR, "Unable to create directory %s, code=%d (%s)",
-//                    subdirectory, errno, strerror(errno) );
-//            return -1;
-//        }
-//    }
-//    return 0;
+    struct stat st = {0};
+    if( stat(subdirectory, &st) == -1 )
+    {
+        if( mkdir(subdirectory, S_IRUSR | S_IXUSR |
+                                S_IRGRP | S_IXGRP |
+                                S_IROTH | S_IXOTH) != 0 )
+        {
+            syslog( LOG_ERR, "Unable to create directory %s, code=%d (%s)",
+                    subdirectory, errno, strerror(errno) );
+            return -1;
+        }
+    }
+    return 0;
     
-//    fprintf(stdout, "%s\n", subdirectory);
-    
-//    remove(subdirectory);
     
     return 0;
 }
@@ -130,12 +129,15 @@ int hubo_rt_safe_make_directory(const char* directory_name)
         if(directory_name[i] == '/')
         {
             char subdirectory[MAX_FILENAME_SIZE];
-            strncpy(subdirectory, directory_name, i-1);
+            strncpy(subdirectory, directory_name, i);
+            subdirectory[i] = '\0';
             int result = hubo_rt_make_directory_component(subdirectory);
             if(result != 0)
                 return result;
         }
     }
+    
+    hubo_rt_make_directory_component(directory_name);
     
     return 0;
 }
@@ -170,7 +172,7 @@ static pid_t hubo_rt_daemon_fork()
 int hubo_rt_daemonize(const char *daemon_name, const char *lock_directory,
                       const char *log_directory)
 {
-    syslog(LOG_NOTICE, "Starting daemonization for %s", daemon_name);
+    syslog(LOG_NOTICE, "Starting daemonization for '%s'", daemon_name);
 
     hubo_rt_sig_quit = 0;
     hubo_rt_sig_usr1 = 0;
@@ -184,16 +186,19 @@ int hubo_rt_daemonize(const char *daemon_name, const char *lock_directory,
     if(make_dir_error != 0)
         return make_dir_error;
     
-    make_dir_error = hubo_rt_safe_make_directory(log_directory);
+    char my_log_directory[MAX_FILENAME_SIZE];
+    sprintf(my_log_directory, "%s/%s", log_directory, daemon_name);
+    make_dir_error = hubo_rt_safe_make_directory(my_log_directory);
     if(make_dir_error != 0)
         return make_dir_error;
 
+    
     char lockfile[MAX_FILENAME_SIZE];
     sprintf(lockfile, "%s/%s", lock_directory, daemon_name);
-    int lfp = open(lockfile, O_RDWR|O_CREAT|O_EXCL, 0640); // lockfile pointer
+    int lfp = open(lockfile, O_RDWR|O_CREAT|O_EXCL, S_IRUSR | S_IRGRP | S_IROTH); // lockfile pointer
     if( lfp < 0 )
     {
-        syslog( LOG_ERR, "Unable to create lock file %s, code=%d (%s)"
+        syslog( LOG_ERR, "Unable to create lock file '%s', code=%d (%s)"
                 " -- Check if daemon already exists!",
                 lockfile, errno, strerror(errno));
         return -2;
@@ -246,9 +251,9 @@ int hubo_rt_daemonize(const char *daemon_name, const char *lock_directory,
     fclose(fp);
     
     char output_file[MAX_FILENAME_SIZE];
-    sprintf(output_file, "%s/%s/output", log_directory, daemon_name);
+    sprintf(output_file, "%s/output", my_log_directory);
     char error_file[MAX_FILENAME_SIZE];
-    sprintf(output_file, "%s/%s/error", log_directory, daemon_name);
+    sprintf(error_file, "%s/error", my_log_directory);
     if(     !fopen(output_file, "w") ||
             !fopen(error_file, "w") )
     {
@@ -266,6 +271,8 @@ int hubo_rt_daemonize(const char *daemon_name, const char *lock_directory,
     }
     
     kill(parent, SIGUSR1); // Let the parent process know that we're okay
+    
+    syslog( LOG_NOTICE, "Finished daemonization for '%s'", daemon_name);
 
     return 0;
 }
@@ -313,5 +320,5 @@ void hubo_rt_daemon_close(const char *daemon_name, const char *lock_directory)
     remove( lockfile );
     fclose( stdout );
     fclose( stderr );
-    syslog( LOG_NOTICE, "Terminated process %s gracefully", daemon_name);
+    syslog( LOG_NOTICE, "Terminated daemon %s gracefully", daemon_name);
 }

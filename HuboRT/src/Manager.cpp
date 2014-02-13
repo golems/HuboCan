@@ -63,19 +63,11 @@ void Manager::_create_channel(const std::string &channel_name,
 
 void Manager::launch()
 {
-    _rt.daemonize("hubo-manager");
-
-    run();
+    if(_rt.daemonize("hubo-manager"))
+        run();
+    else
+        std::cerr << "Failed to daemonize! Check if a manager is already running!" << std::endl;
 }
-
-//double quitSec = 0.5;
-//    struct timespec waitTime;
-//    clock_gettime( ACH_DEFAULT_CLOCK, &waitTime );
-//    int nanoWait = waitTime.tv_nsec + (int)(quitSec*1E9);
-//    waitTime.tv_sec += (int)(nanoWait/1E9);
-//    waitTime.tv_nsec = (int)(nanoWait%((int)1E9));
-//    checkCtrl = ach_get( &chan_hubo_arm_ctrl_right, &H_Arm_Ctrl[RIGHT], sizeof(H_Arm_Ctrl[RIGHT]),
-//                            &fs, &waitTime, ACH_O_LAST | ACH_O_WAIT );
 
 void Manager::run()
 {

@@ -10,9 +10,11 @@ int main(int argc, char* argv[])
 {
     HuboRT::Manager mgr;
     
-    mgr.launch();
+    mgr.register_new_proc("bogus:/home/grey/projects/HuboCan/bin/daemon_test::");
     
-//    hubo_rt_safe_make_directory("/opt/hubo/rt/log");
+    mgr.run_all_processes();
+    
+//    mgr.launch();
     
     return 0;
 }
