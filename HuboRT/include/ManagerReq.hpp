@@ -6,6 +6,7 @@
 
 extern "C" {
 #include "manager_msg.h"
+#include "AchIncludes.h"
 }
 
 namespace HuboRT {
@@ -16,8 +17,12 @@ class ManagerReq
 {
 public:
     
+    ManagerReq();
+    
+    double timeout;
+    
     /*!
-     * \fn list_registered_processes(double timeout)
+     * \fn list_registered_processes()
      * \brief Gives back a list of the registered processes
      * \param timeout
      * \return 
@@ -28,11 +33,11 @@ public:
      * A timeout is given in case the manager is locked up (or not operating)
      * and cannot respond.
      */
-    NameArray list_registered_processes(double timeout = 2);
+    NameArray list_registered_processes();
     
     
     /*!
-     * \fn list_locked_processes(double timeout)
+     * \fn list_locked_processes()
      * \brief Gives back a list of all the currently locked processes
      * \param timeout
      * \return 
@@ -55,7 +60,7 @@ public:
      * of a process which did not quit gracefully) use either kill_process()
      * or kill_all_processes()
      */
-    NameArray list_locked_processes(double timeout = 2);
+    NameArray list_locked_processes();
     
     
     /*!
@@ -67,10 +72,10 @@ public:
      * The return is a NameArray where each entry contains the name of
      * an ach channel which is registered with the Manager.
      */
-    NameArray list_channels(double timeout = 2);
+    NameArray list_channels();
     
     // TODO:
-//    NameArray list_open_channels(double timeout = 2);
+//    NameArray list_open_channels();
     
     /*!
      * \fn run_process()
@@ -283,6 +288,14 @@ public:
     manager_err_t load_config(const std::string& config_name);
     
 protected:
+    
+    void _initialize();
+    
+    manager_err_t _send_request(manager_cmd_t cmd, const std::string& desc="");
+    manager_err_t _send_request(manager_cmd_t cmd, NameArray& reply, const std::string& desc = "");
+    
+    ach_channel_t _req_chan;
+    ach_channel_t _reply_chan;
     
 };
 

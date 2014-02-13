@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include "HuboRtParams.h"
 
-const char hubo_rt_mgr_cmd_chan[] = "hubo_rt_mgr_cmd";
+const char hubo_rt_mgr_req_chan[] = "hubo_rt_mgr_cmd";
 const char hubo_rt_mgr_reply_chan[] = "hubo_rt_mgr_reply";
 
 /*! Commands available for the process management daemon */
@@ -52,9 +52,9 @@ typedef enum manager_cmd {
 typedef struct manager_msg {
     
     manager_cmd_t request_type;
-    char name[2*MAX_FILENAME_SIZE];
+    char details[2*MAX_FILENAME_SIZE];
     
-} manager_msg_t;
+} manager_req_t;
 
 /*! Possible replies from the management daemon */
 typedef enum manager_err {
@@ -66,6 +66,7 @@ typedef enum manager_err {
     MALFORMED_REQUEST,      /*!< A request was sent which does not obey proper formatting. You are encouraged to use the C++ API which is provided. */
     ACH_ERROR,              /*!< Some kind of ach error has occurred */
     NONEXISTENT_DIR,        /*!< Somehow the necessary directory does not exist -- report a bug! */
+    MGR_RACE_CONDITION,     /*!< Something else is trying to talk with the manager, and our signals are getting crossed */
     
     MGR_TIMEOUT             /*!< The manager failed to reply in the specified amount of time. This likely means that the manager is not running. */
     
