@@ -56,17 +56,17 @@ enum error_flag {
 typedef int error_result_t;
 typedef size_t JointIndex;
 typedef std::vector<size_t> IndexArray;
-typedef std::vector<double> ValueArray;
+typedef std::vector<float> ValueArray;
 
 class HuboCmd
 {
 public:
 
-    error_result_t position(JointIndex index, double angle);
-    error_result_t position(IndexArray array, ValueArray angles);
+    error_result_t position(JointIndex index, float value);
+    error_result_t position(IndexArray array, ValueArray values);
 
-    error_result_t velocity(JointIndex index, double velocity);
-    error_result_t velocity(IndexArray array, ValueArray velocities);
+    error_result_t torque(JointIndex index, float value);
+    error_result_t torque(IndexArray array, ValueArray values);
 
 
 
