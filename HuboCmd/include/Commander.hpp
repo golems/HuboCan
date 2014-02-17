@@ -37,15 +37,54 @@
  *   POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef HUBOSTATE_HPP
-#define HUBOSTATE_HPP
+#ifndef HUBOCOMMANDER_HPP
+#define HUBOCOMMANDER_HPP
 
-class HuboState
+#include "AchIncludes.h"
+#include "hubo_cmd_c.h"
+#include "InfoReceiver.hpp"
+
+namespace HuboCmd {
+
+typedef std::vector<hubo_cmd_mode_t> ModeArray;
+
+class Commander
 {
 public:
 
+    Commander();
+    ~Commander();
+
+    HuboState::error_result_t set_mode(JointIndex joint, hubo_cmd_mode_t mode);
+    HuboState::error_result_t set_modes(IndexArray joints, ModeArray modes);
+
+    HuboState::error_result_t position(JointIndex joint, float value);
+    HuboState::error_result_t positions(IndexArray joints, ValueArray values);
+
+    HuboState::error_result_t base_torque(JointIndex joint, double value);
+    HuboState::error_result_t base_torques(IndexArray joints, ValueArray values);
+
+    HuboState::error_result_t kP_gain(JointIndex joint, double kP_value);
+    HuboState::error_result_t kP_gains(IndexArray joints, ValueArray kP_values);
+
+    HuboState::error_result_t kD_gain(JointIndex joint, double kD_value);
+    HuboState::error_result_t kD_gains(IndexArray joints, ValueArray kD_values);
+
+    JointIndex getIndex(std::string joint_name);
+    IndexArray getIndices(StringArray joint_names);
+
+
+    HuboState::error_result_t send_commands();
+
 protected:
+
+    void _initialize();
+    hubo_cmd_data* cmd_data;
+
+    HuboState::InfoReceiver _info;
 
 };
 
-#endif // HUBOSTATE_HPP
+} // HuboCmd
+
+#endif // HUBOCOMMANDER_HPP

@@ -11,6 +11,9 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
+add_subdirectory(HuboState)
+include_directories(HuboState/include)
+
 add_subdirectory(HuboCan)
 include_directories(HuboCan/include)
 
@@ -19,9 +22,6 @@ include_directories(HuboCmd/include)
 
 add_subdirectory(HuboAgg)
 include_directories(HuboAgg/include)
-
-add_subdirectory(HuboState)
-include_directories(HuboState/include)
 
 add_subdirectory(HuboRT)
 include_directories(HuboRT/include)

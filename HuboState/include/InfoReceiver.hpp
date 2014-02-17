@@ -37,46 +37,74 @@
  *   POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef HUBOCMD_HPP
-#define HUBOCMD_HPP
+#ifndef INFORECEIVER_HPP
+#define INFORECEIVER_HPP
 
-#include "AchIncludes.h"
-#include <vector>
+#include "InfoTypes.hpp"
 
-namespace HuboCmd {
+extern "C" {
+#include "hubo_info_c.h"
+} // extern "C"
 
-enum error_flag {
+namespace HuboState {
 
-    NONE                = 0,
-    INDEX_OUT_OF_BOUNDS = 1,
-    ARRAY_MISMATCH      = 1 >> 1
+typedef std::vector<hubo_joint_info_t> JointInfoArray;
 
-};
-
-typedef int error_result_t;
-typedef size_t JointIndex;
-typedef std::vector<size_t> IndexArray;
-typedef std::vector<float> ValueArray;
-
-class HuboCmd
+class InfoReceiver
 {
 public:
 
-    error_result_t position(JointIndex index, float value);
-    error_result_t position(IndexArray array, ValueArray values);
+    /*!
+     * \fn InfoReceiver
+     * \brief Attempts to receive the published information about what kind of Hubo is running
+     * \param receive
+     * \param timeout
+     */
+    InfoReceiver(bool receive=true, double timeout=2);
+    ~InfoReceiver();
 
-    error_result_t torque(JointIndex index, float value);
-    error_result_t torque(IndexArray array, ValueArray values);
+    int receiveInfo(double timeout=2);
 
+    /*!
+     * \fn jointCount()
+     * \brief How many joints the currently running Hubo has
+     * \return
+     */
+    inline size_t jointCount() { return _array.size(); }
 
+    /*!
+     * \fn getJointIndex()
+     * \brief Returns the joint index value corresponding to the given joint name
+     * \param joint_name
+     * \return
+     *
+     * Returns (size_t)(-1) if the given joint name does not exist.
+     */
+    JointIndex getJointIndex(std::string joint_name);
 
-    error_result_t send();
+    /*!
+     * \fn getJointIndices()
+     * \brief Returns a std::vector of joint indices corresponding to the given joint names
+     * \param joint_names
+     * \return
+     */
+    IndexArray getJointIndices(StringArray joint_names);
+
+    /*!
+     * \fn getJointInfo()
+     * \brief Returns a struct describing the requested joint
+     * \param joint_index
+     * \return
+     */
+    hubo_joint_info_t getJointInfo(size_t joint_index);
 
 protected:
 
+    JointInfoArray _array;
+    hubo_info_data* _data;
 
 };
 
-} // HuboCmd
+} // namespace HuboState
 
-#endif // HUBOCMD_HPP
+#endif // INFORECEIVER_HPP
