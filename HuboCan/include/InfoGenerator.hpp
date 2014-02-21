@@ -8,7 +8,7 @@ extern "C" {
 } // extern "C"
 
 
-namespace HuboState {
+namespace HuboCan {
 
 class InfoGenerator
 {

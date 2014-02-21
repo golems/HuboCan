@@ -46,7 +46,7 @@ extern "C" {
 #include "hubo_info_c.h"
 } // extern "C"
 
-namespace HuboState {
+namespace HuboCan {
 
 typedef std::vector<hubo_joint_info_t> JointInfoArray;
 

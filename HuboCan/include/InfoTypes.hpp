@@ -5,7 +5,7 @@
 #include <string>
 #include <stddef.h>
 
-namespace HuboState {
+namespace HuboCan {
 enum error_flag {
 
     NONE                = 0,

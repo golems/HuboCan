@@ -12,7 +12,7 @@ target_link_libraries(${library_name} ach)
 file(GLOB unit_tests_source "test/*.cpp")
 LIST(SORT unit_tests_source)
 
-message(STATUS "\n -- UNIT TEST: ")
+message(STATUS "\n -- ${library_name} UNIT TEST: ")
 add_custom_target(check_${library_name} COMMAND ${CMAKE_CTEST_COMMAND})
 foreach(utest_src_file ${unit_tests_source})
     get_filename_component(test_base ${utest_src_file} NAME_WE)

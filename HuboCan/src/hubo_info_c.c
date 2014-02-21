@@ -4,13 +4,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-hubo_info_data* hubo_info_init_data(size_t joint_count)
+hubo_info_data* hubo_info_init_data(size_t joint_count, size_t jmc_count)
 {
-    size_t data_size = hubo_info_predict_data_size(joint_count);
+    size_t data_size = hubo_info_predict_data_size(joint_count, jmc_count);
     hubo_info_data* new_info = malloc(data_size);
     memset(new_info, 0, data_size);
 
     hubo_meta_info_t* meta_info = (hubo_meta_info_t*)new_info;
+    strcpy(meta_info->code, HUBO_INFO_META_CODE);
     meta_info->joint_count = joint_count;
     meta_info->data_size = data_size;
 
@@ -59,6 +60,7 @@ hubo_info_data* hubo_info_receive_data(double timeout)
     }
 
     size_t joint_count = meta_info.joint_count;
+    size_t jmc_count = meta_info.jmc_count;
 
     ach_channel_t info_channel;
     r = ach_open(&info_channel, HUBO_INFO_DATA_CHANNEL, NULL);
@@ -71,7 +73,7 @@ hubo_info_data* hubo_info_receive_data(double timeout)
         return NULL;
     }
 
-    size_t info_data_size = hubo_info_predict_data_size(joint_count);
+    size_t info_data_size = hubo_info_predict_data_size(joint_count, jmc_count);
     hubo_info_data* data = malloc(info_data_size);
     memset(data, 0, info_data_size);
 
@@ -153,7 +155,17 @@ hubo_joint_info_t* hubo_info_get_joint_info(hubo_info_data *data, size_t joint_i
         return NULL;
     }
 
-    hubo_joint_info_t* joint_info = (hubo_joint_info_t*)(data+hubo_info_predict_data_size(joint_index));
-    return joint_info;
+    return (hubo_joint_info_t*)(data+hubo_info_get_joint_location(data, joint_index));
 }
 
+hubo_jmc_info_t* hubo_info_get_jmc_info(const hubo_info_data *data, size_t jmc_index)
+{
+    if(jmc_index >= hubo_info_get_jmc_count(data))
+    {
+        fprintf(stderr, "Error: requested jmc info (index %zu) which is out of bounds (%zu)!\n",
+                jmc_index, hubo_info_get_jmc_count(data));
+        return NULL;
+    }
+
+    return (hubo_jmc_info_t*)(data+hubo_info_get_jmc_location(data, jmc_index));
+}
