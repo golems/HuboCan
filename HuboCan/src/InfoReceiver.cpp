@@ -19,5 +19,6 @@ InfoReceiver::~InfoReceiver()
 int InfoReceiver::receiveInfo(double timeout)
 {
 
+    return 0;
 }
 

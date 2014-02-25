@@ -11,8 +11,9 @@ typedef enum {
     
     DD_ERROR = 0,
     DD_OKAY,
-    DD_END_OF_DEVICE,
-    DD_END_OF_FILE,
+    DD_BEGIN_DEVICE,
+    DD_END_DEVICE,
+    DD_END_FILE,
     
 } dd_result_t;
 
@@ -46,14 +47,20 @@ public:
     std::stringstream error;
 
     dd_result_t next_line(StringArray& components);
+    bool current_line(StringArray& components);
 
-    StringArray get_components(const std::string& line);
+    StringArray get_string_components(const std::string& line);
 
     size_t clear_front_back_whitespace(std::string& line);
     size_t clear_front_whitespace(std::string& line);
     void clear_back_whitespace(std::string& line);
     
     inline dd_result_t status() { return _status; }
+    inline void reset()
+    {
+        _next_index = 0;
+        _current_device_type = "";
+    }
     
     std::ostream* error_output_stream;
 

@@ -60,6 +60,83 @@ int HuboDescription::receiveInfo(double timeout)
 
 bool HuboDescription::parseFile(const std::string &filename)
 {
+    if(!_parser.load_file(filename))
+        return false;
+
+    StringArray components;
+    while(_parser.status() != HuboCan::DD_END_FILE && _parser.status() != HuboCan::DD_ERROR)
+    {
+        _parser.next_line(components);
+        if(_parser.status() == HuboCan::DD_BEGIN_DEVICE)
+        {
+            if(!_parseDevice(components[1]))
+                return false;
+        }
+    }
+
+    return true;
+}
+
+bool HuboDescription::_parseDevice(const std::string &device_type)
+{
+    if("Joint" == device_type)
+    {
+        if(!_parseJoint())
+            return false;
+    }
+    else if("JMC" == device_type)
+    {
+        if(!_parseJMC())
+            return false;
+    }
+    else if("IMU" == device_type)
+    {
+        if(!_parseIMU())
+            return false;
+    }
+    else if("ForceTorque" == device_type)
+    {
+        if(!_parseForceTorque())
+            return false;
+    }
+
+    return true;
+}
+
+bool HuboDescription::_parseJoint()
+{
+    hubo_joint_info_t new_joint_info;
+    memset(&new_joint_info, 0, sizeof(hubo_joint_info_t));
+
+    StringArray components;
+    while(_parser.next_line(components) == HuboCan::DD_OKAY)
+    {
+        if("type" == components[0])
+        {
+
+        }
+
+
+    }
+
+    return true;
+}
+
+bool HuboDescription::_parseJMC()
+{
+
+    return true;
+}
+
+bool HuboDescription::_parseIMU()
+{
+
+    return true;
+}
+
+bool HuboDescription::_parseForceTorque()
+{
+
     return true;
 }
 
@@ -74,7 +151,7 @@ JointIndex HuboDescription::getJointIndex(const std::string& joint_name)
         }
     }
 
-    return -1;
+    return InvalidIndex;
 }
 
 IndexArray HuboDescription::getJointIndices(StringArray joint_names)

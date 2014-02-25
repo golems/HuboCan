@@ -12,8 +12,8 @@
 #define HUBO_INFO_META_CODE "META_INFO_V0.01"
 #define HUBO_INFO_META_CODE_SIZE 16
 
-#define HUBO_JOINT_NAME_MAX_LENGTH 32
-#define HUBO_JMC_TYPE_MAX_LENGTH 32
+#define HUBO_COMPONENT_NAME_MAX_LENGTH 32
+#define HUBO_COMPONENT_TYPE_MAX_LENGTH 32
 
 typedef uint8_t hubo_info_data;
 
@@ -28,14 +28,29 @@ typedef struct hubo_meta_info {
 
 typedef struct hubo_jmc_info {
 
+    char name[HUBO_COMPONENT_NAME_MAX_LENGTH];
+    char type[HUBO_COMPONENT_TYPE_MAX_LENGTH];
+    uint16_t hardware_index;
+    uint8_t can_channel;
+
 }__attribute__((packed)) hubo_jmc_info_t;
 
 typedef struct hubo_joint_info {
 
-    char name[HUBO_JOINT_NAME_MAX_LENGTH];
-    char jmc_type[HUBO_JMC_TYPE_MAX_LENGTH];
-    uint8_t hardware_index;
-    uint8_t jmc_index;
+    char name[HUBO_COMPONENT_NAME_MAX_LENGTH];
+    char type[HUBO_COMPONENT_TYPE_MAX_LENGTH];
+
+    float drive_factor;
+    float driven_factor;
+    float harmonic_factor;
+    float enc_resolution;
+
+    float default_kp;
+    float default_kd;
+    float default_max_pwm;
+
+    uint16_t hardware_index;
+    char jmc_name[HUBO_COMPONENT_NAME_MAX_LENGTH];
 
 }__attribute__((packed)) hubo_joint_info_t;
 

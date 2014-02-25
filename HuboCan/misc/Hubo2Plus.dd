@@ -1,0 +1,123 @@
+
+
+begin   Joint
+
+name    WST
+type    Hubo2Plus
+
+drive       10
+driven      25
+harmonic    100
+encoder     4000
+
+default_kp      0
+default_kd      0
+default_max_pwm 0
+
+hardware_index  0
+jmc_name        EJMC3
+
+end     Joint
+
+############################
+
+begin   Joint
+
+name    NKY
+type    Hubo2Plus
+
+drive       1
+driven      1
+harmonic    100
+encoder     128
+
+default_kp      0
+default_kd      0
+default_max_pwm 0
+
+hardware_index  0
+jmc_name        EJMC2
+
+end     Joint
+
+###########################
+
+begin   Joint
+
+name    NK1
+type    Hubo2Plus
+
+drive       1
+driven      1
+harmonic    100
+encoder     128
+
+hardware_index  1
+jmc_name        EJMC2
+
+end     Joint
+
+###########################
+
+begin   Joint
+
+name    NK2
+type    Hubo2Plus
+
+drive       1
+driven      1
+harmonic    100
+encoder     128
+
+hardware_index  2
+jmc_name        EJMC2
+
+end     Joint
+
+###########################
+
+begin   Joint
+
+name    LSP
+type    Hubo2Plus
+
+drive       11
+driven      16
+harmonic    100
+encoder     4000
+
+hardware_index  0
+jmc_name        JMC10
+
+end     Joint
+
+###########################
+
+begin   Joint
+
+name    LSR
+type    Hubo2Plus
+
+drive       1
+driven      1
+harmonic    100
+encoder     4000
+
+hardware_index  1
+jmc_name        JMC10
+
+end     Joint
+
+###########################
+
+
+
+
+
+
+
+
+
+
+
+

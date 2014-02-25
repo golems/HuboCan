@@ -4,6 +4,7 @@
 #include "InfoTypes.hpp"
 #include "HuboJmc.hpp"
 #include "HuboJoint.hpp"
+#include "DdParser.hpp"
 
 namespace HuboCan {
 
@@ -68,6 +69,15 @@ public:
 
 
 protected:
+
+    virtual bool _parseDevice(const std::string& device_type);
+
+    virtual bool _parseJoint();
+    virtual bool _parseJMC();
+    virtual bool _parseIMU();
+    virtual bool _parseForceTorque();
+
+    DdParser _parser;
 
     hubo_info_data* _data;
 

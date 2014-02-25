@@ -13,9 +13,8 @@ DdParser::DdParser()
 
 void DdParser::_initialize()
 {
-    _next_index = 0;
-    _current_device_type = "";
-    _status = DD_END_OF_FILE;
+    reset();
+    _status = DD_END_FILE;
     error_output_stream = &std::cerr;
 }
 
@@ -72,7 +71,7 @@ bool DdParser::_push_back_file(const std::string &filename, bool inclusion)
         _contents.push_back(new_line);
         _next_index = _contents.size();
 
-        StringArray line_check = get_components(new_line.data);
+        StringArray line_check = get_string_components(new_line.data);
         if(_status == DD_ERROR)
             return false;
 
@@ -112,7 +111,7 @@ bool DdParser::_inclusion_check(StringArray &line)
     return true;
 }
 
-StringArray DdParser::get_components(const std::string &line)
+StringArray DdParser::get_string_components(const std::string &line)
 {
     StringArray result;
 
@@ -255,7 +254,7 @@ dd_result_t DdParser::next_line(StringArray &components)
     while(   components.size() == 0
           && _next_index < _contents.size())
     {
-        components = get_components(_contents[_next_index].data);
+        components = get_string_components(_contents[_next_index].data);
         ++_next_index;
     }
     
@@ -264,7 +263,7 @@ dd_result_t DdParser::next_line(StringArray &components)
     
     if(_next_index >= _contents.size())
     {
-        _status = DD_END_OF_FILE;
+        _status = DD_END_FILE;
         return _status;
     }
     
@@ -288,6 +287,9 @@ dd_result_t DdParser::next_line(StringArray &components)
         {
             _current_device_type = components[1];
         }
+
+        _status = DD_BEGIN_DEVICE;
+        return _status;
     }
     
     if(components[0] == "end")
@@ -312,7 +314,7 @@ dd_result_t DdParser::next_line(StringArray &components)
             }
         }
         
-        _status = DD_END_OF_DEVICE;
+        _status = DD_END_DEVICE;
         return _status;
     }
     
@@ -322,7 +324,32 @@ dd_result_t DdParser::next_line(StringArray &components)
 
 
 
+bool DdParser::current_line(StringArray &components)
+{
+    components.clear();
 
+    if(_status == DD_ERROR)
+        return false;
+
+    size_t backtrack = 1;
+
+    while(components.empty())
+    {
+
+        if(_next_index-backtrack >= 0 && _next_index-backtrack < _contents.size())
+        {
+            components = get_string_components(_contents[_next_index-backtrack].data);
+        }
+        else
+        {
+            return false;
+        }
+
+        ++backtrack;
+    }
+
+    return true;
+}
 
 
 
