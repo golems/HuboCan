@@ -1,0 +1,10 @@
+
+
+begin   test_device
+
+name    "I am yet another device"
+parts   and I also have some parts which are listed here
+number  10
+
+end     test_device
+

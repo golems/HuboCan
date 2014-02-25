@@ -1,0 +1,19 @@
+
+
+begin test_device
+
+name    "This is my name!"
+parts   these are some parts that belong to me
+number  42
+
+end   test_device
+
+include ../HuboCan/misc/AnotherDevice.dd
+
+begin test_device
+
+name    "Other name!"
+parts   here are the parts that belong to me
+number  23
+
+end test_device

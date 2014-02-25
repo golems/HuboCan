@@ -1,5 +1,5 @@
 
-#include "DescParser.hpp"
+#include "DdParser.hpp"
 #include <iostream>
 
 void print_array(const StringArray& array)
@@ -13,16 +13,15 @@ void print_array(const StringArray& array)
 
 int main(int argc, char* argv[])
 {
+    HuboCan::DdParser parser;
 
-    HuboCan::DescParser parser;
-
-    std::string test_string = "this 12 a    test \t \t string \t yay";
+    std::string test_string = "this 12 \"a    test\" \t \t string \t yay";
     StringArray test_array = parser.get_components(test_string);
     print_array(test_array);
 
     std::cout << std::endl;
 
-    test_string = "    and \t \n another \t test!! !  ";
+    test_string = "name    \"This is my name!\"";
     test_array = parser.get_components(test_string);
     print_array(test_array);
 
