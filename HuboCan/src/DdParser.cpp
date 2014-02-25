@@ -16,7 +16,7 @@ void DdParser::_initialize()
     _next_index = 0;
     _current_device_type = "";
     _status = DD_END_OF_FILE;
-    error_stream = &std::cerr;
+    error_output_stream = &std::cerr;
 }
 
 bool DdParser::load_file(const std::string &filename)
@@ -63,7 +63,7 @@ bool DdParser::_push_back_file(const std::string &filename, bool inclusion)
     while(filestream.good())
     {
         ++count;
-        DescLine new_line;
+        DdLine new_line;
         new_line.file = filename;
         new_line.line_num = count;
 
@@ -72,27 +72,43 @@ bool DdParser::_push_back_file(const std::string &filename, bool inclusion)
         _contents.push_back(new_line);
         _next_index = _contents.size();
 
-        StringArray inclusion_check = get_components(new_line.data);
-        if(inclusion_check.size() > 0)
-        {
-            if(inclusion_check[0] == "include")
-            {
-                if(inclusion_check.size() > 1)
-                {
-                    if(!_push_back_file(inclusion_check[1], true))
-                        return false;
-                }
-                else
-                {
-                    error << "The keyword 'include' must be followed by a file name!";
-                    report_error();
-                }
-            }
-        }
+        StringArray line_check = get_components(new_line.data);
+        if(_status == DD_ERROR)
+            return false;
+
+        if(!_inclusion_check(line_check))
+            return false;
     }
+
+    if(_status == DD_ERROR)
+        return false;
 
     _next_index = 0;
     _status = DD_OKAY;
+    return true;
+}
+
+bool DdParser::_inclusion_check(StringArray &line)
+{
+    if(line.size() > 0)
+    {
+        if(line[0] == "include")
+        {
+            if(line.size() > 1)
+            {
+                if(!_push_back_file(line[1], true))
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                error << "The keyword 'include' must be followed by a file name!";
+                report_error();
+                return false;
+            }
+        }
+    }
     return true;
 }
 
@@ -102,6 +118,9 @@ StringArray DdParser::get_components(const std::string &line)
 
     size_t progress = 0;
     std::string remaining = line;
+    size_t comment = remaining.find("#",0);
+    remaining = remaining.substr(0, comment);
+
     while(remaining.size() > 0)
     {
         progress += clear_front_back_whitespace(remaining);
@@ -214,12 +233,14 @@ void DdParser::report_error()
 {
     if(_next_index-1 < _contents.size())
     {
-        (*error_stream) << "Error! " << _contents[_next_index-1];
+        (*error_output_stream) << "Error! " << _contents[_next_index-1];
     }
     else
-        (*error_stream) << "next_index: " << _next_index-1 << ", size: " << _contents.size() << std::endl;
+        (*error_output_stream) << "next_index: " << _next_index-1 << ", size: " << _contents.size() << std::endl;
     
-    (*error_stream) << error.str() << std::endl;
+    (*error_output_stream) << error.str() << std::endl;
+    error.str("");
+    error.clear();
     
     _status = DD_ERROR;
 }

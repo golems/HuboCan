@@ -4,6 +4,7 @@
 int main(int argc, char* argv[])
 {
     HuboCan::DdParser parser;
+//    parser.error_output_stream = &std::cout;
     parser.load_file("../HuboCan/misc/TestDevice.dd");
     
     StringArray components;

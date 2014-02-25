@@ -16,11 +16,11 @@ typedef enum {
     
 } dd_result_t;
 
-class DescLine
+class DdLine
 {
 public:
 
-    inline DescLine()
+    inline DdLine()
     {
         data = "";
         file = "null";
@@ -32,7 +32,7 @@ public:
     size_t line_num;
 };
 
-typedef std::vector<DescLine> DescArray;
+typedef std::vector<DdLine> DdLineArray;
 
 class DdParser
 {
@@ -55,26 +55,28 @@ public:
     
     inline dd_result_t status() { return _status; }
     
-    std::ostream* error_stream;
+    std::ostream* error_output_stream;
 
 protected:
     
     void _initialize();
 
-    DescArray _contents;
+    DdLineArray _contents;
     size_t _next_index;
     std::string _current_device_type;
     dd_result_t _status;
 
     StringArray _filename_list;
     bool _push_back_file(const std::string& filename, bool inclusion);
+    bool _inclusion_check(StringArray& line);
+    void _destroy_comments();
 
 };
 
 } // namespace HuboCan
 
 
-inline std::ostream& operator<<(std::ostream& oStrStream, const HuboCan::DescLine& desc)
+inline std::ostream& operator<<(std::ostream& oStrStream, const HuboCan::DdLine& desc)
 {
     oStrStream << "Filename:" << desc.file <<", Line:" << desc.line_num << "\n"
                   << " < " << desc.data << " > " << std::endl;
