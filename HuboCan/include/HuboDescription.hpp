@@ -15,8 +15,9 @@ class HuboDescription
 {
 public:
 
-    HuboDescription(bool receive=false, double timeout=2);
-    HuboDescription(const std::string& filename);
+    HuboDescription();
+//    HuboDescription(bool receive=false, double timeout=2);
+//    HuboDescription(const std::string& filename);
     ~HuboDescription();
 
     JointPtrArray joints;
@@ -70,12 +71,14 @@ public:
 
 protected:
 
+    HuboJointPtrArray _joints;
+
     virtual bool _parseDevice(const std::string& device_type);
 
-    virtual bool _parseJoint();
-    virtual bool _parseJMC();
-    virtual bool _parseIMU();
-    virtual bool _parseForceTorque();
+    virtual bool _parseJoint(bool strict=true);
+    virtual bool _parseJMC(bool strict=true);
+    virtual bool _parseIMU(bool strict=true);
+    virtual bool _parseForceTorque(bool strict=true);
 
     DdParser _parser;
 

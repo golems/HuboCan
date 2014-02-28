@@ -4,13 +4,27 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <Hubo2PlusJoint.hpp>
+#include <DrcHuboJoint.hpp>
+
 using namespace HuboCan;
 
-HuboDescription::HuboDescription(bool receive, double timeout)
+//HuboDescription::HuboDescription(bool receive, double timeout)
+//{
+//    _data = NULL;
+//    if(receive)
+//        receiveInfo(timeout);
+//}
+
+//HuboDescription::HuboDescription(const std::string &filename)
+//{
+//    _data = NULL;
+//    parseFile(filename);
+//}
+
+HuboDescription::HuboDescription()
 {
     _data = NULL;
-    if(receive)
-        receiveInfo(timeout);
 }
 
 HuboDescription::~HuboDescription()
@@ -103,7 +117,7 @@ bool HuboDescription::_parseDevice(const std::string &device_type)
     return true;
 }
 
-bool HuboDescription::_parseJoint()
+bool HuboDescription::_parseJoint(bool strict)
 {
     hubo_joint_info_t new_joint_info;
     memset(&new_joint_info, 0, sizeof(hubo_joint_info_t));
@@ -111,30 +125,137 @@ bool HuboDescription::_parseJoint()
     StringArray components;
     while(_parser.next_line(components) == HuboCan::DD_OKAY)
     {
-        if("type" == components[0])
+        if(components.size() < 2)
         {
-
+            _parser.error << "Every component must have at least one argument!";
+            _parser.report_error();
         }
 
+        if(     "name" == components[0])
+        {
+            if(components[1].size() > HUBO_COMPONENT_TYPE_MAX_LENGTH)
+            {
+                _parser.error << "Component name string overflow! Max size is " << HUBO_COMPONENT_NAME_MAX_LENGTH;
+                _parser.report_error();
+            }
+            else
+            {
+                strcpy(new_joint_info.name, components[1].c_str());
+            }
+        }
+        else if("type" == components[0])
+        {
+            if(components[1].size() > HUBO_COMPONENT_TYPE_MAX_LENGTH)
+            {
+                _parser.error << "Component type string overflow! Max size is " << HUBO_COMPONENT_TYPE_MAX_LENGTH;
+                _parser.report_error();
+            }
+            else
+            {
+                strcpy(new_joint_info.type, components[1].c_str());
+            }
+        }
+        else if("drive" == components[0])
+        {
+            new_joint_info.drive_factor = atof(components[1].c_str());
+        }
+        else if("driven" == components[0])
+        {
+            new_joint_info.driven_factor = atof(components[1].c_str());
+        }
+        else if("harmonic" == components[0])
+        {
+            new_joint_info.harmonic_factor = atof(components[1].c_str());
+        }
+        else if("encoder" == components[0])
+        {
+            new_joint_info.enc_resolution = atof(components[1].c_str());
+        }
+        else if("default_kp" == components[0])
+        {
+            new_joint_info.default_kp = atof(components[1].c_str());
+        }
+        else if("default_kd" == components[0])
+        {
+            new_joint_info.default_max_pwm = atof(components[1].c_str());
+        }
+        else if("default_max_pwm" == components[0])
+        {
+            new_joint_info.default_max_pwm = atof(components[1].c_str());
+        }
+        else if("hardware_index" == components[0])
+        {
+            new_joint_info.hardware_index = atof(components[1].c_str());
+        }
+        else if("jmc_name" == components[0])
+        {
+            if(components[1].size() > HUBO_COMPONENT_NAME_MAX_LENGTH)
+            {
+                _parser.error << "Component name string overflow! Max size is " << HUBO_COMPONENT_NAME_MAX_LENGTH;
+                _parser.report_error();
+            }
+            else
+            {
+                strcpy(new_joint_info.jmc_name, components[1].c_str());
+            }
+        }
+        else
+        {
+            if(strict)
+            {
+                _parser.error << "Invalid component: " << components[0];
+                _parser.report_error();
+            }
+        }
 
+        if(_parser.status() == DD_ERROR)
+            return false;
+    }
+
+    for(size_t i=0; i < _joints.size(); ++i)
+    {
+        if(strcmp(new_joint_info.name, _joints[i]->info.name)==0)
+        {
+            _parser.error << "Repeated joint name: " << new_joint_info.name;
+            _parser.report_error();
+            return false;
+        }
+    }
+
+    HuboJoint* new_joint = NULL;
+    if(std::string(new_joint_info.type) == "Hubo2Plus")
+    {
+        new_joint = new Hubo2PlusJoint;
+    }
+
+    if(new_joint == NULL)
+    {
+        _parser.error << "Invalid joint type string: " << new_joint_info.type;
+        _parser.report_error();
+        return false;
+    }
+    else
+    {
+        new_joint->info = new_joint_info;
+        _joints.push_back(new_joint);
     }
 
     return true;
 }
 
-bool HuboDescription::_parseJMC()
+bool HuboDescription::_parseJMC(bool strict)
 {
 
     return true;
 }
 
-bool HuboDescription::_parseIMU()
+bool HuboDescription::_parseIMU(bool strict)
 {
 
     return true;
 }
 
-bool HuboDescription::_parseForceTorque()
+bool HuboDescription::_parseForceTorque(bool strict)
 {
 
     return true;

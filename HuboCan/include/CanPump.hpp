@@ -22,6 +22,11 @@ public:
 
     void pump();
 
+    inline void addDevice(CanDevice* new_device)
+    {
+        _devices.push_back(new_device);
+    }
+
 protected:
 
     CanDevicePtrArray _devices;

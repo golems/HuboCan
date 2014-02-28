@@ -7,6 +7,7 @@ file(GLOB lib_source "src/*.cpp" "src/*.c" "include/*.hpp" "include/*.h")
 list(SORT lib_source)
 
 add_library(${library_name} SHARED ${lib_source})
+target_link_libraries(${library_name} ach rt)
 
 
 file(GLOB unit_tests_source "test/*.cpp")

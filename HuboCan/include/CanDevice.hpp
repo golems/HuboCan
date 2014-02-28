@@ -9,10 +9,14 @@ class CanDevice
 {
 public:
 
-    virtual void registerPump(CanPump& pump);
+    inline virtual void registerPump(CanPump& pump)
+    {
+        pump.addDevice(this);
+        _pump = &pump;
+    }
 
-    virtual void update() = 0;
-    virtual void decode(const can_frame_t& frame) = 0;
+    inline virtual void update() { }
+    inline virtual void decode(const can_frame_t& frame) { }
 
 protected:
 

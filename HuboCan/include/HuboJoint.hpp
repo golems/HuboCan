@@ -5,9 +5,11 @@ extern "C" {
 #include "hubo_info_c.h"
 }
 
+#include "CanDevice.hpp"
+
 namespace HuboCan {
 
-class HuboJoint
+class HuboJoint : public CanDevice
 {
 public:
 
@@ -17,6 +19,8 @@ protected:
 
 
 };
+
+typedef std::vector<HuboJoint*> HuboJointPtrArray;
 
 } // namespace HuboCan
 
