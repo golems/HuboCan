@@ -1,9 +1,9 @@
 
+include ../HuboCan/misc/H2P_JMCs.dd
 
 begin   Joint
 
 name    WST
-type    Hubo2Plus
 
 drive       10
 driven      25
@@ -24,7 +24,6 @@ end     Joint
 begin   Joint
 
 name    NKY
-type    Hubo2Plus
 
 drive       1
 driven      1
@@ -45,7 +44,6 @@ end     Joint
 begin   Joint
 
 name    NK1
-type    Hubo2Plus
 
 drive       1
 driven      1
@@ -62,7 +60,6 @@ end     Joint
 begin   Joint
 
 name    NK2
-type    Hubo2Plus
 
 drive       1
 driven      1
@@ -79,7 +76,6 @@ end     Joint
 begin   Joint
 
 name    LSP
-type    Hubo2Plus
 
 drive       11
 driven      16
@@ -96,7 +92,6 @@ end     Joint
 begin   Joint
 
 name    LSR
-type    Hubo2Plus
 
 drive       1
 driven      1
@@ -107,10 +102,6 @@ hardware_index  1
 jmc_name        JMC10
 
 end     Joint
-
-###########################
-
-
 
 
 

@@ -1,0 +1,21 @@
+
+begin IMU
+
+name    IMU0
+
+hardware_index  0x32
+
+end IMU
+
+#########################
+
+begin IMU
+
+name    IMU1
+
+hardware_index  0x33
+
+end IMU
+
+#########################
+

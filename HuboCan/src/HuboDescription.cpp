@@ -4,23 +4,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <Hubo2PlusJoint.hpp>
-#include <DrcHuboJoint.hpp>
+#include <HuboJoint.hpp>
 
 using namespace HuboCan;
-
-//HuboDescription::HuboDescription(bool receive, double timeout)
-//{
-//    _data = NULL;
-//    if(receive)
-//        receiveInfo(timeout);
-//}
-
-//HuboDescription::HuboDescription(const std::string &filename)
-//{
-//    _data = NULL;
-//    parseFile(filename);
-//}
 
 HuboDescription::HuboDescription()
 {
@@ -31,14 +17,14 @@ HuboDescription::~HuboDescription()
 {
     free(_data);
 
-    for(size_t i=0; i<joints.size(); ++i)
+    for(size_t i=0; i<_joints.size(); ++i)
     {
-        delete joints[i];
+        delete _joints[i];
     }
 
-    for(size_t i=0; i<jmcs.size(); ++i)
+    for(size_t i=0; i<_jmcs.size(); ++i)
     {
-        delete jmcs[i];
+        delete _jmcs[i];
     }
 }
 
@@ -56,14 +42,14 @@ int HuboDescription::receiveInfo(double timeout)
     {
         HuboJoint* newJoint = new HuboJoint;
         newJoint->info = *hubo_info_get_joint_info(_data, i);
-        joints.push_back(newJoint);
+        _joints.push_back(newJoint);
     }
 
     for(size_t i=0; i < joint_count; ++i)
     {
         HuboJmc* newJmc = new HuboJmc;
         newJmc->info = *hubo_info_get_jmc_info(_data, i);
-        jmcs.push_back(newJmc);
+        _jmcs.push_back(newJmc);
     }
 
     free(_data);
@@ -133,7 +119,7 @@ bool HuboDescription::_parseJoint(bool strict)
 
         if(     "name" == components[0])
         {
-            if(components[1].size() > HUBO_COMPONENT_TYPE_MAX_LENGTH)
+            if(components[1].size() > HUBO_COMPONENT_NAME_MAX_LENGTH)
             {
                 _parser.error << "Component name string overflow! Max size is " << HUBO_COMPONENT_NAME_MAX_LENGTH;
                 _parser.report_error();
@@ -141,18 +127,6 @@ bool HuboDescription::_parseJoint(bool strict)
             else
             {
                 strcpy(new_joint_info.name, components[1].c_str());
-            }
-        }
-        else if("type" == components[0])
-        {
-            if(components[1].size() > HUBO_COMPONENT_TYPE_MAX_LENGTH)
-            {
-                _parser.error << "Component type string overflow! Max size is " << HUBO_COMPONENT_TYPE_MAX_LENGTH;
-                _parser.report_error();
-            }
-            else
-            {
-                strcpy(new_joint_info.type, components[1].c_str());
             }
         }
         else if("drive" == components[0])
@@ -222,35 +196,123 @@ bool HuboDescription::_parseJoint(bool strict)
         }
     }
 
-    HuboJoint* new_joint = NULL;
-    if(std::string(new_joint_info.type) == "Hubo2Plus")
-    {
-        new_joint = new Hubo2PlusJoint;
-    }
-
-    if(new_joint == NULL)
-    {
-        _parser.error << "Invalid joint type string: " << new_joint_info.type;
-        _parser.report_error();
-        return false;
-    }
-    else
-    {
-        new_joint->info = new_joint_info;
-        _joints.push_back(new_joint);
-    }
+    HuboJoint* new_joint = new HuboJoint;
+    new_joint->info = new_joint_info;
+    _joints.push_back(new_joint);
 
     return true;
 }
 
 bool HuboDescription::_parseJMC(bool strict)
 {
+    hubo_jmc_info_t new_jmc_info;
+    memset(&new_jmc_info, 0, sizeof(hubo_jmc_info_t));
+
+    StringArray components;
+    while(_parser.next_line(components) == HuboCan::DD_OKAY)
+    {
+        if(components.size() < 2)
+        {
+            _parser.error << "Every component must have at least one argument!";
+            _parser.report_error();
+        }
+
+        if(     "name" == components[0])
+        {
+            if(components[1].size() > HUBO_COMPONENT_NAME_MAX_LENGTH)
+            {
+                _parser.error << "Component name string overflow! Max size is " << HUBO_COMPONENT_NAME_MAX_LENGTH;
+                _parser.report_error();
+            }
+            else
+            {
+                strcpy(new_jmc_info.name, components[1].c_str());
+            }
+        }
+        else if("type" == components[0])
+        {
+            if(components[1].size() > HUBO_COMPONENT_NAME_MAX_LENGTH)
+            {
+                _parser.error << "Component type string overflow! max size is " << HUBO_COMPONENT_TYPE_MAX_LENGTH;
+                _parser.report_error();
+            }
+            else
+            {
+                strcpy(new_jmc_info.type, components[1].c_str());
+            }
+        }
+        else if("can_channel" == components[0])
+        {
+            new_jmc_info.can_channel = atoi(components[1].c_str());
+        }
+        else if("hardware_index" == components[0])
+        {
+            new_jmc_info.hardware_index = strtol(components[1].c_str(), NULL, 0);
+        }
+        else
+        {
+            if(strict)
+            {
+                _parser.error << "Invalid component: " << components[0];
+                _parser.report_error();
+            }
+        }
+
+        if(_parser.status() == DD_ERROR)
+            return false;
+    }
+
+    for(size_t i=0; i < _jmcs.size(); ++i)
+    {
+        if(strcmp(new_jmc_info.name, _jmcs[i]->info.name) == 0)
+        {
+            _parser.error << "Repated JMC name: " << new_jmc_info.name;
+            _parser.report_error();
+            return false;
+        }
+    }
+
+    HuboJmc* new_jmc = NULL;
+    std::string type_string(new_jmc_info.type);
+    if(     type_string == hubo2plus_1ch_code ||
+            type_string == hubo2plus_2ch_code)
+    {
+        new_jmc = new Hubo2Plus2chJmc;
+    }
+    else if(type_string == hubo2plus_3ch_code)
+    {
+        new_jmc = new Hubo2Plus3chJmc;
+    }
+    else if(type_string == hubo2plus_5ch_code)
+    {
+        new_jmc = new Hubo2Plus5chJmc;
+    }
+    else if(type_string == drchubo_2ch_code)
+    {
+        new_jmc = new DrcHubo2chJmc;
+    }
+    else if(type_string == drchubo_hybrid_code)
+    {
+        new_jmc = new DrcHuboHybridJmc;
+    }
+
+    if( NULL == new_jmc )
+    {
+        _parser.error << "Invalid JMC type: " << new_jmc_info.type;
+        _parser.report_error();
+        return false;
+    }
+
+    new_jmc->info = new_jmc_info;
+    _jmcs.push_back(new_jmc);
 
     return true;
 }
 
 bool HuboDescription::_parseIMU(bool strict)
 {
+
+
 
     return true;
 }
@@ -265,7 +327,7 @@ JointIndex HuboDescription::getJointIndex(const std::string& joint_name)
 {
     for(JointIndex i=0; i < jointCount(); ++i)
     {
-        std::string current_name(joints[i]->info.name);
+        std::string current_name(_joints[i]->info.name);
         if(joint_name == current_name)
         {
             return i;
@@ -296,5 +358,5 @@ hubo_joint_info_t HuboDescription::getJointInfo(JointIndex joint_index)
         return info;
     }
 
-    return joints[joint_index]->info;
+    return _joints[joint_index]->info;
 }

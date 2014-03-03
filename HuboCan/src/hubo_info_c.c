@@ -4,9 +4,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-hubo_info_data* hubo_info_init_data(size_t joint_count, size_t jmc_count)
+hubo_info_data* hubo_info_init_data(size_t joint_count, size_t jmc_count, size_t sensor_count)
 {
-    size_t data_size = hubo_info_predict_data_size(joint_count, jmc_count);
+    size_t data_size = hubo_info_predict_data_size(joint_count, jmc_count, sensor_count);
     hubo_info_data* new_info = malloc(data_size);
     memset(new_info, 0, data_size);
 
@@ -61,6 +61,7 @@ hubo_info_data* hubo_info_receive_data(double timeout)
 
     size_t joint_count = meta_info.joint_count;
     size_t jmc_count = meta_info.jmc_count;
+    size_t sensor_count = meta_info.sensor_count;
 
     ach_channel_t info_channel;
     r = ach_open(&info_channel, HUBO_INFO_DATA_CHANNEL, NULL);
@@ -73,7 +74,7 @@ hubo_info_data* hubo_info_receive_data(double timeout)
         return NULL;
     }
 
-    size_t info_data_size = hubo_info_predict_data_size(joint_count, jmc_count);
+    size_t info_data_size = hubo_info_predict_data_size(joint_count, jmc_count, sensor_count);
     hubo_info_data* data = malloc(info_data_size);
     memset(data, 0, info_data_size);
 

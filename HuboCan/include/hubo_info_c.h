@@ -22,23 +22,14 @@ typedef struct hubo_meta_info {
     char code[HUBO_INFO_META_CODE_SIZE];
     uint8_t joint_count;
     uint8_t jmc_count;
+    uint8_t sensor_count;
     size_t data_size;
 
 }__attribute__((packed)) hubo_meta_info_t;
 
-typedef struct hubo_jmc_info {
-
-    char name[HUBO_COMPONENT_NAME_MAX_LENGTH];
-    char type[HUBO_COMPONENT_TYPE_MAX_LENGTH];
-    uint16_t hardware_index;
-    uint8_t can_channel;
-
-}__attribute__((packed)) hubo_jmc_info_t;
-
 typedef struct hubo_joint_info {
 
     char name[HUBO_COMPONENT_NAME_MAX_LENGTH];
-    char type[HUBO_COMPONENT_TYPE_MAX_LENGTH];
 
     float drive_factor;
     float driven_factor;
@@ -53,6 +44,26 @@ typedef struct hubo_joint_info {
     char jmc_name[HUBO_COMPONENT_NAME_MAX_LENGTH];
 
 }__attribute__((packed)) hubo_joint_info_t;
+
+typedef struct hubo_jmc_info {
+
+    char name[HUBO_COMPONENT_NAME_MAX_LENGTH];
+    char type[HUBO_COMPONENT_TYPE_MAX_LENGTH];
+
+    uint16_t hardware_index;
+    uint8_t can_channel;
+
+}__attribute__((packed)) hubo_jmc_info_t;
+
+typedef struct hubo_sensor_info {
+
+    char name[HUBO_COMPONENT_NAME_MAX_LENGTH];
+    char type[HUBO_COMPONENT_TYPE_MAX_LENGTH];
+
+    uint16_t hardware_index;
+    uint8_t can_channel;
+
+}__attribute__((packed)) hubo_sensor_info_t;
 
 inline size_t hubo_info_get_joint_count(const hubo_info_data* data)
 {
@@ -72,7 +83,16 @@ inline size_t hubo_info_get_jmc_count(const hubo_info_data* data)
     return header->jmc_count;
 }
 
-hubo_info_data* hubo_info_init_data(size_t joint_count, size_t jmc_count);
+inline size_t hubo_info_get_sensor_count(const hubo_info_data* data)
+{
+    if(data == NULL)
+        return 0;
+
+    const hubo_meta_info_t* header = (hubo_meta_info_t*)data;
+    return header->sensor_count;
+}
+
+hubo_info_data* hubo_info_init_data(size_t joint_count, size_t jmc_count, size_t sensor_count);
 
 hubo_info_data* hubo_info_receive_data(double timeout); ///< Will return NULL pointer if there is an error
 
@@ -95,11 +115,20 @@ inline size_t hubo_info_get_jmc_location(const hubo_info_data* data, size_t jmc_
             + jmc_index*sizeof(hubo_jmc_info_t);
 }
 
-inline size_t hubo_info_predict_data_size(size_t joint_count, size_t jmc_count)
+inline size_t hubo_info_get_sensor_location(const hubo_info_data* data, size_t sensor_index)
+{
+    return sizeof(hubo_meta_info_t)
+            + hubo_info_get_joint_count(data)*sizeof(hubo_joint_info_t)
+            + hubo_info_get_jmc_count(data)*sizeof(hubo_jmc_info_t)
+            + sensor_index*sizeof(hubo_sensor_info_t);
+}
+
+inline size_t hubo_info_predict_data_size(size_t joint_count, size_t jmc_count, size_t sensor_count)
 {
     return sizeof(hubo_meta_info_t)
             + joint_count*sizeof(hubo_joint_info_t)
-            + jmc_count*sizeof(hubo_jmc_info_t);
+            + jmc_count*sizeof(hubo_jmc_info_t)
+            + sensor_count*sizeof(hubo_sensor_info_t);
 }
 
 inline size_t hubo_info_get_data_size(const hubo_info_data* data)

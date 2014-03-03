@@ -8,20 +8,12 @@
 
 namespace HuboCan {
 
-typedef std::vector<HuboJoint*> JointPtrArray;
-typedef std::vector<HuboJmc*> JmcPtrArray;
-
 class HuboDescription
 {
 public:
 
     HuboDescription();
-//    HuboDescription(bool receive=false, double timeout=2);
-//    HuboDescription(const std::string& filename);
     ~HuboDescription();
-
-    JointPtrArray joints;
-    JmcPtrArray jmcs;
 
     virtual bool parseFile(const std::string& filename);
 
@@ -38,9 +30,9 @@ public:
      * \brief How many joints the currently running Hubo has
      * \return
      */
-    inline size_t jointCount() { return joints.size(); }
+    inline size_t jointCount() { return _joints.size(); }
 
-    inline size_t jmcCount() { return jmcs.size(); }
+    inline size_t jmcCount() { return _jmcs.size(); }
 
     /*!
      * \fn getJointIndex()
@@ -72,6 +64,7 @@ public:
 protected:
 
     HuboJointPtrArray _joints;
+    HuboJmcPtrArray _jmcs;
 
     virtual bool _parseDevice(const std::string& device_type);
 

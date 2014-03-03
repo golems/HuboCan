@@ -5,11 +5,11 @@ extern "C" {
 #include "hubo_info_c.h"
 }
 
-#include "CanDevice.hpp"
+#include <vector>
 
 namespace HuboCan {
 
-class HuboJoint : public CanDevice
+class HuboJoint
 {
 public:
 
