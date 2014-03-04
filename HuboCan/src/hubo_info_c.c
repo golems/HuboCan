@@ -120,7 +120,7 @@ int hubo_info_send_data(const hubo_info_data *data)
     {
         fprintf(stderr, "Could not open Hubo's meta info channel \"%s\"\n"
                 " -- Ach Error: %s (%d)\n"
-                " -- Make sure you are using the Manager correctly\n",
+                " -- The Manager should open this channel if you are using it correctly\n",
                 HUBO_INFO_META_CHANNEL, ach_result_to_string(r), (int)r);
         return -1;
     }
@@ -135,7 +135,7 @@ int hubo_info_send_data(const hubo_info_data *data)
     {
         fprintf(stderr, "Could not open Hubo's joint info channel \"%s\"\n"
                 " -- Ach Error: %s (%d)\n"
-                " -- Make sure you are using the Manager correctly\n",
+                " -- The Manager should open this channel if you are using it correctly\n",
                 HUBO_INFO_META_CHANNEL, ach_result_to_string(r), (int)r);
         return -2;
     }

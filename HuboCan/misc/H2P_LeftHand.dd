@@ -1,0 +1,83 @@
+
+begin   Joint
+
+name            LF1
+software_index  28
+
+drive       1
+driven      1
+harmonic    256
+encoder     128
+
+hardware_index  0
+jmc_name        EJMC5
+
+end     Joint
+
+###########################
+
+begin   Joint
+
+name            LF2
+software_index  29
+
+drive       1
+driven      1
+harmonic    256
+encoder     128
+
+hardware_index  1
+jmc_name        EJMC5
+
+end     Joint
+
+###########################
+
+begin   Joint
+
+name            LF3
+software_index  30
+
+drive       1
+driven      1
+harmonic    256
+encoder     128
+
+hardware_index  2
+jmc_name        EJMC5
+
+end     Joint
+
+###########################
+
+begin   Joint
+
+name            LF4
+software_index  31
+
+drive       1
+driven      1
+harmonic    256
+encoder     128
+
+hardware_index  3
+jmc_name        EJMC5
+
+end     Joint
+
+###########################
+
+begin   Joint
+
+name            LF5
+software_index  32
+
+drive       1
+driven      1
+harmonic    256
+encoder     128
+
+hardware_index  4
+jmc_name        EJMC5
+
+end     Joint

@@ -1,0 +1,83 @@
+
+begin   Joint
+
+name            RF1
+software_index  33
+
+drive       1
+driven      1
+harmonic    256
+encoder     128
+
+hardware_index  0
+jmc_name        EJMC4
+
+end     Joint
+
+###########################
+
+begin   Joint
+
+name            RF2
+software_index  34
+
+drive       1
+driven      1
+harmonic    256
+encoder     128
+
+hardware_index  1
+jmc_name        EJMC4
+
+end     Joint
+
+###########################
+
+begin   Joint
+
+name            RF3
+software_index  35
+
+drive       1
+driven      1
+harmonic    256
+encoder     128
+
+hardware_index  2
+jmc_name        EJMC4
+
+end     Joint
+
+###########################
+
+begin   Joint
+
+name            RF4
+software_index  36
+
+drive       1
+driven      1
+harmonic    256
+encoder     128
+
+hardware_index  3
+jmc_name        EJMC4
+
+end     Joint
+
+###########################
+
+begin   Joint
+
+name            RF5
+software_index  37
+
+drive       1
+driven      1
+harmonic    256
+encoder     128
+
+hardware_index  4
+jmc_name        EJMC4
+
+end     Joint

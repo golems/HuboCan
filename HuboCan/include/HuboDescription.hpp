@@ -4,6 +4,7 @@
 #include "InfoTypes.hpp"
 #include "HuboJmc.hpp"
 #include "HuboJoint.hpp"
+#include "HuboSensor.hpp"
 #include "DdParser.hpp"
 
 namespace HuboCan {
@@ -15,6 +16,14 @@ public:
     HuboDescription();
     ~HuboDescription();
 
+    /*!
+     * \fn parseFile(const std::string& filename)
+     * \brief Reads in a device description from the .dd file given by filename
+     * \param filename
+     * \return
+     *
+     * Returns true if and only if the parsing and processing had no errors.
+     */
     virtual bool parseFile(const std::string& filename);
 
     /*!
@@ -26,13 +35,20 @@ public:
     int receiveInfo(double timeout=2);
 
     /*!
+     * \fn broadcastInfo()
+     * \brief Sends out the HuboDescription info to the appropriate Ach Channels
+     * \return
+     */
+    int broadcastInfo();
+
+    /*!
      * \fn jointCount()
      * \brief How many joints the currently running Hubo has
      * \return
      */
-    inline size_t jointCount() { return _joints.size(); }
+    inline size_t jointCount() { return joints.size(); }
 
-    inline size_t jmcCount() { return _jmcs.size(); }
+    inline size_t jmcCount() { return jmcs.size(); }
 
     /*!
      * \fn getJointIndex()
@@ -63,13 +79,13 @@ public:
 
     size_t getJmcIndex(const std::string& jmc_name);
 
+    HuboJointPtrArray joints;
+    HuboJmcPtrArray jmcs;
+    HuboSensorPtrArray sensors;
 
 protected:
 
     HuboJointPtrMap _tempJointMap;
-
-    HuboJointPtrArray _joints;
-    HuboJmcPtrArray _jmcs;
 
     virtual bool _parseDevice(const std::string& device_type);
 

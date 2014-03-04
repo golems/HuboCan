@@ -20,14 +20,14 @@ const char drchubo_hybrid_code[] = "DRC_HYBRID";
 
 namespace HuboCan {
 
-class HuboJmc
+class HuboJmc : public CanDevice
 {
 public:
 
     hubo_jmc_info_t info;
     HuboJointPtrArray joints;
 
-    void addJoint(HuboJoint* joint);
+    bool addJoint(HuboJoint* joint, std::string& error_report);
     bool sortJoints(std::string& error_report);
 
 protected:

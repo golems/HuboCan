@@ -1,0 +1,100 @@
+
+begin   Joint
+
+name            LHY
+software_index  4
+
+drive       10
+driven      25
+harmonic    100
+encoder     4000
+
+hardware_index  0
+jmc_name        JMC4
+
+end     Joint
+
+###########################
+
+begin   Joint
+
+name            LHR
+software_index  5
+
+drive       324
+driven      1024
+harmonic    160
+encoder     4000
+
+hardware_index  1
+jmc_name        JMC4
+
+end     Joint
+
+###########################
+
+begin   Joint
+
+name            LHP
+software_index  6
+
+drive       16
+driven      20
+harmonic    160
+encoder     4000
+
+hardware_index  0
+jmc_name        JMC5
+
+end     Joint
+
+###########################
+
+begin   Joint
+
+name            LKP
+software_index  7
+
+drive       16
+driven      16
+harmonic    160
+encoder     4000
+
+hardware_index  0
+jmc_name        JMC6
+
+end     Joint
+
+###########################
+
+begin   Joint
+
+name            LAP
+software_index  8
+
+drive       10
+driven      25
+harmonic    100
+encoder     4000
+
+hardware_index  0
+jmc_name        JMC7
+
+end     Joint
+
+###########################
+
+begin   Joint
+
+name            LAR
+software_index  9
+
+drive       324
+driven      1024
+harmonic    100
+encoder     4000
+
+hardware_index  1
+jmc_name        JMC7
+
+end     Joint

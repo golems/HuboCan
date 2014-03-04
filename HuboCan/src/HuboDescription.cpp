@@ -17,14 +17,14 @@ HuboDescription::~HuboDescription()
 {
     free(_data);
 
-    for(size_t i=0; i<_joints.size(); ++i)
+    for(size_t i=0; i<joints.size(); ++i)
     {
-        delete _joints[i];
+        delete joints[i];
     }
 
-    for(size_t i=0; i<_jmcs.size(); ++i)
+    for(size_t i=0; i<jmcs.size(); ++i)
     {
-        delete _jmcs[i];
+        delete jmcs[i];
     }
 }
 
@@ -42,18 +42,46 @@ int HuboDescription::receiveInfo(double timeout)
     {
         HuboJoint* newJoint = new HuboJoint;
         newJoint->info = *hubo_info_get_joint_info(_data, i);
-        _joints.push_back(newJoint);
+        joints.push_back(newJoint);
     }
 
     for(size_t i=0; i < joint_count; ++i)
     {
         HuboJmc* newJmc = new HuboJmc;
         newJmc->info = *hubo_info_get_jmc_info(_data, i);
-        _jmcs.push_back(newJmc);
+        jmcs.push_back(newJmc);
     }
 
     free(_data);
     _data = NULL;
+
+    return 0;
+}
+
+int HuboDescription::broadcastInfo()
+{
+    free(_data);
+    _data = hubo_info_init_data(joints.size(), jmcs.size(), sensors.size());
+
+    for(size_t i=0; i < joints.size(); ++i)
+    {
+        size_t loc = hubo_info_get_joint_location(_data, i);
+        memcpy(_data+loc, joints[i], sizeof(hubo_joint_info_t));
+    }
+
+    for(size_t i=0; i < jmcs.size(); ++i)
+    {
+        size_t loc = hubo_info_get_jmc_location(_data, i);
+        memcpy(_data+loc, jmcs[i], sizeof(hubo_jmc_info_t));
+    }
+
+    for(size_t i=0; i < sensors.size(); ++i)
+    {
+        size_t loc = hubo_info_get_sensor_location(_data, i);
+        memcpy(_data+loc, sensors[i], sizeof(hubo_jmc_info_t));
+    }
+
+    hubo_info_send_data(_data);
 
     return 0;
 }
@@ -208,6 +236,14 @@ bool HuboDescription::_parseJoint(bool strict)
         }
     }
 
+    HuboJointPtrMap::iterator check = _tempJointMap.find(joint_index);
+    if(check != _tempJointMap.end())
+    {
+        _parser.error << "Repeated software index: " << check->first;
+        _parser.error << "\n --This already belongs to a joint named '" << check->second->info.name << "'";
+        _parser.report_error();
+    }
+
     if(_parser.status() == DD_ERROR)
         return false;
 
@@ -277,9 +313,9 @@ bool HuboDescription::_parseJMC(bool strict)
             return false;
     }
 
-    for(size_t i=0; i < _jmcs.size(); ++i)
+    for(size_t i=0; i < jmcs.size(); ++i)
     {
-        if(strcmp(new_jmc_info.name, _jmcs[i]->info.name) == 0)
+        if(strcmp(new_jmc_info.name, jmcs[i]->info.name) == 0)
         {
             _parser.error << "Repated JMC name: " << new_jmc_info.name;
             _parser.report_error();
@@ -322,7 +358,7 @@ bool HuboDescription::_parseJMC(bool strict)
     }
 
     new_jmc->info = new_jmc_info;
-    _jmcs.push_back(new_jmc);
+    jmcs.push_back(new_jmc);
 
     return true;
 }
@@ -343,8 +379,9 @@ bool HuboDescription::_parseForceTorque(bool strict)
 
 bool HuboDescription::_postParseProcessing()
 {
-    _joints.clear();
+    joints.clear();
 
+    std::string report;
     HuboJointPtrMap::iterator it = _tempJointMap.begin();
     for(size_t i=0; i < _tempJointMap.size(); ++i)
     {
@@ -356,18 +393,23 @@ bool HuboDescription::_postParseProcessing()
             return false;
         }
 
-        _joints.push_back(it->second);
+        joints.push_back(it->second);
 
-        size_t jmc_index = getJmcIndex(_joints[i]->info.jmc_name);
-        _jmcs[jmc_index]->addJoint(_joints[i]);
+        size_t jmc_index = getJmcIndex(joints[i]->info.jmc_name);
+
+        if(!jmcs[jmc_index]->addJoint(joints[i], report))
+        {
+            _parser.error << report;
+            _parser.report_error();
+            return false;
+        }
 
         ++it;
     }
 
-    for(size_t i=0; i < _jmcs.size(); ++i)
+    for(size_t i=0; i < jmcs.size(); ++i)
     {
-        std::string report;
-        if(!_jmcs[i]->sortJoints(report))
+        if(!jmcs[i]->sortJoints(report))
         {
             _parser.error << report;
             _parser.report_error();
@@ -385,7 +427,7 @@ JointIndex HuboDescription::getJointIndex(const std::string& joint_name)
 {
     for(JointIndex i=0; i < jointCount(); ++i)
     {
-        std::string current_name(_joints[i]->info.name);
+        std::string current_name(joints[i]->info.name);
         if(joint_name == current_name)
         {
             return i;
@@ -416,16 +458,16 @@ hubo_joint_info_t HuboDescription::getJointInfo(JointIndex joint_index)
         return info;
     }
 
-    return _joints[joint_index]->info;
+    return joints[joint_index]->info;
 }
 
 
 size_t HuboDescription::getJmcIndex(const std::string &jmc_name)
 {
     size_t result = InvalidIndex;
-    for(size_t i=0; i < _jmcs.size(); ++i)
+    for(size_t i=0; i < jmcs.size(); ++i)
     {
-        if(jmc_name.compare(_jmcs[i]->info.name)==0)
+        if(jmc_name.compare(jmcs[i]->info.name)==0)
         {
             return i;
         }
