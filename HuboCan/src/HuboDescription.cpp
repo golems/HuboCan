@@ -81,9 +81,12 @@ int HuboDescription::broadcastInfo()
         memcpy(_data+loc, sensors[i], sizeof(hubo_jmc_info_t));
     }
 
-    hubo_info_send_data(_data);
+    int result = hubo_info_send_data(_data);
 
-    return 0;
+    free(_data);
+    _data = NULL;
+
+    return result;
 }
 
 bool HuboDescription::parseFile(const std::string &filename)
@@ -474,12 +477,3 @@ size_t HuboDescription::getJmcIndex(const std::string &jmc_name)
     }
     return result;
 }
-
-
-
-
-
-
-
-
-
