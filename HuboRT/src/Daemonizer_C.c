@@ -115,9 +115,7 @@ static int hubo_rt_make_directory_component(const char* subdirectory)
             return -1;
         }
     }
-    return 0;
-    
-    
+
     return 0;
 }
 
