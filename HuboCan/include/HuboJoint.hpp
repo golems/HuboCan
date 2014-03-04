@@ -6,6 +6,7 @@ extern "C" {
 }
 
 #include <vector>
+#include <map>
 
 namespace HuboCan {
 
@@ -21,6 +22,7 @@ protected:
 };
 
 typedef std::vector<HuboJoint*> HuboJointPtrArray;
+typedef std::map<size_t,HuboJoint*> HuboJointPtrMap;
 
 } // namespace HuboCan
 

@@ -23,6 +23,6 @@ typedef std::vector<size_t> IndexArray;
 typedef std::vector<double> ValueArray;
 typedef std::vector<std::string> StringArray;
 
-const size_t InvalidIndex = -1;
+const size_t InvalidIndex = size_t(-1);
 
 #endif // INFOTYPES_HPP

@@ -7,6 +7,7 @@ extern "C" {
 
 #include "CanDevice.hpp"
 #include "HuboJoint.hpp"
+#include <string>
 
 const char hubo2plus_1ch_code[] = "H2P_1CH";
 const char hubo2plus_2ch_code[] = "H2P_2CH";
@@ -24,9 +25,14 @@ class HuboJmc
 public:
 
     hubo_jmc_info_t info;
+    HuboJointPtrArray joints;
+
+    void addJoint(HuboJoint* joint);
+    bool sortJoints(std::string& error_report);
 
 protected:
 
+    HuboJointPtrMap _tempJointMap;
 
 };
 

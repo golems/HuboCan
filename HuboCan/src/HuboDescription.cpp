@@ -74,7 +74,7 @@ bool HuboDescription::parseFile(const std::string &filename)
         }
     }
 
-    return true;
+    return _postParseProcessing();
 }
 
 bool HuboDescription::_parseDevice(const std::string &device_type)
@@ -105,6 +105,7 @@ bool HuboDescription::_parseDevice(const std::string &device_type)
 
 bool HuboDescription::_parseJoint(bool strict)
 {
+    size_t joint_index = size_t(-1);
     hubo_joint_info_t new_joint_info;
     memset(&new_joint_info, 0, sizeof(hubo_joint_info_t));
 
@@ -173,6 +174,10 @@ bool HuboDescription::_parseJoint(bool strict)
                 strcpy(new_joint_info.jmc_name, components[1].c_str());
             }
         }
+        else if("software_index" == components[0])
+        {
+            joint_index = atoi(components[1].c_str());
+        }
         else
         {
             if(strict)
@@ -186,19 +191,29 @@ bool HuboDescription::_parseJoint(bool strict)
             return false;
     }
 
-    for(size_t i=0; i < _joints.size(); ++i)
+    if(size_t(-1) == joint_index)
     {
-        if(strcmp(new_joint_info.name, _joints[i]->info.name)==0)
+        _parser.error << "software_index parameter is never specified!";
+        _parser.report_error();
+    }
+
+    HuboJointPtrMap::iterator it;
+    for( it = _tempJointMap.begin(); it != _tempJointMap.end(); ++it)
+    {
+        if(strcmp(new_joint_info.name,it->second->info.name)==0)
         {
             _parser.error << "Repeated joint name: " << new_joint_info.name;
             _parser.report_error();
-            return false;
+            break;
         }
     }
 
+    if(_parser.status() == DD_ERROR)
+        return false;
+
     HuboJoint* new_joint = new HuboJoint;
     new_joint->info = new_joint_info;
-    _joints.push_back(new_joint);
+    _tempJointMap[joint_index] = new_joint;
 
     return true;
 }
@@ -268,9 +283,12 @@ bool HuboDescription::_parseJMC(bool strict)
         {
             _parser.error << "Repated JMC name: " << new_jmc_info.name;
             _parser.report_error();
-            return false;
+            break;
         }
     }
+
+    if(_parser.status() == DD_ERROR)
+        return false;
 
     HuboJmc* new_jmc = NULL;
     std::string type_string(new_jmc_info.type);
@@ -323,6 +341,46 @@ bool HuboDescription::_parseForceTorque(bool strict)
     return true;
 }
 
+bool HuboDescription::_postParseProcessing()
+{
+    _joints.clear();
+
+    HuboJointPtrMap::iterator it = _tempJointMap.begin();
+    for(size_t i=0; i < _tempJointMap.size(); ++i)
+    {
+        if( it->first != i )
+        {
+            _parser.error << "Your device description file is missing a joint for index #"
+                      << i << "!";
+            _parser.report_error();
+            return false;
+        }
+
+        _joints.push_back(it->second);
+
+        size_t jmc_index = getJmcIndex(_joints[i]->info.jmc_name);
+        _jmcs[jmc_index]->addJoint(_joints[i]);
+
+        ++it;
+    }
+
+    for(size_t i=0; i < _jmcs.size(); ++i)
+    {
+        std::string report;
+        if(!_jmcs[i]->sortJoints(report))
+        {
+            _parser.error << report;
+            _parser.report_error();
+        }
+
+        if(_parser.status() == DD_ERROR)
+            return false;
+    }
+
+    _tempJointMap.clear();
+    return true;
+}
+
 JointIndex HuboDescription::getJointIndex(const std::string& joint_name)
 {
     for(JointIndex i=0; i < jointCount(); ++i)
@@ -360,3 +418,26 @@ hubo_joint_info_t HuboDescription::getJointInfo(JointIndex joint_index)
 
     return _joints[joint_index]->info;
 }
+
+
+size_t HuboDescription::getJmcIndex(const std::string &jmc_name)
+{
+    size_t result = InvalidIndex;
+    for(size_t i=0; i < _jmcs.size(); ++i)
+    {
+        if(jmc_name.compare(_jmcs[i]->info.name)==0)
+        {
+            return i;
+        }
+    }
+    return result;
+}
+
+
+
+
+
+
+
+
+

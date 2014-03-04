@@ -42,7 +42,7 @@
 
 #include "AchIncludes.h"
 #include "hubo_cmd_c.h"
-#include "InfoReceiver.hpp"
+#include "HuboDescription.hpp"
 
 namespace HuboCmd {
 
@@ -81,7 +81,7 @@ protected:
     void _initialize();
     hubo_cmd_data* cmd_data;
 
-    HuboCan::InfoReceiver _info;
+    HuboCan::HuboDescription _desc;
 
 };
 

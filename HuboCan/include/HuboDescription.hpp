@@ -61,7 +61,12 @@ public:
     hubo_joint_info_t getJointInfo(JointIndex joint_index);
 
 
+    size_t getJmcIndex(const std::string& jmc_name);
+
+
 protected:
+
+    HuboJointPtrMap _tempJointMap;
 
     HuboJointPtrArray _joints;
     HuboJmcPtrArray _jmcs;
@@ -72,6 +77,8 @@ protected:
     virtual bool _parseJMC(bool strict=true);
     virtual bool _parseIMU(bool strict=true);
     virtual bool _parseForceTorque(bool strict=true);
+
+    virtual bool _postParseProcessing();
 
     DdParser _parser;
 
