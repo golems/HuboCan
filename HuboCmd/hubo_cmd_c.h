@@ -30,6 +30,7 @@ typedef enum hubo_cmd_mode {
     HUBO_CMD_COMPLIANT,
     HUBO_CMD_HYBRID,
 
+    HUBO_CMD_HOME,
     HUBO_CMD_CLAIM,
     HUBO_CMD_RELEASE
 
@@ -81,7 +82,7 @@ size_t hubo_cmd_data_compressor(hubo_cmd_data* compressed, const hubo_cmd_data* 
 
 void hubo_cmd_data_set_joint_cmd(hubo_cmd_data* data, const hubo_joint_cmd_t* cmd, size_t joint_num);
 
-void hubo_cmd_data_get_joint_cmd(hubo_joint_cmd_t* output, const hubo_cmd_data* data, size_t joint_num);
+int hubo_cmd_data_get_joint_cmd(hubo_joint_cmd_t* output, const hubo_cmd_data* data, size_t joint_num);
 
 size_t hubo_cmd_data_get_size(const hubo_cmd_data* data);
 

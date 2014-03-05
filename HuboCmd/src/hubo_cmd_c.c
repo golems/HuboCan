@@ -120,14 +120,14 @@ void hubo_cmd_data_set_joint_cmd(hubo_cmd_data *data, const hubo_joint_cmd_t *cm
     memcpy(data+hubo_cmd_data_location(joint_num), cmd, sizeof(hubo_joint_cmd_t));
 }
 
-void hubo_cmd_data_get_joint_cmd(hubo_joint_cmd_t *output, const hubo_cmd_data *data, size_t joint_num)
+int hubo_cmd_data_get_joint_cmd(hubo_joint_cmd_t *output, const hubo_cmd_data *data, size_t joint_num)
 {
     size_t total_num_joints = hubo_cmd_data_get_total_num_joints(data);
     if(joint_num >= total_num_joints)
     {
         fprintf(stderr, "Attempting to get an out-of-bounds joint value in a hubo_cmd_cx_t!\n"
                 " -- Index:%zu, Maximum:%zu\n", joint_num, total_num_joints-1);
-        return;
+        return -1;
     }
 
     if(hubo_cmd_data_is_compressed(data) == 1) // The data is compressed
@@ -137,7 +137,7 @@ void hubo_cmd_data_get_joint_cmd(hubo_joint_cmd_t *output, const hubo_cmd_data *
         {
             fprintf(stderr, "Attempting to get joint information from a compressed data set which does not\n"
                     "\tcontain the requested joint index (%zu)\n", joint_num);
-            return;
+            return -2;
         }
 
         size_t i=0;
@@ -159,7 +159,10 @@ void hubo_cmd_data_get_joint_cmd(hubo_joint_cmd_t *output, const hubo_cmd_data *
     else
     {
         fprintf(stderr, "Your hubo_cmd_cx_t is malformed!! The compressed flag believes it is '%d'\n", hubo_cmd_data_is_compressed(data));
+        return -3;
     }
+
+    return 0;
 }
 
 size_t hubo_cmd_data_get_size(const hubo_cmd_data *data)

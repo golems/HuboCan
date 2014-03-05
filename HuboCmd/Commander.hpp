@@ -87,6 +87,12 @@ public:
 protected:
 
     void _initialize();
+    void _create_memory();
+
+    hubo_joint_cmd_t _container;
+    HuboCan::error_result_t _setup_container(JointIndex joint);
+
+    hubo_cmd_data* _compressed_data;
 
     HuboCan::HuboDescription _desc;
 };

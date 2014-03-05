@@ -8,7 +8,7 @@
 namespace HuboCan {
 enum error_flag {
 
-    NONE                = 0,
+    OKAY                = 0,
     INDEX_OUT_OF_BOUNDS = 1,
     ARRAY_MISMATCH      = 1 >> 1,
     ACH_ERROR           = 1 >> 2,
