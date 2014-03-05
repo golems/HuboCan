@@ -1,5 +1,6 @@
 
 #include "../Commander.hpp"
+#include <stdlib.h>
 
 using namespace HuboCmd;
 
