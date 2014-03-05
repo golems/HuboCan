@@ -189,7 +189,7 @@ bool HuboDescription::_parseJoint(bool strict)
     {
         if(components.size() < 2)
         {
-            _parser.error << "Every component must have at least one argument!";
+            _parser.error() << "Every component must have at least one argument!";
             _parser.report_error();
         }
 
@@ -197,7 +197,7 @@ bool HuboDescription::_parseJoint(bool strict)
         {
             if(components[1].size() > HUBO_COMPONENT_NAME_MAX_LENGTH)
             {
-                _parser.error << "Component name string overflow! Max size is " << HUBO_COMPONENT_NAME_MAX_LENGTH;
+                _parser.error() << "Component name string overflow! Max size is " << HUBO_COMPONENT_NAME_MAX_LENGTH;
                 _parser.report_error();
             }
             else
@@ -241,7 +241,7 @@ bool HuboDescription::_parseJoint(bool strict)
         {
             if(components[1].size() > HUBO_COMPONENT_NAME_MAX_LENGTH)
             {
-                _parser.error << "Component name string overflow! Max size is " << HUBO_COMPONENT_NAME_MAX_LENGTH;
+                _parser.error() << "Component name string overflow! Max size is " << HUBO_COMPONENT_NAME_MAX_LENGTH;
                 _parser.report_error();
             }
             else
@@ -257,7 +257,7 @@ bool HuboDescription::_parseJoint(bool strict)
         {
             if(strict)
             {
-                _parser.error << "Invalid component: " << components[0];
+                _parser.error() << "Invalid component: " << components[0];
                 _parser.report_error();
             }
         }
@@ -268,7 +268,7 @@ bool HuboDescription::_parseJoint(bool strict)
 
     if(size_t(-1) == joint_index)
     {
-        _parser.error << "software_index parameter is never specified!";
+        _parser.error() << "software_index parameter is never specified!";
         _parser.report_error();
     }
 
@@ -277,7 +277,7 @@ bool HuboDescription::_parseJoint(bool strict)
     {
         if(strcmp(new_joint_info.name,it->second->info.name)==0)
         {
-            _parser.error << "Repeated joint name: " << new_joint_info.name;
+            _parser.error() << "Repeated joint name: " << new_joint_info.name;
             _parser.report_error();
             break;
         }
@@ -286,8 +286,8 @@ bool HuboDescription::_parseJoint(bool strict)
     HuboJointPtrMap::iterator check = _tempJointMap.find(joint_index);
     if(check != _tempJointMap.end())
     {
-        _parser.error << "Repeated software index: " << check->first;
-        _parser.error << "\n --This already belongs to a joint named '" << check->second->info.name << "'";
+        _parser.error() << "Repeated software index: " << check->first;
+        _parser.error() << "\n --This already belongs to a joint named '" << check->second->info.name << "'";
         _parser.report_error();
     }
 
@@ -312,7 +312,7 @@ bool HuboDescription::_parseJMC(bool strict)
     {
         if(components.size() < 2)
         {
-            _parser.error << "Every component must have at least one argument!";
+            _parser.error() << "Every component must have at least one argument!";
             _parser.report_error();
         }
 
@@ -320,7 +320,7 @@ bool HuboDescription::_parseJMC(bool strict)
         {
             if(components[1].size() > HUBO_COMPONENT_NAME_MAX_LENGTH)
             {
-                _parser.error << "Component name string overflow! Max size is " << HUBO_COMPONENT_NAME_MAX_LENGTH;
+                _parser.error() << "Component name string overflow! Max size is " << HUBO_COMPONENT_NAME_MAX_LENGTH;
                 _parser.report_error();
             }
             else
@@ -332,7 +332,7 @@ bool HuboDescription::_parseJMC(bool strict)
         {
             if(components[1].size() > HUBO_COMPONENT_NAME_MAX_LENGTH)
             {
-                _parser.error << "Component type string overflow! max size is " << HUBO_COMPONENT_TYPE_MAX_LENGTH;
+                _parser.error() << "Component type string overflow! max size is " << HUBO_COMPONENT_TYPE_MAX_LENGTH;
                 _parser.report_error();
             }
             else
@@ -352,7 +352,7 @@ bool HuboDescription::_parseJMC(bool strict)
         {
             if(strict)
             {
-                _parser.error << "Invalid component: " << components[0];
+                _parser.error() << "Invalid component: " << components[0];
                 _parser.report_error();
             }
         }
@@ -365,7 +365,7 @@ bool HuboDescription::_parseJMC(bool strict)
     {
         if(strcmp(new_jmc_info.name, jmcs[i]->info.name) == 0)
         {
-            _parser.error << "Repated JMC name: " << new_jmc_info.name;
+            _parser.error() << "Repated JMC name: " << new_jmc_info.name;
             _parser.report_error();
             break;
         }
@@ -400,7 +400,7 @@ bool HuboDescription::_parseJMC(bool strict)
 
     if( NULL == new_jmc )
     {
-        _parser.error << "Invalid JMC type: " << new_jmc_info.type;
+        _parser.error() << "Invalid JMC type: " << new_jmc_info.type;
         _parser.report_error();
         return false;
     }
@@ -435,7 +435,7 @@ bool HuboDescription::_postParseProcessing()
     {
         if( it->first != i )
         {
-            _parser.error << "Your device description file is missing a joint for index #"
+            _parser.error() << "Your device description file is missing a joint for index #"
                       << i << "!";
             _parser.report_error();
             return false;
@@ -447,7 +447,7 @@ bool HuboDescription::_postParseProcessing()
 
         if(!jmcs[jmc_index]->addJoint(joints[i], report))
         {
-            _parser.error << report;
+            _parser.error() << report;
             _parser.report_error();
             return false;
         }
@@ -459,7 +459,7 @@ bool HuboDescription::_postParseProcessing()
     {
         if(!jmcs[i]->sortJoints(report))
         {
-            _parser.error << report;
+            _parser.error() << report;
             _parser.report_error();
         }
 
@@ -473,7 +473,7 @@ bool HuboDescription::_postParseProcessing()
 
 JointIndex HuboDescription::getJointIndex(const std::string& joint_name)
 {
-    for(JointIndex i=0; i < jointCount(); ++i)
+    for(JointIndex i=0; i < getJointCount(); ++i)
     {
         std::string current_name(joints[i]->info.name);
         if(joint_name == current_name)
@@ -497,10 +497,10 @@ IndexArray HuboDescription::getJointIndices(StringArray joint_names)
 
 hubo_joint_info_t HuboDescription::getJointInfo(JointIndex joint_index)
 {
-    if( joint_index >= jointCount() )
+    if( joint_index >= getJointCount() )
     {
         fprintf(stderr, "Requesting joint info for an index which is out-of-bounds (%zu)!\n"
-                " -- Maximum index is %zu\n", joint_index, jointCount()-1);
+                " -- Maximum index is %zu\n", joint_index, getJointCount()-1);
         hubo_joint_info_t info;
         memset(&info, 0, sizeof(hubo_joint_info_t));
         return info;

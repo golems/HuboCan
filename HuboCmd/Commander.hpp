@@ -40,8 +40,10 @@
 #ifndef HUBOCOMMANDER_HPP
 #define HUBOCOMMANDER_HPP
 
+extern "C" {
 #include "HuboCan/AchIncludes.h"
 #include "HuboCmd/hubo_cmd_c.h"
+}
 #include "HuboCan/HuboDescription.hpp"
 
 namespace HuboCmd {
@@ -52,8 +54,12 @@ class Commander
 {
 public:
 
-    Commander();
+    Commander(double timeout=2);
+    Commander(const HuboCan::HuboDescription& description);
     ~Commander();
+
+    bool getDescription(double timeout=2);
+    void getDescription(const HuboCan::HuboDescription& description);
 
     HuboCan::error_result_t set_mode(JointIndex joint, hubo_cmd_mode_t mode);
     HuboCan::error_result_t set_modes(IndexArray joints, ModeArray modes);
@@ -76,13 +82,13 @@ public:
 
     HuboCan::error_result_t send_commands();
 
+    hubo_cmd_data* cmd_data;
+
 protected:
 
     void _initialize();
-    hubo_cmd_data* cmd_data;
 
     HuboCan::HuboDescription _desc;
-
 };
 
 } // HuboCmd

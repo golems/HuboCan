@@ -1,17 +1,40 @@
 
-#include "HuboCmd/Commander.hpp"
+#include "../Commander.hpp"
 
 using namespace HuboCmd;
 
-Commander::Commander()
+Commander::Commander(double timeout)
 {
-    _initialize();
+    cmd_data = NULL;
+    getDescription(timeout);
+}
+
+Commander::Commander(const HuboCan::HuboDescription& description)
+{
+    cmd_data = NULL;
+    getDescription(description);
 }
 
 void Commander::_initialize()
 {
-    // How to find the number of joints??
-//    cmd_data = hubo_cmd_init_data( derp );
+    free(cmd_data);
+    if(_desc.getJointCount() > 0)
+        cmd_data = hubo_cmd_init_data( _desc.getJointCount() );
+    else
+        cmd_data = NULL;
+}
+
+bool Commander::getDescription(double timeout)
+{
+    int result = _desc.receiveInfo(timeout);
+    _initialize();
+    return result;
+}
+
+void Commander::getDescription(const HuboCan::HuboDescription &description)
+{
+    _desc = description;
+    _initialize();
 }
 
 Commander::~Commander()

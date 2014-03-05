@@ -1,5 +1,5 @@
 
-#include "HuboCan/DdParser.hpp"
+#include "../DdParser.hpp"
 #include <fstream>
 #include <ostream>
 #include <iostream>
@@ -16,6 +16,7 @@ void DdParser::_initialize()
     reset();
     _status = DD_END_FILE;
     error_output_stream = &std::cerr;
+    _error_input_stream = new std::stringstream;
 }
 
 bool DdParser::load_file(const std::string &filename)
@@ -43,7 +44,7 @@ bool DdParser::_push_back_file(const std::string &filename, bool inclusion, cons
         {
             if( full_filename == _filename_list[i] )
             {
-                error << "Infinite loop found after including '" << full_filename << "'! Aborting!";
+                error() << "Infinite loop found after including '" << full_filename << "'! Aborting!";
                 report_error();
                 return false;
             }
@@ -57,7 +58,7 @@ bool DdParser::_push_back_file(const std::string &filename, bool inclusion, cons
 
     if(!filestream.is_open())
     {
-        error << "Could not open '" << filename << "'! (Resolved to '" << full_filename << "')";
+        error() << "Could not open '" << filename << "'! (Resolved to '" << full_filename << "')";
         report_error();
         return false;
     }
@@ -111,7 +112,7 @@ bool DdParser::_inclusion_check(StringArray &line, std::string parent_filename)
             }
             else
             {
-                error << "The keyword 'include' must be followed by a file name!";
+                error() << "The keyword 'include' must be followed by a file name!";
                 report_error();
                 return false;
             }
@@ -146,7 +147,7 @@ StringArray DdParser::get_string_components(const std::string &line)
                     
                     if(count >= remaining.size())
                     {
-                        error << "Unclosed quotes starting at character #" << progress-1;
+                        error() << "Unclosed quotes starting at character #" << progress-1;
                         report_error();
                         result.clear();
                         return result;
@@ -157,7 +158,7 @@ StringArray DdParser::get_string_components(const std::string &line)
                 {
                     if(!isspace(remaining.at(count+1)))
                     {
-                        error << "Found illegal quotes at character #" << progress+count+1;
+                        error() << "Found illegal quotes at character #" << progress+count+1;
                         report_error();
                         result.clear();
                         return result;
@@ -175,7 +176,7 @@ StringArray DdParser::get_string_components(const std::string &line)
                 {
                     if(remaining.at(count) == '\"')
                     {
-                        error << "Found illegal quotes at character #" << progress+count+1;
+                        error() << "Found illegal quotes at character #" << progress+count+1;
                         report_error();
                         result.clear();
                         return result;
@@ -246,9 +247,9 @@ void DdParser::report_error()
     else
         (*error_output_stream) << "next_index: " << _next_index-1 << ", size: " << _contents.size() << std::endl;
     
-    (*error_output_stream) << error.str() << std::endl;
-    error.str("");
-    error.clear();
+    (*error_output_stream) << error().str() << std::endl;
+    error().str("");
+    error().clear();
     
     _status = DD_ERROR;
 }
@@ -280,14 +281,14 @@ dd_result_t DdParser::next_line(StringArray &components)
     {
         if(_current_device_type != "")
         {
-            error << "The keyword 'begin' is being used inside of a device's description!";
+            error() << "The keyword 'begin' is being used inside of a device's description!";
             report_error();
             return _status;
         }
         
         if(components.size() < 2)
         {
-            error << "The keyword 'begin' must be followed by a device type!";
+            error() << "The keyword 'begin' must be followed by a device type!";
             report_error();
             _current_device_type = "";
             return _status;
@@ -305,7 +306,7 @@ dd_result_t DdParser::next_line(StringArray &components)
     {
         if(components.size() < 2)
         {
-            error << "The keyword 'end' must be followed by a device type!";
+            error() << "The keyword 'end' must be followed by a device type!";
             report_error();
             return _status;
         }
@@ -317,7 +318,7 @@ dd_result_t DdParser::next_line(StringArray &components)
             }
             else
             {
-                error << "The device type accompanying this 'end' does not match the last 'begin'!";
+                error() << "The device type accompanying this 'end' does not match the last 'begin'!";
                 report_error();
                 return _status;
             }

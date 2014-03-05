@@ -44,7 +44,7 @@ public:
     bool load_file(const std::string& filename);
 
     void report_error();
-    std::stringstream error;
+    std::stringstream& error() { return *_error_input_stream; }
 
     dd_result_t next_line(StringArray& components);
     bool current_line(StringArray& components);
@@ -66,6 +66,8 @@ public:
 
 protected:
     
+    std::stringstream* _error_input_stream;
+
     void _initialize();
 
     DdLineArray _contents;

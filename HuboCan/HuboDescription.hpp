@@ -46,9 +46,9 @@ public:
      * \brief How many joints the currently running Hubo has
      * \return
      */
-    inline size_t jointCount() { return joints.size(); }
+    inline size_t getJointCount() { return joints.size(); }
 
-    inline size_t jmcCount() { return jmcs.size(); }
+    inline size_t getJmcCount() { return jmcs.size(); }
 
     /*!
      * \fn getJointIndex()
