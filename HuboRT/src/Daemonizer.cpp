@@ -38,13 +38,13 @@
  */
 
 extern "C" {
-#include "Daemonizer_C.h"
-#include "HuboRtParams.h"
+#include "HuboRT/Daemonizer_C.h"
+#include "HuboRT/HuboRtParams.h"
 #include <syslog.h>
 #include <stdlib.h>
 }
 
-#include "Daemonizer.hpp"
+#include "HuboRT/Daemonizer.hpp"
 
 using namespace HuboRT;
 

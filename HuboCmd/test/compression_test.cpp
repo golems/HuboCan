@@ -1,6 +1,6 @@
 
 extern "C" {
-#include "hubo_cmd_c.h"
+#include "HuboCmd/hubo_cmd_c.h"
 }
 
 #include <iostream>

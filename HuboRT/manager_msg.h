@@ -2,7 +2,7 @@
 #define MANAGERMSGS_H
 
 #include <stdint.h>
-#include "HuboRtParams.h"
+#include "HuboRT/HuboRtParams.h"
 
 const char hubo_rt_mgr_req_chan[] = "hubo_rt_mgr_cmd";
 const char hubo_rt_mgr_reply_chan[] = "hubo_rt_mgr_reply";

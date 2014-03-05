@@ -76,6 +76,20 @@ public:
      */
     hubo_joint_info_t getJointInfo(JointIndex joint_index);
 
+    /*!
+     * \fn getJointTable()
+     * \brief Produces a table with the basic specs of all loaded joints
+     * \return
+     */
+    std::string getJointTable();
+
+    /*!
+     * \fn getJmcTable()
+     * \brief Produces a table with the basic specs of all loaded JMCs
+     * \return
+     */
+    std::string getJmcTable();
+
 
     size_t getJmcIndex(const std::string& jmc_name);
 

@@ -1,6 +1,6 @@
 
-#include "AchIncludes.h"
-#include "hubo_info_c.h"
+#include "HuboCan/AchIncludes.h"
+#include "HuboCan/hubo_info_c.h"
 #include <stdlib.h>
 #include <stdio.h>
 

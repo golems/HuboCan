@@ -30,6 +30,42 @@ public:
     bool addJoint(HuboJoint* joint, std::string& error_report);
     bool sortJoints(std::string& error_report);
 
+    inline static std::string header()
+    {
+        std::stringstream str;
+        str.setf(std::ios::fixed);
+        str.setf(std::ios::right);
+
+        str.width(8);
+        str << "JMC Name";
+        str.width(12);
+        str << "JMC Type";
+        str.width(7);
+        str << "Index";
+        str.width(13);
+        str << "CAN Channel";
+
+        return str.str();
+    }
+
+    inline std::string table() const
+    {
+        std::stringstream str;
+        str.setf(std::ios::fixed);
+        str.setf(std::ios::right);
+
+        str.width(8);   // JMC Name
+        str << info.name;
+        str.width(12);  // JMC Type
+        str << info.type;
+        str.width(7);   // Index
+        str << info.hardware_index;
+        str.width(13);  // CAN Channel
+        str << info.can_channel;
+
+        return str.str();
+    }
+
 protected:
 
     HuboJointPtrMap _tempJointMap;
@@ -87,5 +123,11 @@ protected:
 };
 
 } // namespace HuboCan
+
+inline std::ostream& operator<<(std::ostream& oStrStream, const HuboCan::HuboJmc& jmc)
+{
+    oStrStream << jmc.table();
+    return oStrStream;
+}
 
 #endif // HUBOJMC_HPP

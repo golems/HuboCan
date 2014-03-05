@@ -30,6 +30,7 @@ typedef struct hubo_meta_info {
 typedef struct hubo_joint_info {
 
     char name[HUBO_COMPONENT_NAME_MAX_LENGTH];
+    uint16_t software_index;
 
     float drive_factor;
     float driven_factor;
@@ -51,7 +52,7 @@ typedef struct hubo_jmc_info {
     char type[HUBO_COMPONENT_TYPE_MAX_LENGTH];
 
     uint16_t hardware_index;
-    uint8_t can_channel;
+    uint16_t can_channel;
 
 }__attribute__((packed)) hubo_jmc_info_t;
 

@@ -1,9 +1,9 @@
 
-#include "Manager.hpp"
+#include "HuboRT/Manager.hpp"
 #include <iostream>
 
 extern "C" {
-#include "Daemonizer_C.h"
+#include "HuboRT/Daemonizer_C.h"
 }
 
 int main(int argc, char* argv[])

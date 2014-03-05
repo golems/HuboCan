@@ -2,12 +2,12 @@ cmake_minimum_required(VERSION 2.6)
 
 get_filename_component(library_name ${CMAKE_CURRENT_LIST_DIR} NAME)
 
-include_directories(${CMAKE_CURRENT_LIST_DIR}/include)
-file(GLOB lib_source "src/*.cpp" "src/*.c" "include/*.hpp" "include/*.h")
+file(GLOB lib_source "src/*.cpp" "src/*.c" "*.hpp" "*.h")
 list(SORT lib_source)
 
 add_library(${library_name} SHARED ${lib_source})
-target_link_libraries(${library_name} ach)
+target_link_libraries(${library_name} ach rt HuboCan)
+
 
 file(GLOB unit_tests_source "test/*.cpp")
 LIST(SORT unit_tests_source)
@@ -18,7 +18,7 @@ foreach(utest_src_file ${unit_tests_source})
     get_filename_component(test_base ${utest_src_file} NAME_WE)
     message(STATUS "Adding test ${test_base}")
     add_executable(${test_base} ${utest_src_file})
-    target_link_libraries(${test_base} ${library_name} HuboCan ach rt)
+    target_link_libraries(${test_base} ${library_name} ach rt)
     add_test(${test_base} ${EXECUTABLE_OUTPUT_PATH}/${test_base})
     add_custom_target(${test_base}.run ${test_base} ${ARGN})
     add_dependencies(check_${library_name} ${test_base})

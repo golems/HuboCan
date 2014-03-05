@@ -40,9 +40,9 @@
 #ifndef HUBOCOMMANDER_HPP
 #define HUBOCOMMANDER_HPP
 
-#include "AchIncludes.h"
-#include "hubo_cmd_c.h"
-#include "HuboDescription.hpp"
+#include "HuboCan/AchIncludes.h"
+#include "HuboCmd/hubo_cmd_c.h"
+#include "HuboCan/HuboDescription.hpp"
 
 namespace HuboCmd {
 

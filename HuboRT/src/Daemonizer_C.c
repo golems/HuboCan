@@ -37,8 +37,8 @@
  *   POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "Daemonizer_C.h"
-#include "HuboRtParams.h"
+#include "HuboRT/Daemonizer_C.h"
+#include "HuboRT/HuboRtParams.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <syslog.h>

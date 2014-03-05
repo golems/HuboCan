@@ -1,5 +1,5 @@
 
-#include "HuboJmc.hpp"
+#include "HuboCan/HuboJmc.hpp"
 #include <sstream>
 
 using namespace HuboCan;

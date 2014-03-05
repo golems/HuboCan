@@ -6,8 +6,8 @@
 #include "Daemonizer.hpp"
 
 extern "C" {
-#include "manager_msg.h"
-#include "AchIncludes.h"
+#include "HuboRT/manager_msg.h"
+#include "HuboCan/AchIncludes.h"
 }
 
 namespace HuboRT {

@@ -1,7 +1,7 @@
-#include "AchIncludes.h"
-#include "Manager.hpp"
-#include "manager_msg.h"
-#include "Daemonizer_C.h"
+#include "HuboCan/AchIncludes.h"
+#include "HuboRT/Manager.hpp"
+#include "HuboRT/manager_msg.h"
+#include "HuboRT/Daemonizer_C.h"
 #include <sstream>
 #include <stdlib.h>
 #include <iostream>

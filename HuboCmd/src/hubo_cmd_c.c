@@ -1,5 +1,5 @@
 
-#include "hubo_cmd_c.h"
+#include "HuboCmd/hubo_cmd_c.h"
 
 #include <unistd.h>
 #include <string.h>

@@ -1,10 +1,11 @@
 
-#include "HuboDescription.hpp"
+#include "HuboCan/HuboDescription.hpp"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <sstream>
 
-#include <HuboJoint.hpp>
+#include "HuboCan/HuboJoint.hpp"
 
 using namespace HuboCan;
 
@@ -25,6 +26,11 @@ HuboDescription::~HuboDescription()
     for(size_t i=0; i<jmcs.size(); ++i)
     {
         delete jmcs[i];
+    }
+
+    for(size_t i=0; i<sensors.size(); ++i)
+    {
+        delete sensors[i];
     }
 }
 
@@ -87,6 +93,34 @@ int HuboDescription::broadcastInfo()
     _data = NULL;
 
     return result;
+}
+
+std::string HuboDescription::getJointTable()
+{
+    std::stringstream table;
+
+    table << HuboJoint::header() << "\n";
+
+    for(size_t i=0; i < joints.size(); ++i)
+    {
+        table << (*joints[i]) << "\n";
+    }
+
+    return table.str();
+}
+
+std::string HuboDescription::getJmcTable()
+{
+    std::stringstream table;
+
+    table << HuboJmc::header() << "\n";
+
+    for(size_t i=0; i < jmcs.size(); ++i)
+    {
+        table << (*jmcs[i]) << "\n";
+    }
+
+    return table.str();
 }
 
 bool HuboDescription::parseFile(const std::string &filename)
@@ -251,6 +285,7 @@ bool HuboDescription::_parseJoint(bool strict)
         return false;
 
     HuboJoint* new_joint = new HuboJoint;
+    new_joint_info.software_index = joint_index;
     new_joint->info = new_joint_info;
     _tempJointMap[joint_index] = new_joint;
 
