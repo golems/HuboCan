@@ -23,3 +23,10 @@ foreach(utest_src_file ${unit_tests_source})
     add_custom_target(${test_base}.run ${test_base} ${ARGN})
     add_dependencies(check_${library_name} ${test_base})
 endforeach(utest_src_file)
+
+
+file(GLOB ${library_name}_includes "*.h*")
+LIST(SORT ${library_name}_includes)
+install(FILES ${${library_name}_includes} DESTINATION "${HEADER_INSTALL_PATH}/${library_name}")
+
+install(TARGETS ${library_name} DESTINATION ${LIBRARY_INSTALL_PATH})

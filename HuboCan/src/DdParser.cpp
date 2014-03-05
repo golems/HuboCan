@@ -23,32 +23,41 @@ bool DdParser::load_file(const std::string &filename)
     return _push_back_file(filename, false);
 }
 
-bool DdParser::_push_back_file(const std::string &filename, bool inclusion)
+bool DdParser::_push_back_file(const std::string &filename, bool inclusion, const std::string &parent_filename)
 {
+    std::string full_filename = filename;
+
     if(_status == DD_ERROR)
         return false;
     
     if(inclusion)
     {
+        if(full_filename.at(0) != '/')
+        {
+            size_t base_directory = parent_filename.rfind('/');
+            if(base_directory != std::string::npos)
+                full_filename = parent_filename.substr(0, base_directory+1) + full_filename;
+        }
+
         for(size_t i=0; i<_filename_list.size(); ++i)
         {
-            if( filename == _filename_list[i] )
+            if( full_filename == _filename_list[i] )
             {
-                error << "Infinite loop found after including '" << filename << "'! Aborting!";
+                error << "Infinite loop found after including '" << full_filename << "'! Aborting!";
                 report_error();
                 return false;
             }
         }
     }
 
-    _filename_list.push_back(filename);
+    _filename_list.push_back(full_filename);
 
     std::ifstream filestream;
-    filestream.open(filename.c_str());
+    filestream.open(full_filename.c_str());
 
     if(!filestream.is_open())
     {
-        error << "Could not open '" << filename << "'!" << std::endl;
+        error << "Could not open '" << filename << "'! (Resolved to '" << full_filename << "')";
         report_error();
         return false;
     }
@@ -63,7 +72,7 @@ bool DdParser::_push_back_file(const std::string &filename, bool inclusion)
     {
         ++count;
         DdLine new_line;
-        new_line.file = filename;
+        new_line.file = full_filename;
         new_line.line_num = count;
 
         std::getline(filestream, new_line.data);
@@ -75,7 +84,7 @@ bool DdParser::_push_back_file(const std::string &filename, bool inclusion)
         if(_status == DD_ERROR)
             return false;
 
-        if(!_inclusion_check(line_check))
+        if(!_inclusion_check(line_check, full_filename))
             return false;
     }
 
@@ -87,7 +96,7 @@ bool DdParser::_push_back_file(const std::string &filename, bool inclusion)
     return true;
 }
 
-bool DdParser::_inclusion_check(StringArray &line)
+bool DdParser::_inclusion_check(StringArray &line, std::string parent_filename)
 {
     if(line.size() > 0)
     {
@@ -95,7 +104,7 @@ bool DdParser::_inclusion_check(StringArray &line)
         {
             if(line.size() > 1)
             {
-                if(!_push_back_file(line[1], true))
+                if(!_push_back_file(line[1], true, parent_filename))
                 {
                     return false;
                 }
