@@ -2,16 +2,18 @@
 #include "HuboCan/HuboDescription.hpp"
 #include <iostream>
 
+
 int main(int argc, char* argv[])
 {
     HuboCan::HuboDescription desc;
-    desc.parseFile("../HuboCan/misc/Hubo2Plus.dd");
+
+    desc.receiveInfo();
+
+    std::cout << "======= I AM THE RECEIVER ========" << std::endl;
 
     std::cout << desc.getJointTable() << std::endl << std::endl;
 
     std::cout << desc.getJmcTable() << std::endl;
-
-    desc.broadcastInfo();
 
     return 0;
 }

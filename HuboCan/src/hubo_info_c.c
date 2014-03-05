@@ -13,6 +13,8 @@ hubo_info_data* hubo_info_init_data(size_t joint_count, size_t jmc_count, size_t
     hubo_meta_info_t* meta_info = (hubo_meta_info_t*)new_info;
     strcpy(meta_info->code, HUBO_INFO_META_CODE);
     meta_info->joint_count = joint_count;
+    meta_info->jmc_count = jmc_count;
+    meta_info->sensor_count = sensor_count;
     meta_info->data_size = data_size;
 
     return new_info;
@@ -82,7 +84,7 @@ hubo_info_data* hubo_info_receive_data(double timeout)
     nano_wait = wait_time.tv_nsec + (int)(timeout*1E9);
     wait_time.tv_sec += (int)(nano_wait/1E9);
     wait_time.tv_nsec = (int)(nano_wait%((int)1E9));
-    r = ach_get(&info_channel, &data, info_data_size,
+    r = ach_get(&info_channel, data, info_data_size,
                 &fs, &wait_time, ACH_O_LAST | ACH_O_WAIT);
 
     ach_close(&info_channel);
@@ -94,7 +96,12 @@ hubo_info_data* hubo_info_receive_data(double timeout)
         return data;
     }
 
-    if( ACH_OK != r && ACH_STALE_FRAMES != r  && ACH_MISSED_FRAME != r )
+    if( ACH_OVERFLOW == r )
+    {
+        fprintf(stderr, "Ach Overflow! Mismatch between predicted data size (%zu) and the size of the message in the channel (%zu)!\n",
+                info_data_size, fs);
+    }
+    else if( ACH_OK != r && ACH_STALE_FRAMES != r  && ACH_MISSED_FRAME != r )
     {
         fprintf(stderr, "Unexpected ach result on Hubo's info data channel \"%s\":\n"
                 " -- Ach Error: %s (%d)\n",
@@ -169,4 +176,16 @@ hubo_jmc_info_t* hubo_info_get_jmc_info(const hubo_info_data *data, size_t jmc_i
     }
 
     return (hubo_jmc_info_t*)(data+hubo_info_get_jmc_location(data, jmc_index));
+}
+
+hubo_sensor_info_t* hubo_info_get_sensor_info(const hubo_info_data *data, size_t sensor_index)
+{
+    if(sensor_index >= hubo_info_get_sensor_count(data))
+    {
+        fprintf(stderr, "Error: requesting sensor info (index %zu) which is out of bounds (%zu)!\n",
+                sensor_index, hubo_info_get_sensor_count(data));
+        return NULL;
+    }
+
+    return (hubo_sensor_info_t*)(data+hubo_info_get_sensor_location(data, sensor_index));
 }

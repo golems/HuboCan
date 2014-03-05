@@ -5,6 +5,8 @@
 #include <string.h>
 #include <sstream>
 
+#include <iostream>
+
 #include "HuboCan/HuboJoint.hpp"
 
 using namespace HuboCan;
@@ -43,7 +45,6 @@ int HuboDescription::receiveInfo(double timeout)
         return -1;
 
     size_t joint_count = hubo_info_get_joint_count(_data);
-
     for(size_t i=0; i < joint_count; ++i)
     {
         HuboJoint* newJoint = new HuboJoint;
@@ -51,11 +52,20 @@ int HuboDescription::receiveInfo(double timeout)
         joints.push_back(newJoint);
     }
 
-    for(size_t i=0; i < joint_count; ++i)
+    size_t jmc_count = hubo_info_get_jmc_count(_data);
+    for(size_t i=0; i < jmc_count; ++i)
     {
         HuboJmc* newJmc = new HuboJmc;
         newJmc->info = *hubo_info_get_jmc_info(_data, i);
         jmcs.push_back(newJmc);
+    }
+
+    size_t sensor_count = hubo_info_get_sensor_count(_data);
+    for(size_t i=0; i < sensor_count; ++i)
+    {
+        HuboSensor* newSensor = new HuboSensor;
+        newSensor->info = *hubo_info_get_sensor_info(_data, i);
+        sensors.push_back(newSensor);
     }
 
     free(_data);
@@ -72,19 +82,19 @@ int HuboDescription::broadcastInfo()
     for(size_t i=0; i < joints.size(); ++i)
     {
         size_t loc = hubo_info_get_joint_location(_data, i);
-        memcpy(_data+loc, joints[i], sizeof(hubo_joint_info_t));
+        memcpy(_data+loc, &(joints[i]->info), sizeof(hubo_joint_info_t));
     }
 
     for(size_t i=0; i < jmcs.size(); ++i)
     {
         size_t loc = hubo_info_get_jmc_location(_data, i);
-        memcpy(_data+loc, jmcs[i], sizeof(hubo_jmc_info_t));
+        memcpy(_data+loc, &(jmcs[i]->info), sizeof(hubo_jmc_info_t));
     }
 
     for(size_t i=0; i < sensors.size(); ++i)
     {
         size_t loc = hubo_info_get_sensor_location(_data, i);
-        memcpy(_data+loc, sensors[i], sizeof(hubo_jmc_info_t));
+        memcpy(_data+loc, &(sensors[i]->info), sizeof(hubo_jmc_info_t));
     }
 
     int result = hubo_info_send_data(_data);

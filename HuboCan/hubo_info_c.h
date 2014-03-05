@@ -103,6 +103,8 @@ hubo_joint_info_t* hubo_info_get_joint_info(hubo_info_data* data, size_t joint_i
 
 hubo_jmc_info_t* hubo_info_get_jmc_info(const hubo_info_data *data, size_t jmc_index);
 
+hubo_sensor_info_t* hubo_info_get_sensor_info(const hubo_info_data *data, size_t sensor_index);
+
 inline size_t hubo_info_get_joint_location(const hubo_info_data* data, size_t joint_index)
 {
     return sizeof(hubo_meta_info_t)

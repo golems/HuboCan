@@ -116,6 +116,15 @@ manager_err_t ManagerReq::unregister_old_process(const std::string &list_name)
     return _send_request(UNREGISTER_OLD_PROC, list_name);
 }
 
+manager_err_t ManagerReq::register_new_channel(const std::string &list_name,
+                                               const std::string &ach_channel_name,
+                                               size_t message_count, size_t nominal_size)
+{
+    std::stringstream stream;
+    stream << list_name << ":" << ach_channel_name << ":" << message_count << ":" << nominal_size << ":";
+    return _send_request(REGISTER_NEW_CHAN, stream.str());
+}
+
 manager_err_t ManagerReq::unregister_old_channel(const std::string &list_name)
 {
     return _send_request(UNREGISTER_OLD_CHAN, list_name);
