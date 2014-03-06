@@ -18,14 +18,12 @@ add_subdirectory(HuboCan)
 
 add_subdirectory(HuboCmd)
 
-add_subdirectory(HuboAgg)
-
 add_subdirectory(HuboRT)
 
 file(GLOB bin_source "src/*.cpp")
 list(SORT bin_source)
 
 add_executable(hubo_interface ${bin_source})
-target_link_libraries(hubo_interface HuboRT HuboCan HuboAgg HuboState rt)
+target_link_libraries(hubo_interface HuboRT HuboCan HuboState rt)
 
 
