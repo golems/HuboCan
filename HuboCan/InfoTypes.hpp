@@ -12,13 +12,13 @@ enum error_flag {
     INDEX_OUT_OF_BOUNDS = 1,
     ARRAY_MISMATCH      = 1 >> 1,
     ACH_ERROR           = 1 >> 2,
+    READ_ONLY           = 1 >> 3,
 
 };
 
 typedef int error_result_t;
 } // namespace HuboState
 
-typedef size_t JointIndex;
 typedef std::vector<size_t> IndexArray;
 typedef std::vector<double> ValueArray;
 typedef std::vector<std::string> StringArray;

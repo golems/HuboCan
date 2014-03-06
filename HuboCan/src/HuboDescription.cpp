@@ -16,6 +16,42 @@ HuboDescription::HuboDescription()
     _data = NULL;
 }
 
+HuboDescription::HuboDescription(const HuboDescription &desc)
+{
+    _copy_description(desc);
+}
+
+HuboDescription& HuboDescription::operator=(const HuboDescription& desc)
+{
+    free(_data);
+    _copy_description(desc);
+
+    return *this;
+}
+
+void HuboDescription::_copy_description(const HuboDescription &desc)
+{
+    for(size_t i=0; i<desc.joints.size(); ++i)
+    {
+        HuboJoint* newJoint = new HuboJoint(*desc.joints[i]);
+        joints.push_back(newJoint);
+    }
+
+    for(size_t i=0; i<desc.jmcs.size(); ++i)
+    {
+        HuboJmc* newJmc = new HuboJmc(*desc.jmcs[i]);
+        jmcs.push_back(newJmc);
+    }
+
+    for(size_t i=0; i<desc.sensors.size(); ++i)
+    {
+        HuboSensor* newSensor = new HuboSensor(*desc.sensors[i]);
+        sensors.push_back(newSensor);
+    }
+
+    _data = NULL;
+}
+
 HuboDescription::~HuboDescription()
 {
     free(_data);
@@ -471,9 +507,9 @@ bool HuboDescription::_postParseProcessing()
     return true;
 }
 
-JointIndex HuboDescription::getJointIndex(const std::string& joint_name)
+size_t HuboDescription::getJointIndex(const std::string& joint_name)
 {
-    for(JointIndex i=0; i < getJointCount(); ++i)
+    for(size_t i=0; i < getJointCount(); ++i)
     {
         std::string current_name(joints[i]->info.name);
         if(joint_name == current_name)
@@ -495,7 +531,7 @@ IndexArray HuboDescription::getJointIndices(StringArray joint_names)
     return result;
 }
 
-hubo_joint_info_t HuboDescription::getJointInfo(JointIndex joint_index)
+hubo_joint_info_t HuboDescription::getJointInfo(size_t joint_index)
 {
     if( joint_index >= getJointCount() )
     {

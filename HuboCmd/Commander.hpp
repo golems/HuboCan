@@ -54,31 +54,50 @@ class Commander
 {
 public:
 
-    Commander(double timeout=2);
+    Commander(double timeout=1);
     Commander(const HuboCan::HuboDescription& description);
     ~Commander();
 
-    bool getDescription(double timeout=2);
-    void getDescription(const HuboCan::HuboDescription& description);
+    bool receive_description(double timeout=2);
+    void load_description(const HuboCan::HuboDescription& description);
 
-    HuboCan::error_result_t set_mode(JointIndex joint, hubo_cmd_mode_t mode);
-    HuboCan::error_result_t set_modes(IndexArray joints, ModeArray modes);
+    HuboCan::error_result_t set_mode(size_t joint_index, hubo_cmd_mode_t mode);
+    HuboCan::error_result_t set_modes(const IndexArray& joints, const ModeArray& modes);
 
-    HuboCan::error_result_t position(JointIndex joint, float value);
-    HuboCan::error_result_t positions(IndexArray joints, ValueArray values);
+    hubo_cmd_mode_t get_mode(size_t joint_index);
+    ModeArray       get_modes(const IndexArray& joints);
 
-    HuboCan::error_result_t base_torque(JointIndex joint, double value);
-    HuboCan::error_result_t base_torques(IndexArray joints, ValueArray values);
+    HuboCan::error_result_t set_position(size_t joint_index, float value);
+    HuboCan::error_result_t set_positions(const IndexArray& joints, const ValueArray& values);
 
-    HuboCan::error_result_t kP_gain(JointIndex joint, double kP_value);
-    HuboCan::error_result_t kP_gains(IndexArray joints, ValueArray kP_values);
+    float       get_position_cmd(size_t joint_index);
+    ValueArray  get_position_cmds(const IndexArray& joints);
 
-    HuboCan::error_result_t kD_gain(JointIndex joint, double kD_value);
-    HuboCan::error_result_t kD_gains(IndexArray joints, ValueArray kD_values);
+    HuboCan::error_result_t set_base_torque(size_t joint_index, double value);
+    HuboCan::error_result_t set_base_torques(const IndexArray& joints, const ValueArray& values);
 
-    JointIndex getIndex(std::string joint_name);
-    IndexArray getIndices(StringArray joint_names);
+    double      get_base_torque_cmd(size_t joint_index);
+    ValueArray  get_base_torque_cmds(const IndexArray& joints);
 
+    HuboCan::error_result_t set_kp_gain(size_t joint_index, double kP_value);
+    HuboCan::error_result_t set_kp_gains(const IndexArray& joints, const ValueArray& kP_values);
+
+    double      get_kp_gain_cmd(size_t joint_index);
+    ValueArray  get_kp_gain_cmds(const IndexArray& joints);
+
+    HuboCan::error_result_t set_kd_gain(size_t joint_index, double kD_value);
+    HuboCan::error_result_t set_kd_gains(const IndexArray& joints, const ValueArray& kD_values);
+
+    double      get_kd_gain_cmd(size_t joint_index);
+    ValueArray  get_kd_gain_cmds(const IndexArray& joints);
+
+    size_t      get_index(const std::string& joint_name);
+    IndexArray  get_indices(const StringArray& joint_names);
+
+    inline size_t get_joint_count()
+    {
+        return _desc.getJointCount();
+    }
 
     HuboCan::error_result_t send_commands();
 
@@ -86,15 +105,21 @@ public:
 
 protected:
 
+    bool _has_been_updated;
+
     void _initialize();
     void _create_memory();
 
-    hubo_joint_cmd_t _container;
-    HuboCan::error_result_t _setup_container(JointIndex joint);
+    HuboCan::error_result_t _register_joint(size_t joint_index);
+    void _fill_container(size_t joint_index);
 
     hubo_cmd_data* _compressed_data;
 
+    hubo_joint_cmd_t _container;
+
     HuboCan::HuboDescription _desc;
+
+    ach_channel_t _cmd_chan;
 };
 
 } // HuboCmd

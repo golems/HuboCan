@@ -40,13 +40,31 @@
 #ifndef HUBOAGG_HPP
 #define HUBOAGG_HPP
 
+#include <vector>
+#include "HuboCan/HuboDescription.hpp"
+
+extern "C" {
+#include "HuboCan/AchIncludes.h"
+#include "HuboCmd/hubo_cmd_c.h"
+}
+
 namespace HuboAgg {
 
-class HuboAgg
+typedef std::vector<uint16_t> PidArray;
+
+class Aggregator
 {
 public:
 
+
+
 protected:
+
+    PidArray _pids;
+
+    hubo_cmd_data* _data;
+
+    HuboCan::HuboDescription _desc;
 
 };
 

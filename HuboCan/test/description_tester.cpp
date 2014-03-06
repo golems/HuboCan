@@ -13,5 +13,15 @@ int main(int argc, char* argv[])
 
     desc.broadcastInfo();
 
+    HuboCan::HuboDescription copy_desc(desc);
+
+    std::cout << "Copy-constructed:" << std::endl;
+    std::cout << copy_desc.getJointTable() << std::endl << std::endl;
+
+    HuboCan::HuboDescription assign_desc;
+    assign_desc = desc;
+    std::cout << "Copy-assigned:" << std::endl;
+    std::cout << assign_desc.getJointTable() << std::endl;
+
     return 0;
 }

@@ -5,6 +5,8 @@
 #include <stdint.h>
 #include <sys/types.h>
 
+#include "HuboCan/AchIncludes.h"
+
 #define HUBO_CMD_CHANNEL "hubo_cmd"
 
 /*                            123456789012345                        */
@@ -13,13 +15,23 @@
 
 typedef uint8_t hubo_cmd_data;
 
+typedef enum hubo_cmd_error {
+
+    CMD_ERR_OKAY = 0,
+    CMD_ERR_OUT_OF_BOUNDS,
+    CMD_ERR_READ_ONLY,
+    CMD_ERR_UNAVAILABLE_INDEX,
+    CMD_ERR_MALFORMED_HEADER
+
+} hubo_cmd_error_t;
+
 typedef struct hubo_cmd_header {
 
     char code[HUBO_CMD_HEADER_CODE_SIZE];
     uint16_t pid;
     uint8_t is_compressed;
-    uint8_t total_num_joints;
-    uint8_t bitmap;
+    uint16_t total_num_joints;
+    uint64_t bitmap;
 
 }__attribute__((packed)) hubo_cmd_header_t;
 
@@ -30,7 +42,6 @@ typedef enum hubo_cmd_mode {
     HUBO_CMD_COMPLIANT,
     HUBO_CMD_HYBRID,
 
-    HUBO_CMD_HOME,
     HUBO_CMD_CLAIM,
     HUBO_CMD_RELEASE
 
@@ -46,14 +57,16 @@ typedef struct hubo_joint_cmd {
 
 }__attribute__((packed)) hubo_joint_cmd_t;
 
-inline size_t hubo_cmd_data_max_message_size(size_t num_joints)
+inline size_t hubo_cmd_data_predict_max_message_size(size_t num_joints)
 {
     return sizeof(hubo_cmd_header_t)+num_joints*sizeof(hubo_joint_cmd_t);
 }
 
+size_t hubo_cmd_data_get_min_data_size(const hubo_cmd_data* data);
+
 inline size_t hubo_cmd_data_location(size_t joint_index)
 {
-    return hubo_cmd_data_max_message_size(joint_index);
+    return hubo_cmd_data_predict_max_message_size(joint_index);
 }
 
 inline int hubo_cmd_data_is_compressed(const hubo_cmd_data* data)
@@ -65,24 +78,28 @@ inline int hubo_cmd_data_is_compressed(const hubo_cmd_data* data)
     return header->is_compressed;
 }
 
-inline uint8_t hubo_cmd_data_get_total_num_joints(const hubo_cmd_data* data)
+inline size_t hubo_cmd_data_get_total_num_joints(const hubo_cmd_data* data)
 {
     if( NULL == data )
         return 0;
 
     const hubo_cmd_header_t* header = (hubo_cmd_header_t*)data;
-    return header->total_num_joints;
+    return (size_t)header->total_num_joints;
 }
 
-int hubo_cmd_header_check(const hubo_cmd_data* cmd_message);
+hubo_cmd_error_t hubo_cmd_header_check(const hubo_cmd_data* cmd_message);
 
 hubo_cmd_data* hubo_cmd_init_data(size_t num_total_joints);
 
 size_t hubo_cmd_data_compressor(hubo_cmd_data* compressed, const hubo_cmd_data* uncompressed);
 
-void hubo_cmd_data_set_joint_cmd(hubo_cmd_data* data, const hubo_joint_cmd_t* cmd, size_t joint_num);
+hubo_cmd_error_t hubo_cmd_data_set_joint_cmd(hubo_cmd_data* data, const hubo_joint_cmd_t* cmd, size_t joint_index);
 
-int hubo_cmd_data_get_joint_cmd(hubo_joint_cmd_t* output, const hubo_cmd_data* data, size_t joint_num);
+hubo_cmd_error_t hubo_cmd_data_get_joint_cmd(hubo_joint_cmd_t* output, const hubo_cmd_data* data, size_t joint_index);
+
+hubo_joint_cmd_t* hubo_cmd_data_access_joint_cmd(hubo_cmd_data* data, size_t joint_index);
+
+hubo_cmd_error_t hubo_cmd_data_register_joint(hubo_cmd_data* data, size_t joint_index);
 
 size_t hubo_cmd_data_get_size(const hubo_cmd_data* data);
 

@@ -58,7 +58,7 @@ public:
      *
      * Returns (size_t)(-1) if the given joint name does not exist.
      */
-    JointIndex getJointIndex(const std::string& joint_name);
+    size_t getJointIndex(const std::string& joint_name);
 
     /*!
      * \fn getJointIndices()
@@ -74,7 +74,7 @@ public:
      * \param joint_index
      * \return
      */
-    hubo_joint_info_t getJointInfo(JointIndex joint_index);
+    hubo_joint_info_t getJointInfo(size_t joint_index);
 
     /*!
      * \fn getJointTable()
@@ -97,6 +97,9 @@ public:
     HuboJmcPtrArray jmcs;
     HuboSensorPtrArray sensors;
 
+    HuboDescription& operator=(const HuboDescription& desc);
+    HuboDescription(const HuboDescription& desc);
+
 protected:
 
     HuboJointPtrMap _tempJointMap;
@@ -113,6 +116,8 @@ protected:
     DdParser _parser;
 
     hubo_info_data* _data;
+
+    virtual void _copy_description(const HuboDescription& desc);
 
 };
 
