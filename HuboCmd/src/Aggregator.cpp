@@ -82,6 +82,7 @@ void Aggregator::_create_memory()
         _input_data  = hubo_cmd_init_data( _desc.getJointCount() );
         _output_data = hubo_cmd_init_data( _desc.getJointCount() );
         _final_data  = hubo_cmd_init_data( _desc.getJointCount() );
+        _aggregated_cmds.reserve(_desc.getJointCount());
         _pids.resize(_desc.getJointCount(), 0);
         _memory_set = true;
     }
@@ -90,6 +91,7 @@ void Aggregator::_create_memory()
         _input_data  = NULL;
         _output_data = NULL;
         _final_data  = NULL;
+        _aggregated_cmds.resize(0);
         _pids.resize(0);
         _memory_set = false;
     }
@@ -190,10 +192,17 @@ void Aggregator::_aggregator_loop()
             continue;
         }
 
+        _check_hubocan_state();
+
         _collate_input();
 
         _send_output();
     }
+}
+
+void Aggregator::_check_hubocan_state()
+{
+    // TODO: Grab the current state and update data structures accordingly
 }
 
 void Aggregator::_collate_input()
@@ -273,6 +282,51 @@ void Aggregator::_accept_command(size_t joint_index)
 
     hubo_cmd_data_set_joint_cmd(_output_data, &_container, joint_index);
 }
+
+
+const JointCmdArray& Aggregator::get_latest_commands()
+{
+    if(!_memory_set)
+    {
+        std::cerr << "Trying to get the latest commands before a valid HuboDescription has been loaded! Don't do that!!" << std::endl;
+        return _aggregated_cmds;
+    }
+
+    size_t fs;
+    ach_status_t result = ach_get(&_agg_chan, _final_data, hubo_cmd_data_get_size(_final_data), &fs, NULL, ACH_O_LAST);
+    if( ACH_OK != result && ACH_STALE_FRAMES != result )
+    {
+        std::cout << "Unexpected Ach result: " << ach_result_to_string(result) << " (" << (int)result << ")" << std::endl;
+        return _aggregated_cmds;
+    }
+
+    _copy_final_data_to_array();
+
+    return _aggregated_cmds;
+}
+
+void Aggregator::_copy_final_data_to_array()
+{
+    if(_aggregated_cmds.size() != hubo_cmd_data_get_total_num_joints(_final_data))
+    {
+        std::cout << "Mismatch between final data size (" << hubo_cmd_data_get_total_num_joints(_final_data)
+                  << ") and the command array size (" << _aggregated_cmds.size()
+                  << ")! THIS SHOULD BE IMPOSSIBLE. REPORT BUG IMMEDIATELY." << std::endl;
+        return;
+    }
+
+    for(size_t i=0; i < _aggregated_cmds.size(); ++i)
+    {
+        hubo_cmd_data_get_joint_cmd(&_container, _final_data, i);
+        _aggregated_cmds[i] = _container;
+    }
+}
+
+
+
+
+
+
 
 
 

@@ -4,6 +4,7 @@
 #define HUBO_AGG_CHANNEL "hubo_agg"
 
 #include <vector>
+#include <map>
 #include "HuboCan/HuboDescription.hpp"
 #include "HuboRT/Daemonizer.hpp"
 
@@ -14,7 +15,8 @@ extern "C" {
 
 namespace HuboCan {
 
-typedef std::vector<uint16_t> PidArray;
+typedef std::vector<pid_t> PidArray;
+typedef std::map<pid_t,bool> PidBoolMap;
 typedef std::vector<hubo_joint_cmd_t> JointCmdArray;
 
 class Aggregator
@@ -31,7 +33,7 @@ public:
 
     bool run();
 
-    const JointCmdArray& getCommands();
+    const JointCmdArray& get_latest_commands();
 
 protected:
 
@@ -45,12 +47,15 @@ protected:
     void _init_aggregator();
     void _aggregator_loop();
     void _quit_aggregator();
+
+    void _check_hubocan_state();
     void _collate_input();
     bool _resolve_ownership(size_t joint_index);
     void _accept_command(size_t joint_index);
     void _send_output();
 
     PidArray _pids;
+    PidBoolMap _reception_check;
 
     hubo_joint_cmd_t _container;
 
@@ -59,6 +64,7 @@ protected:
 
     hubo_cmd_data* _final_data;
     JointCmdArray _aggregated_cmds;
+    void _copy_final_data_to_array();
 
     HuboCan::HuboDescription _desc;
 

@@ -80,7 +80,7 @@ void hubo_rt_redirect_signals()
     signal(SIGCHLD, hubo_rt_daemon_sig_handler);
     signal(SIGUSR1, hubo_rt_daemon_sig_handler);
     signal(SIGUSR2, hubo_rt_daemon_sig_handler);
-    signal(SIGINT, hubo_rt_daemon_sig_handler);
+    signal(SIGINT,  hubo_rt_daemon_sig_handler);
     signal(SIGTERM, hubo_rt_daemon_sig_handler);
 }
 
