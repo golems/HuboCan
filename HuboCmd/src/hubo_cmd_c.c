@@ -41,7 +41,7 @@ hubo_cmd_data* hubo_cmd_init_data(size_t num_total_joints)
 
 inline size_t hubo_cmd_data_get_min_data_size(const hubo_cmd_data *data)
 {
-    if(hubo_cmd_header_check(data) != 0)
+    if(hubo_cmd_header_check(data) != CMD_ERR_OKAY)
         return 0;
 
     size_t joint_count = 0;

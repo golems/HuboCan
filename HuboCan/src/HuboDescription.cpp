@@ -1,5 +1,5 @@
 
-#include "HuboCan/HuboDescription.hpp"
+#include "../HuboDescription.hpp"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -527,6 +527,31 @@ IndexArray HuboDescription::getJointIndices(StringArray joint_names)
     for(size_t i=0; i < joint_names.size(); ++i)
     {
         result.push_back(getJointIndex(joint_names[i]));
+    }
+    return result;
+}
+
+std::string HuboDescription::getJointName(size_t joint_index)
+{
+    return std::string(getJointInfo(joint_index).name);
+}
+
+StringArray HuboDescription::getJointNames(IndexArray joints)
+{
+    StringArray result;
+    for(size_t i=0; i<joints.size(); ++i)
+    {
+        result.push_back(getJointName(joints[i]));
+    }
+    return result;
+}
+
+StringArray HuboDescription::getJointNames()
+{
+    StringArray result;
+    for(size_t i=0; i<getJointCount(); ++i)
+    {
+        result.push_back(getJointName(i));
     }
     return result;
 }

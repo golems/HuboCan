@@ -5,6 +5,7 @@
 
 #include <vector>
 #include "HuboCan/HuboDescription.hpp"
+#include "HuboRT/Daemonizer.hpp"
 
 extern "C" {
 #include "HuboCan/AchIncludes.h"
@@ -26,30 +27,38 @@ public:
     void load_description(const HuboCan::HuboDescription& desc);
 
     bool open_channels();
+    void close_channels();
 
     bool run();
-    void stop();
 
-    JointCmdArray& getCommands();
+    const JointCmdArray& getCommands();
 
 protected:
 
+    bool _memory_set;
     bool _channels_opened;
+    bool _is_launched;
 
     void _initialize();
     void _create_memory();
 
+    void _init_aggregator();
     void _aggregator_loop();
-
-    bool _is_launched;
+    void _quit_aggregator();
+    void _collate_input();
+    bool _resolve_ownership(size_t joint_index);
+    void _accept_command(size_t joint_index);
+    void _send_output();
 
     PidArray _pids;
+
+    hubo_joint_cmd_t _container;
 
     hubo_cmd_data* _input_data;
     hubo_cmd_data* _output_data;
 
     hubo_cmd_data* _final_data;
-    JointCmdArray _aggregate;
+    JointCmdArray _aggregated_cmds;
 
     HuboCan::HuboDescription _desc;
 
@@ -57,6 +66,9 @@ protected:
     ach_channel_t _agg_chan;
 
     pid_t _child;
+    size_t _child_death_count;
+
+    HuboRT::Daemonizer _rt;
 
     inline Aggregator(const Aggregator& doNotCopy) { }
     inline Aggregator& operator=(const Aggregator& doNotCopy) { return *this; }

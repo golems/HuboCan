@@ -105,6 +105,11 @@ size_t Daemonizer::alarm() const
     return hubo_rt_sig_alarm;
 }
 
+size_t Daemonizer::child_processes_exited() const
+{
+    return hubo_rt_sig_child;
+}
+
 bool Daemonizer::check(bool condition, std::string message, bool quit_immediately)
 {
     if(!condition)

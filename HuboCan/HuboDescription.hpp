@@ -69,6 +69,29 @@ public:
     IndexArray getJointIndices(StringArray joint_names);
 
     /*!
+     * \fn getJointName()
+     * \brief Returns the joint name of the requested index
+     * \param joint_index
+     * \return
+     */
+    std::string getJointName(size_t joint_index);
+
+    /*!
+     * \fn getJointNames(IndexArray joints)
+     * \brief Returns a list of the joint names corresponding to the requested joints
+     * \param joints
+     * \return
+     */
+    StringArray getJointNames(IndexArray joints);
+
+    /*!
+     * \fn getJointNames()
+     * \brief Returns an ordered list of all the joint names of the robot
+     * \return
+     */
+    StringArray getJointNames();
+
+    /*!
      * \fn getJointInfo()
      * \brief Returns a struct describing the requested joint
      * \param joint_index
