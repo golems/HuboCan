@@ -5,6 +5,7 @@
 #include <errno.h>
 #include <iostream>
 
+using namespace HuboCmd;
 using namespace HuboCan;
 
 Aggregator::Aggregator(const HuboDescription& description)
@@ -82,7 +83,7 @@ void Aggregator::_create_memory()
         _input_data  = hubo_cmd_init_data( _desc.getJointCount() );
         _output_data = hubo_cmd_init_data( _desc.getJointCount() );
         _final_data  = hubo_cmd_init_data( _desc.getJointCount() );
-        _aggregated_cmds.reserve(_desc.getJointCount());
+        _aggregated_cmds.resize(_desc.getJointCount());
         _pids.resize(_desc.getJointCount(), 0);
         _memory_set = true;
     }
@@ -140,8 +141,8 @@ void Aggregator::_init_aggregator()
 {
     if(!_rt.begin("hubo_cmd_aggregator"))
     {
-        std::cerr << "Could not properly daemonize the aggregator: quitting!" << std::endl;
-        _quit_aggregator();
+        std::cerr << "Could not properly daemonize the aggregator: Aggregator might already exist. Check the syslog!" << std::endl;
+        exit(0);
     }
     if(!open_channels())
     {
@@ -229,6 +230,8 @@ void Aggregator::_quit_aggregator()
 {
     close_channels();
 
+    std::cout << "Closing down aggregator" << std::endl;
+    _rt.close();
     exit(0);
 }
 
@@ -294,8 +297,8 @@ const JointCmdArray& Aggregator::get_latest_commands()
 
     size_t fs;
     ach_status_t result = ach_get(&_agg_chan, _final_data, hubo_cmd_data_get_size(_final_data), &fs, NULL, ACH_O_LAST);
-    if( ACH_OK != result && ACH_STALE_FRAMES != result )
-    {
+    if( ACH_OK != result && ACH_STALE_FRAMES != result && ACH_MISSED_FRAME != result )
+    { // TODO: Is ACH_STALE_FRAMES really okay? It might imply that the upstream pipeline has been frozen
         std::cout << "Unexpected Ach result: " << ach_result_to_string(result) << " (" << (int)result << ")" << std::endl;
         return _aggregated_cmds;
     }

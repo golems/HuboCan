@@ -328,6 +328,14 @@ IndexArray Commander::get_indices(const StringArray& joint_names)
     return _desc.getJointIndices(joint_names);
 }
 
+HuboCan::error_result_t Commander::update()
+{
+    _has_been_updated = true;
+
+    // TODO: Inherit the state class, and call its update function here
+    return HuboCan::OKAY;
+}
+
 HuboCan::error_result_t Commander::send_commands()
 {
     if(!_has_been_updated)

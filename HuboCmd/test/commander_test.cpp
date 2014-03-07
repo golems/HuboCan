@@ -24,6 +24,9 @@ int main(int argc, char* argv[])
         std::cout << cmd.get_position_cmd(i);
     }
 
+    cmd.update();
+    cmd.send_commands();
+
     std::cout << std::endl;
 
     return 0;

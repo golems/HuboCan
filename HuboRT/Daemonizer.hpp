@@ -152,14 +152,12 @@ public:
 
     size_t stack_prefault_size;
 
-protected:
-
     /*!
      * \fn close()
      * \brief Cleans up the daemonization by removing the lock file
      * \return
      *
-     * This function is called in Daemonizer's destructor, so there is no need to call
+     * This function is called in Daemonizer's destructor, so you typically will not need
      * this on your own.
      *
      * However, this does mean that you need to make sure your Daemonizer
@@ -167,6 +165,10 @@ protected:
      * function, or else it might be destructed prematurely.
      */
     void close();
+
+protected:
+
+    bool _successful_launch;
 
     std::string _daemon_name;
     std::string _lock_directory;

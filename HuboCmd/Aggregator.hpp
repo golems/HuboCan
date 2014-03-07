@@ -13,7 +13,7 @@ extern "C" {
 #include "HuboCmd/hubo_cmd_c.h"
 }
 
-namespace HuboCan {
+namespace HuboCmd {
 
 typedef std::vector<pid_t> PidArray;
 typedef std::map<pid_t,bool> PidBoolMap;

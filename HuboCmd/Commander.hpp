@@ -99,6 +99,7 @@ public:
         return _desc.getJointCount();
     }
 
+    virtual HuboCan::error_result_t update();
     HuboCan::error_result_t send_commands();
 
     bool open_channel();

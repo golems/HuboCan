@@ -38,18 +38,19 @@
  */
 
 extern "C" {
-#include "HuboRT/Daemonizer_C.h"
+#include "../Daemonizer_C.h"
 #include "HuboRT/HuboRtParams.h"
 #include <syslog.h>
 #include <stdlib.h>
 }
 
-#include "HuboRT/Daemonizer.hpp"
+#include "../Daemonizer.hpp"
 
 using namespace HuboRT;
 
 Daemonizer::Daemonizer(size_t safe_stack_size)
 {
+    _successful_launch = false;
     stack_prefault_size = safe_stack_size;
     _lock_directory = hubo_rt_default_lock_dir;
     _log_directory = hubo_rt_default_log_dir;
@@ -57,7 +58,8 @@ Daemonizer::Daemonizer(size_t safe_stack_size)
 
 Daemonizer::~Daemonizer()
 {
-    close();
+    if(_successful_launch)
+        close();
 }
 
 bool Daemonizer::begin(std::string daemon_name, int priority)
@@ -71,6 +73,9 @@ bool Daemonizer::daemonize(std::string daemon_name)
     int result = hubo_rt_daemonize(daemon_name.c_str(), _lock_directory.c_str(),
                                    _log_directory.c_str());
     hubo_rt_stack_prefault(stack_prefault_size);
+    if(result == 0)
+        _successful_launch = true;
+
     return result == 0;
 }
 
