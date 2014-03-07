@@ -12,18 +12,35 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 
 include_directories(${PROJECT_SOURCE_DIR})
 
+set(library_name ${PROJECT_NAME})
+set(lib_source "")
+
+set(tests_source "")
+
 add_subdirectory(HuboState)
-
 add_subdirectory(HuboCan)
-
 add_subdirectory(HuboCmd)
-
 add_subdirectory(HuboRT)
+
+add_library(${library_name} SHARED ${lib_source})
+target_link_libraries(${library_name} ach)
 
 file(GLOB bin_source "src/*.cpp")
 list(SORT bin_source)
 
 add_executable(hubo_interface ${bin_source})
-target_link_libraries(hubo_interface HuboRT HuboCan HuboState rt)
+target_link_libraries(hubo_interface HuboCan rt)
 
+message(STATUS "\n -- ${library_name} UNIT TEST: ")
+add_custom_target(check_${library_name} COMMAND ${CMAKE_CTEST_COMMAND})
+foreach(utest_src_file ${tests_source})
+    get_filename_component(test_base ${utest_src_file} NAME_WE)
+    message(STATUS "Adding test ${test_base}")
+    add_executable(${test_base} ${utest_src_file})
+    target_link_libraries(${test_base} ${library_name} ach rt)
+    add_test(${test_base} ${EXECUTABLE_OUTPUT_PATH}/${test_base})
+    add_custom_target(${test_base}.run ${test_base} ${ARGN})
+    add_dependencies(check_${library_name} ${test_base})
+endforeach(utest_src_file)
 
+install(TARGETS ${library_name} DESTINATION ${LIBRARY_INSTALL_PATH})

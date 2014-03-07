@@ -44,6 +44,8 @@ bool Commander::open_channel()
     {
         _channel_opened = true;
     }
+
+    return false;
 }
 
 void Commander::_create_memory()
