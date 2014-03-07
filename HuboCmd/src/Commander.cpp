@@ -22,14 +22,28 @@ void Commander::_initialize()
     cmd_data = NULL;
     _compressed_data = NULL;
 
-    ach_status_t result = ach_open(&_cmd_chan, HUBO_CMD_CHANNEL, NULL);
-    if(result != ACH_OK)
-    {
-        fprintf(stderr, "Error opening command channel: %s (%d)",
-                ach_result_to_string(result), (int)result);
-    }
+    _channel_opened = false;
+    open_channel();
 
     _has_been_updated = false;
+}
+
+bool Commander::open_channel()
+{
+    if(_channel_opened)
+        return true;
+
+    ach_status_t result = ach_open(&_cmd_chan, HUBO_CMD_CHANNEL, NULL);
+    if(ACH_OK != result)
+    {
+        fprintf(stderr, "Error opening command channel: %s (%d)\n",
+                ach_result_to_string(result), (int)result);
+        _channel_opened = false;
+    }
+    else
+    {
+        _channel_opened = true;
+    }
 }
 
 void Commander::_create_memory()
@@ -64,8 +78,8 @@ void Commander::load_description(const HuboCan::HuboDescription &description)
 Commander::~Commander()
 {
     ach_close(&_cmd_chan);
-//    free(cmd_data);
-//    free(_compressed_data);
+    free(cmd_data);
+    free(_compressed_data);
 }
 
 HuboCan::error_result_t Commander::_register_joint(size_t joint_index)

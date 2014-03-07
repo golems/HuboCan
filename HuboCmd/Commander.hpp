@@ -101,11 +101,14 @@ public:
 
     HuboCan::error_result_t send_commands();
 
+    bool open_channel();
+
     hubo_cmd_data* cmd_data;
 
 protected:
 
     bool _has_been_updated;
+    bool _channel_opened;
 
     void _initialize();
     void _create_memory();
@@ -120,6 +123,10 @@ protected:
     HuboCan::HuboDescription _desc;
 
     ach_channel_t _cmd_chan;
+
+    inline Commander(const Commander& doNotCopy) { }
+    inline Commander& operator=(const Commander& doNotCopy) { return *this; }
+
 };
 
 } // HuboCmd
