@@ -153,9 +153,10 @@ static pid_t hubo_rt_daemon_fork()
 
     if( child > 0 ) // Quit silently if we get a good Process ID for the child
     {
-        // Wait for confirmation from the child
+        // (1) Wait for confirmation from the child
         //  -- The child should send SIGUSR1 which tells us to quit silently
-        // Or quit forcibly after 2 seconds
+        //
+        // Or (2) quit forcibly after 2 seconds
         //  -- alarm(2) will trigger a SIGALRM after 2 seconds which we are
         //     handling by quitting with an error
         alarm(2);
@@ -271,7 +272,7 @@ int hubo_rt_daemonize(const char *daemon_name, const char *lock_directory,
     
     syslog( LOG_NOTICE, "Finished daemonization for '%s'", daemon_name);
 
-    return 0;
+    return 1;
 }
 
 
@@ -280,7 +281,7 @@ int hubo_rt_prioritize(int priority)
     if(priority >= 50)
     {
         fprintf(stderr, "You requested an unreasonably high priority of %d\n"
-               " -- The maximum you should use is 50\n"
+               " -- The maximum you should use is 49\n"
                " -- Most real-time applications should be from 30 - 40\n",
                priority);
         return -1;

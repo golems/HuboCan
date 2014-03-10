@@ -84,7 +84,7 @@ bool Daemonizer::prioritize(int priority)
 {
     hubo_rt_stack_prefault(stack_prefault_size);
     hubo_rt_lock_memory();
-    return hubo_rt_prioritize(priority) == 0;
+    return hubo_rt_prioritize(priority) == 1;
 }
 
 int Daemonizer::daemonization_status() const { return _d_status; }

@@ -190,7 +190,7 @@ void Aggregator::_aggregator_loop()
             continue;
         }
 
-        if(hubo_cmd_header_check(_input_data) != CMD_ERR_OKAY)
+        if(hubo_cmd_header_check(_input_data) != HUBO_DATA_OKAY)
         {
             std::cerr << "Malformed command header!" << std::endl;
             // TODO: Broadcast the fact that the header was malformed?

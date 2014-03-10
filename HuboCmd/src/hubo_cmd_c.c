@@ -6,18 +6,45 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-
-hubo_cmd_error_t hubo_cmd_header_check(const hubo_cmd_data *cmd_message)
+size_t hubo_cmd_data_predict_max_message_size(size_t num_joints)
 {
-    char header_check[HUBO_CMD_HEADER_CODE_SIZE];
-    memcpy(header_check, cmd_message, HUBO_CMD_HEADER_CODE_SIZE);
-    if( strcmp(header_check, HUBO_CMD_HEADER_CODE) != 0)
+    return sizeof(hubo_cmd_header_t)+num_joints*sizeof(hubo_joint_cmd_t);
+}
+
+size_t hubo_cmd_data_location(size_t joint_index)
+{
+    return hubo_cmd_data_predict_max_message_size(joint_index);
+}
+
+int hubo_cmd_data_is_compressed(const hubo_cmd_data* data)
+{
+    if( NULL == data )
+        return 0;
+
+    const hubo_cmd_header_t* header = (hubo_cmd_header_t*)data;
+    return header->is_compressed;
+}
+
+size_t hubo_cmd_data_get_total_num_joints(const hubo_cmd_data* data)
+{
+    if( NULL == data )
+        return 0;
+
+    const hubo_cmd_header_t* header = (hubo_cmd_header_t*)data;
+    return (size_t)header->total_num_joints;
+}
+
+
+hubo_data_error_t hubo_cmd_header_check(const hubo_cmd_data *cmd_message)
+{
+    const hubo_cmd_header_t* header_check = (hubo_cmd_header_t*)cmd_message;
+    if( strcmp(header_check->code, HUBO_CMD_HEADER_CODE) != 0)
     {
-        fprintf(stderr, "Your hubo_cmd data has a malformed header!!\n");
-        return CMD_ERR_MALFORMED_HEADER;
+        fprintf(stderr, "Your hubo_cmd_data has a malformed header!!\n");
+        return HUBO_DATA_MALFORMED_HEADER;
     }
     else
-        return CMD_ERR_OKAY;
+        return HUBO_DATA_OKAY;
 }
 
 hubo_cmd_data* hubo_cmd_init_data(size_t num_total_joints)
@@ -41,7 +68,7 @@ hubo_cmd_data* hubo_cmd_init_data(size_t num_total_joints)
 
 inline size_t hubo_cmd_data_get_min_data_size(const hubo_cmd_data *data)
 {
-    if(hubo_cmd_header_check(data) != CMD_ERR_OKAY)
+    if(hubo_cmd_header_check(data) != HUBO_DATA_OKAY)
         return 0;
 
     size_t joint_count = 0;
@@ -124,20 +151,20 @@ size_t hubo_cmd_data_compressor(hubo_cmd_data *compressed,
     return joint_count;
 }
 
-hubo_cmd_error_t hubo_cmd_data_set_joint_cmd(hubo_cmd_data *data, const hubo_joint_cmd_t *cmd, size_t joint_index)
+hubo_data_error_t hubo_cmd_data_set_joint_cmd(hubo_cmd_data *data, const hubo_joint_cmd_t *cmd, size_t joint_index)
 {
     size_t total_num_joints = hubo_cmd_data_get_total_num_joints(data);
     if(joint_index >= total_num_joints)
     {
         fprintf(stderr, "Attempting to set an out-of-bounds joint value in a hubo_cmd_data!\n"
                 " -- Index:%zu, Maximum:%zu\n", joint_index, total_num_joints-1);
-        return CMD_ERR_OUT_OF_BOUNDS;
+        return HUBO_DATA_OUT_OF_BOUNDS;
     }
 
     if(hubo_cmd_data_is_compressed(data) == 1)
     {
         fprintf(stderr, "Attempting to set a joint value in a hubo_cmd_data which is compressed. Compressed data is read-only!!\n");
-        return CMD_ERR_READ_ONLY;
+        return HUBO_DATA_READ_ONLY;
     }
 
     hubo_cmd_header_t* header = (hubo_cmd_header_t*)data;
@@ -145,29 +172,29 @@ hubo_cmd_error_t hubo_cmd_data_set_joint_cmd(hubo_cmd_data *data, const hubo_joi
 
     memcpy(data+hubo_cmd_data_location(joint_index), cmd, sizeof(hubo_joint_cmd_t));
 
-    return CMD_ERR_OKAY;
+    return HUBO_DATA_OKAY;
 }
 
-hubo_cmd_error_t hubo_cmd_data_register_joint(hubo_cmd_data *data, size_t joint_index)
+hubo_data_error_t hubo_cmd_data_register_joint(hubo_cmd_data *data, size_t joint_index)
 {
     size_t total_num_joints = hubo_cmd_data_get_total_num_joints(data);
     if(joint_index >= total_num_joints)
     {
         fprintf(stderr, "Attempting to register an out-of-bounds joint value in a hubo_cmd_data!\n"
                 " -- Index:%zu, Maximum:%zu\n", joint_index, total_num_joints-1);
-        return CMD_ERR_OUT_OF_BOUNDS;
+        return HUBO_DATA_OUT_OF_BOUNDS;
     }
 
     if(hubo_cmd_data_is_compressed(data) == 1)
     {
         fprintf(stderr, "Attempting to register a joint value in a hubo_cmd_data which is compressed. Compressed data is read-only!!\n");
-        return CMD_ERR_READ_ONLY;
+        return HUBO_DATA_READ_ONLY;
     }
 
     hubo_cmd_header_t* header = (hubo_cmd_header_t*)data;
     header->bitmap |= (0x01 << joint_index);
 
-    return CMD_ERR_OKAY;
+    return HUBO_DATA_OKAY;
 }
 
 hubo_joint_cmd_t* hubo_cmd_data_access_joint_cmd(hubo_cmd_data *data, size_t joint_index)
@@ -189,14 +216,14 @@ hubo_joint_cmd_t* hubo_cmd_data_access_joint_cmd(hubo_cmd_data *data, size_t joi
     return (hubo_joint_cmd_t*)(data+hubo_cmd_data_location(joint_index));
 }
 
-hubo_cmd_error_t hubo_cmd_data_get_joint_cmd(hubo_joint_cmd_t *output, const hubo_cmd_data *data, size_t joint_index)
+hubo_data_error_t hubo_cmd_data_get_joint_cmd(hubo_joint_cmd_t *output, const hubo_cmd_data *data, size_t joint_index)
 {
     size_t total_num_joints = hubo_cmd_data_get_total_num_joints(data);
     if(joint_index >= total_num_joints)
     {
         fprintf(stderr, "Attempting to get an out-of-bounds joint value in a hubo_cmd_cx_t!\n"
                 " -- Index:%zu, Maximum:%zu\n", joint_index, total_num_joints-1);
-        return CMD_ERR_OUT_OF_BOUNDS;
+        return HUBO_DATA_OUT_OF_BOUNDS;
     }
 
     if(hubo_cmd_data_is_compressed(data) == 1) // The data is compressed
@@ -206,7 +233,7 @@ hubo_cmd_error_t hubo_cmd_data_get_joint_cmd(hubo_joint_cmd_t *output, const hub
         {
             fprintf(stderr, "Attempting to get joint information from a compressed data set which does not\n"
                     "\tcontain the requested joint index (%zu)\n", joint_index);
-            return CMD_ERR_UNAVAILABLE_INDEX;
+            return HUBO_DATA_UNAVAILABLE_INDEX;
         }
 
         size_t i=0;
@@ -228,10 +255,10 @@ hubo_cmd_error_t hubo_cmd_data_get_joint_cmd(hubo_joint_cmd_t *output, const hub
     else
     {
         fprintf(stderr, "Your hubo_cmd_cx_t is malformed!! The compressed flag believes it is '%d'\n", hubo_cmd_data_is_compressed(data));
-        return CMD_ERR_MALFORMED_HEADER;
+        return HUBO_DATA_MALFORMED_HEADER;
     }
 
-    return CMD_ERR_OKAY;
+    return HUBO_DATA_OKAY;
 }
 
 size_t hubo_cmd_data_get_size(const hubo_cmd_data *data)

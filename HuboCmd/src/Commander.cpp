@@ -7,16 +7,18 @@
 
 using namespace HuboCmd;
 
-Commander::Commander(double timeout)
+Commander::Commander(double timeout) :
+    HuboState::Receiver(timeout)
 {
-    _initialize();
-    receive_description(timeout);
+//    _initialize();
+//    receive_description(timeout);
 }
 
-Commander::Commander(const HuboCan::HuboDescription& description)
+Commander::Commander(const HuboCan::HuboDescription& description) :
+    HuboState::Receiver(description)
 {
-    _initialize();
-    load_description(description);
+//    _initialize();
+//    load_description(description);
 }
 
 void Commander::_initialize()
@@ -24,15 +26,17 @@ void Commander::_initialize()
     cmd_data = NULL;
     _compressed_data = NULL;
 
-    _channel_opened = false;
-    open_channel();
+//    _channels_opened = false;
+//    open_channels();
 
     _has_been_updated = false;
+
+    HuboState::Receiver::_initialize();
 }
 
-bool Commander::open_channel()
+bool Commander::open_channels()
 {
-    if(_channel_opened)
+    if(_channels_opened)
         return true;
 
     ach_status_t result = ach_open(&_cmd_chan, HUBO_CMD_CHANNEL, NULL);
@@ -40,14 +44,16 @@ bool Commander::open_channel()
     {
         fprintf(stderr, "Error opening command channel: %s (%d)\n",
                 ach_result_to_string(result), (int)result);
-        _channel_opened = false;
+        _channels_opened = false;
     }
     else
     {
-        _channel_opened = true;
+        _channels_opened = true;
     }
 
-    return false;
+    _channels_opened &= HuboState::Receiver::open_channels();
+
+    return _channels_opened;
 }
 
 void Commander::_create_memory()
@@ -64,19 +70,6 @@ void Commander::_create_memory()
         cmd_data = NULL;
         _compressed_data = NULL;
     }
-}
-
-bool Commander::receive_description(double timeout)
-{
-    int result = _desc.receiveInfo(timeout);
-    _create_memory();
-    return result;
-}
-
-void Commander::load_description(const HuboCan::HuboDescription &description)
-{
-    _desc = description;
-    _create_memory();
 }
 
 Commander::~Commander()
@@ -146,12 +139,12 @@ HuboCan::error_result_t Commander::claim_joint(size_t joint_index)
 
 HuboCan::error_result_t Commander::_register_joint(size_t joint_index)
 {
-    hubo_cmd_error_t result = hubo_cmd_data_register_joint(cmd_data, joint_index);
-    if(CMD_ERR_OUT_OF_BOUNDS == result)
+    hubo_data_error_t result = hubo_cmd_data_register_joint(cmd_data, joint_index);
+    if(HUBO_DATA_OUT_OF_BOUNDS == result)
     {
         return HuboCan::INDEX_OUT_OF_BOUNDS;
     }
-    else if(CMD_ERR_READ_ONLY == result)
+    else if(HUBO_DATA_READ_ONLY == result)
     {
         return HuboCan::READ_ONLY;
     }

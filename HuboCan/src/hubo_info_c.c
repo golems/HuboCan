@@ -4,6 +4,71 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+size_t hubo_info_get_joint_count(const hubo_info_data* data)
+{
+    if(data == NULL)
+        return 0;
+
+    const hubo_meta_info_t* header = (hubo_meta_info_t*)data;
+    return header->joint_count;
+}
+
+size_t hubo_info_get_jmc_count(const hubo_info_data* data)
+{
+    if(data == NULL)
+        return 0;
+
+    const hubo_meta_info_t* header = (hubo_meta_info_t*)data;
+    return header->jmc_count;
+}
+
+size_t hubo_info_get_sensor_count(const hubo_info_data* data)
+{
+    if(data == NULL)
+        return 0;
+
+    const hubo_meta_info_t* header = (hubo_meta_info_t*)data;
+    return header->sensor_count;
+}
+
+size_t hubo_info_get_joint_location(const hubo_info_data* data, size_t joint_index)
+{
+    return sizeof(hubo_meta_info_t)
+            + joint_index*sizeof(hubo_joint_info_t);
+}
+
+size_t hubo_info_get_jmc_location(const hubo_info_data* data, size_t jmc_index)
+{
+    return sizeof(hubo_meta_info_t)
+            + hubo_info_get_joint_count(data)*sizeof(hubo_joint_info_t)
+            + jmc_index*sizeof(hubo_jmc_info_t);
+}
+
+size_t hubo_info_get_sensor_location(const hubo_info_data* data, size_t sensor_index)
+{
+    return sizeof(hubo_meta_info_t)
+            + hubo_info_get_joint_count(data)*sizeof(hubo_joint_info_t)
+            + hubo_info_get_jmc_count(data)*sizeof(hubo_jmc_info_t)
+            + sensor_index*sizeof(hubo_sensor_info_t);
+}
+
+size_t hubo_info_predict_data_size(size_t joint_count, size_t jmc_count, size_t sensor_count)
+{
+    return sizeof(hubo_meta_info_t)
+            + joint_count*sizeof(hubo_joint_info_t)
+            + jmc_count*sizeof(hubo_jmc_info_t)
+            + sensor_count*sizeof(hubo_sensor_info_t);
+}
+
+inline size_t hubo_info_get_data_size(const hubo_info_data* data)
+{
+    if(data == NULL)
+        return 0;
+
+    const hubo_meta_info_t* header = (hubo_meta_info_t*)data;
+    return header->data_size;
+}
+
 hubo_info_data* hubo_info_init_data(size_t joint_count, size_t jmc_count, size_t sensor_count)
 {
     size_t data_size = hubo_info_predict_data_size(joint_count, jmc_count, sensor_count);

@@ -40,26 +40,20 @@
 #ifndef HUBOCOMMANDER_HPP
 #define HUBOCOMMANDER_HPP
 
-extern "C" {
-#include "HuboCan/AchIncludes.h"
-#include "HuboCmd/hubo_cmd_c.h"
-}
-#include "HuboCan/HuboDescription.hpp"
+#include "HuboState/Receiver.hpp"
+
 
 namespace HuboCmd {
 
 typedef std::vector<hubo_cmd_mode_t> ModeArray;
 
-class Commander
+class Commander : public HuboState::Receiver
 {
 public:
 
     Commander(double timeout=1);
     Commander(const HuboCan::HuboDescription& description);
     ~Commander();
-
-    bool receive_description(double timeout=2);
-    void load_description(const HuboCan::HuboDescription& description);
 
     HuboCan::error_result_t set_mode(size_t joint_index, hubo_cmd_mode_t mode);
     HuboCan::error_result_t set_modes(const IndexArray& joints, const ModeArray& modes);
@@ -109,17 +103,16 @@ public:
     HuboCan::error_result_t claim_joint(size_t joint_index);
     HuboCan::error_result_t claim_joints(const IndexArray& joints);
 
-    bool open_channel();
+    virtual bool open_channels();
 
     hubo_cmd_data* cmd_data;
 
 protected:
 
     bool _has_been_updated;
-    bool _channel_opened;
 
-    void _initialize();
-    void _create_memory();
+    virtual void _initialize();
+    virtual void _create_memory();
 
     HuboCan::error_result_t _register_joint(size_t joint_index);
     void _fill_container(size_t joint_index);
