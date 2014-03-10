@@ -141,7 +141,19 @@ void Aggregator::_init_aggregator()
 {
     if(!_rt.begin("hubo_cmd_aggregator"))
     {
-        std::cerr << "Could not properly daemonize the aggregator: Aggregator might already exist. Check the syslog!" << std::endl;
+        if(_rt.daemonization_status() == 13)
+        {
+            std::cerr << "Did not have permissions to create the aggregator. Run with sudo!" << std::endl;
+        }
+        else if(_rt.daemonization_status() == 17)
+        {
+            std::cerr << "Not launching a new aggregator, because one seems to already exist." << std::endl;
+        }
+        else
+        {
+            std::cerr << "Could not properly daemonize the aggregator. Uncommon error ("
+                      << _rt.daemonization_status() << "). Check the syslog!" << std::endl;
+        }
         exit(0);
     }
     if(!open_channels())
@@ -266,10 +278,16 @@ bool Aggregator::_resolve_ownership(size_t joint_index)
     else if(HUBO_CMD_CLAIM == _container.mode)
     {
         std::cout << "PID# " << header->pid << " has demanded ownership of joint '"
-                  << _desc.getJointName(joint_index) << "' (" << joint_index << ")!" << std::endl;
+                  << _desc.getJointName(joint_index) << "' (" << joint_index << ")." << std::endl;
         _pids[joint_index] = header->pid;
         return true;
     }
+
+    std::cerr << "PID# " << header->pid << " is trying to command joint '"
+                 << _desc.getJointName(joint_index) << "' (" << joint_index << ") which is already "
+                    << "owned by PID# " << _pids[joint_index] << "! Please resolve this conflict!" << std::endl;
+
+    // TODO: Report this as an error in a channel that goes all the way up to the user
 
     return false;
 }

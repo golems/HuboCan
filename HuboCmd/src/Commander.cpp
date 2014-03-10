@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include <iostream>
+
 using namespace HuboCmd;
 
 Commander::Commander(double timeout)
@@ -79,9 +81,67 @@ void Commander::load_description(const HuboCan::HuboDescription &description)
 
 Commander::~Commander()
 {
+    release_joints();
+    send_commands();
+
     ach_close(&_cmd_chan);
     free(cmd_data);
     free(_compressed_data);
+}
+
+void Commander::release_joints()
+{
+    for(size_t i=0; i < get_joint_count(); ++i)
+    {
+        if(hubo_cmd_data_check_if_joint_is_set(cmd_data, i) == 1)
+        {
+            release_joint(i);
+        }
+    }
+}
+
+HuboCan::error_result_t Commander::release_joints(const IndexArray &joints)
+{
+    HuboCan::error_result_t result = HuboCan::OKAY;
+
+    for(size_t i=0; i<joints.size(); ++i)
+    {
+        result |= release_joint(joints[i]);
+    }
+
+    return result;
+}
+
+HuboCan::error_result_t Commander::release_joint(size_t joint_index)
+{
+    if(hubo_cmd_data_check_if_joint_is_set(cmd_data, joint_index) == 1)
+    {
+        return set_mode(joint_index, HUBO_CMD_RELEASE);
+    }
+    else
+    {
+        std::cerr << "Warning: Attempting to release a joint which this process does not own. This will not do anything." << std::endl;
+        return HuboCan::INCOMPATIBLE_JOINT;
+    }
+
+    return HuboCan::UNDEFINED_ERROR;
+}
+
+HuboCan::error_result_t Commander::claim_joints(const IndexArray &joints)
+{
+    HuboCan::error_result_t result = HuboCan::OKAY;
+
+    for(size_t i=0; i<joints.size(); ++i)
+    {
+        result |= release_joint(joints[i]);
+    }
+
+    return result;
+}
+
+HuboCan::error_result_t Commander::claim_joint(size_t joint_index)
+{
+    return set_mode(joint_index, HUBO_CMD_CLAIM);
 }
 
 HuboCan::error_result_t Commander::_register_joint(size_t joint_index)

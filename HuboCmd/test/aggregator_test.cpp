@@ -23,7 +23,7 @@ int main(int argc, char* argv[])
         size_t stop = simple_min(10, desc.getJointCount());
         for(size_t i=0; i < stop; ++i)
         {
-            std::cout.width(10);
+            std::cout.width(12);
             std::cout << cmds[i].position;
         }
         std::cout << std::endl;

@@ -50,6 +50,7 @@ using namespace HuboRT;
 
 Daemonizer::Daemonizer(size_t safe_stack_size)
 {
+    _d_status = 0;
     _successful_launch = false;
     stack_prefault_size = safe_stack_size;
     _lock_directory = hubo_rt_default_lock_dir;
@@ -70,13 +71,13 @@ bool Daemonizer::begin(std::string daemon_name, int priority)
 bool Daemonizer::daemonize(std::string daemon_name)
 {
     _daemon_name = daemon_name;
-    int result = hubo_rt_daemonize(daemon_name.c_str(), _lock_directory.c_str(),
+    _d_status = hubo_rt_daemonize(daemon_name.c_str(), _lock_directory.c_str(),
                                    _log_directory.c_str());
     hubo_rt_stack_prefault(stack_prefault_size);
-    if(result == 0)
+    if(_d_status == 1)
         _successful_launch = true;
 
-    return result == 0;
+    return _d_status == 1;
 }
 
 bool Daemonizer::prioritize(int priority)
@@ -85,6 +86,8 @@ bool Daemonizer::prioritize(int priority)
     hubo_rt_lock_memory();
     return hubo_rt_prioritize(priority) == 0;
 }
+
+int Daemonizer::daemonization_status() const { return _d_status; }
 
 bool Daemonizer::good() const
 {

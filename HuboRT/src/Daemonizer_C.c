@@ -196,10 +196,9 @@ int hubo_rt_daemonize(const char *daemon_name, const char *lock_directory,
     int lfp = open(lockfile, O_RDWR|O_CREAT|O_EXCL, S_IRUSR | S_IRGRP | S_IROTH); // lockfile pointer
     if( lfp < 0 )
     {
-        syslog( LOG_ERR, "Unable to create lock file '%s', code=%d (%s)"
-                " -- Check if daemon already exists!",
+        syslog( LOG_ERR, "Unable to create lock file '%s', code=%d (%s)\n",
                 lockfile, errno, strerror(errno));
-        return -2;
+        return errno;
     }
 
     // Drop the user if one exists
@@ -297,7 +296,7 @@ int hubo_rt_prioritize(int priority)
             return -2;
         }
     }
-    return 0;
+    return 1;
 }
 
 int hubo_rt_lock_memory()

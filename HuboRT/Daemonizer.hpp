@@ -166,7 +166,12 @@ public:
      */
     void close();
 
+    // TODO: Document this function
+    int daemonization_status() const;
+
 protected:
+
+    int _d_status;
 
     bool _successful_launch;
 

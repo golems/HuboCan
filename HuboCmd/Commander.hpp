@@ -102,6 +102,13 @@ public:
     virtual HuboCan::error_result_t update();
     HuboCan::error_result_t send_commands();
 
+    HuboCan::error_result_t release_joint(size_t joint_index);
+    HuboCan::error_result_t release_joints(const IndexArray& joints);
+    void release_joints();
+
+    HuboCan::error_result_t claim_joint(size_t joint_index);
+    HuboCan::error_result_t claim_joints(const IndexArray& joints);
+
     bool open_channel();
 
     hubo_cmd_data* cmd_data;

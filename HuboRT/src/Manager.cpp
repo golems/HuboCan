@@ -243,10 +243,6 @@ void Manager::_stop_process_raw(const std::string &name)
 {
     int id = 0;
     std::ifstream str;
-//            if(!str.good())
-//            {
-//                // Handle error here? Can this ever not be good?
-//            }
     str.open( (_rt_lock_dir+"/"+name).c_str());
     
     str >> id;
@@ -256,6 +252,9 @@ void Manager::_stop_process_raw(const std::string &name)
         pid_t processID = id;
         kill(processID, SIGINT);
     }
+
+    // TODO: Check if process really stopped and report failure
+    //          But how to do this in a decent way???
 }
 
 void Manager::_kill_process_raw(const std::string &name)
