@@ -21,9 +21,8 @@ typedef uint8_t hubo_sensor_data;
 typedef struct hubo_sensor_header {
 
     char code[HUBO_SENSOR_HEADER_CODE_SIZE];
-    char type[HUBO_COMPONENT_TYPE_MAX_LENGTH];
-    uint8_t array_count;
-    double timer;
+    uint8_t array_size;
+    double time;
 
 }__attribute__((packed)) hubo_sensor_header_t;
 

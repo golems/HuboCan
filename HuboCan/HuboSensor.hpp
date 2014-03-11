@@ -7,6 +7,10 @@ extern "C" {
 
 #include "CanDevice.hpp"
 #include <vector>
+#include <string>
+
+const std::string imu_sensor_type_string = "imu";
+const std::string ft_sensor_type_string = "force_torque";
 
 namespace HuboCan {
 

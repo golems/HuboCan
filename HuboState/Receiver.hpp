@@ -20,6 +20,8 @@ public:
     bool receive_description(double timeout=2);
     void load_description(const HuboCan::HuboDescription& description);
 
+    virtual HuboCan::error_result_t update();
+
     virtual bool open_channels();
 
 
@@ -29,6 +31,11 @@ protected:
 
     virtual void _initialize();
     virtual void _create_memory();
+
+    hubo_cmd_data*    _last_cmd_data;
+    hubo_sensor_data* _joint_data;
+    hubo_sensor_data* _ft_data;
+    hubo_sensor_data* _imu_data;
 
     HuboCan::HuboDescription _desc;
 

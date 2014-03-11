@@ -21,7 +21,9 @@ typedef enum hubo_data_error {
     HUBO_DATA_OUT_OF_BOUNDS,
     HUBO_DATA_READ_ONLY,
     HUBO_DATA_UNAVAILABLE_INDEX,
-    HUBO_DATA_MALFORMED_HEADER
+    HUBO_DATA_MALFORMED_HEADER,
+
+    HUBO_DATA_IMPOSSIBLE
 
 } hubo_data_error_t;
 
