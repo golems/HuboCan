@@ -1,6 +1,6 @@
 
 #include "../Receiver.hpp"
-#include "../HuboDataParsers.hpp"
+#include "../HuboData.hpp"
 
 extern "C"{
 #include <stdlib.h>
@@ -57,7 +57,7 @@ void Receiver::_create_memory()
     free(_ft_data);
     free(_imu_data);
 
-    _joint_data = initialize_sensor_data<hubo_joint_state_t>(_desc.getJointCount());
+    _joint_data = initialize_data<hubo_joint_state_t>(_desc.getJointCount());
 
     size_t imu_count = 0;
     size_t ft_count = 0;
@@ -76,8 +76,8 @@ void Receiver::_create_memory()
         }
     }
 
-    _imu_data = initialize_sensor_data<hubo_imu_state_t>(imu_count);
-    _ft_data  = initialize_sensor_data<hubo_imu_state_t>(ft_count);
+    _imu_data = initialize_data<hubo_imu_state_t>(imu_count);
+    _ft_data  = initialize_data<hubo_imu_state_t>(ft_count);
 }
 
 bool Receiver::open_channels()

@@ -13,18 +13,18 @@
 #define HUBO_IMU_SENSOR_CHANNEL     "hubo_imu_sensors"
 #define HUBO_FT_SENSOR_CHANNEL      "hubo_ft_sensors"
 
-#define HUBO_SENSOR_HEADER_CODE "SENSORHDR_V0.01"
-#define HUBO_SENSOR_HEADER_CODE_SIZE 16 /* including null-terminator \0 */
+#define HUBO_DATA_HEADER_CODE "DATAHEADER_0.01"
+#define HUBO_DATA_HEADER_CODE_SIZE 16 /* including null-terminator \0 */
 
-typedef uint8_t hubo_sensor_data;
+typedef uint8_t hubo_data;
 
-typedef struct hubo_sensor_header {
+typedef struct hubo_data_header {
 
-    char code[HUBO_SENSOR_HEADER_CODE_SIZE];
+    char code[HUBO_DATA_HEADER_CODE_SIZE];
     uint8_t array_size;
     double time;
 
-}__attribute__((packed)) hubo_sensor_header_t;
+}__attribute__((packed)) hubo_data_header_t;
 
 
 typedef struct hubo_joint_status {
@@ -48,7 +48,7 @@ typedef struct hubo_joint_status {
     uint8_t max_position_error;
     uint8_t velocity_error;
     uint8_t acceleration_error;
-    uint8_t temperature_error;
+    uint8_t temperature_error; // 17 bytes total
 
 }__attribute__((packed)) hubo_joint_status_t;
 
@@ -85,6 +85,6 @@ typedef struct hubo_ft_state {
 }__attribute__((packed)) hubo_ft_state_t;
 
 
-hubo_data_error_t hubo_sensor_header_check(const hubo_sensor_data* sensor_message);
+hubo_data_error_t hubo_data_header_check(const hubo_data* data);
 
 #endif // HUBO_SENSOR_C_H

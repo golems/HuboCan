@@ -494,12 +494,16 @@ bool Manager::_register(const std::string &directory,
     std::ofstream output;
     output.open( (directory+"/"+components[0]).c_str() );
     
-    std::cout << "Registered " << components[0] << ": ";
+    std::cout << "Registering " << components[0] << ": ";
     for(size_t i=1; i < components.size(); ++i)
     {
         output << components[i] << ":";
         std::cout << components[i] << " | ";
     }
+    
+    if(!output.good())
+        std::cout << " FAILED! -- Make sure the manager is running with sudo!";
+    
     std::cout << std::endl;
     
     output.close();

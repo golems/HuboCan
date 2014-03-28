@@ -33,9 +33,9 @@ protected:
     virtual void _create_memory();
 
     hubo_cmd_data*    _last_cmd_data;
-    hubo_sensor_data* _joint_data;
-    hubo_sensor_data* _ft_data;
-    hubo_sensor_data* _imu_data;
+    hubo_data* _joint_data;
+    hubo_data* _ft_data;
+    hubo_data* _imu_data;
 
     HuboCan::HuboDescription _desc;
 
