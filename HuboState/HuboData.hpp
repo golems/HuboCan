@@ -16,7 +16,7 @@ typedef std::vector<hubo_joint_state_t> JointStateArray;
 typedef std::vector<hubo_imu_state_t> ImuStateArray;
 typedef std::vector<hubo_ft_state_t> ForceTorqueStateArray;
 
-size_t get_data_component_count(const hubo_data* data)
+inline size_t get_data_component_count(const hubo_data* data)
 {
     if(NULL == data)
         return 0;
@@ -61,7 +61,7 @@ hubo_data* initialize_data(size_t array_size)
     return new_data;
 }
 
-hubo_data_error_t set_data_timestamp(hubo_data* data, double time)
+inline hubo_data_error_t set_data_timestamp(hubo_data* data, double time)
 {
     if(NULL == data)
         return HUBO_DATA_NULL;

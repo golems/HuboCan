@@ -51,8 +51,6 @@ bool Commander::open_channels()
         _channels_opened = true;
     }
 
-    _channels_opened &= HuboState::Receiver::open_channels();
-
     return _channels_opened;
 }
 

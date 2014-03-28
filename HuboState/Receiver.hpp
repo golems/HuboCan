@@ -8,6 +8,8 @@ extern "C" {
 }
 #include "HuboCan/HuboDescription.hpp"
 
+#include "HuboData.hpp"
+
 namespace HuboState {
 
 class Receiver
@@ -17,14 +19,15 @@ public:
     Receiver(const HuboCan::HuboDescription& description);
     ~Receiver();
 
-    bool receive_description(double timeout=2);
+    bool receive_description(double timeout_sec=2);
     void load_description(const HuboCan::HuboDescription& description);
 
-    virtual HuboCan::error_result_t update();
-
-    virtual bool open_channels();
-
-
+    virtual HuboCan::error_result_t update(double timeout_sec=1);
+    
+    HuboData<hubo_joint_state_t>    joints;
+    HuboData<hubo_imu_state_t>      imus;
+    HuboData<hubo_ft_state_t>       force_torques;
+    
 protected:
 
     bool _channels_opened;
@@ -33,10 +36,6 @@ protected:
     virtual void _create_memory();
 
     hubo_cmd_data*    _last_cmd_data;
-    hubo_data* _joint_data;
-    hubo_data* _ft_data;
-    hubo_data* _imu_data;
-
     HuboCan::HuboDescription _desc;
 
     inline Receiver(const Receiver& doNotCopy) { }

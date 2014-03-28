@@ -1,6 +1,5 @@
 
 #include "../Receiver.hpp"
-#include "../HuboData.hpp"
 
 extern "C"{
 #include <stdlib.h>
@@ -23,14 +22,12 @@ Receiver::Receiver(const HuboCan::HuboDescription &description)
 
 Receiver::~Receiver()
 {
-    free(_joint_data);
-    free(_ft_data);
-    free(_imu_data);
+    free(_last_cmd_data);
 }
 
-bool Receiver::receive_description(double timeout)
+bool Receiver::receive_description(double timeout_sec)
 {
-    int result = _desc.receiveInfo(timeout);
+    int result = _desc.receiveInfo(timeout_sec);
     _create_memory();
     return result;
 }
@@ -44,20 +41,15 @@ void Receiver::load_description(const HuboCan::HuboDescription &description)
 void Receiver::_initialize()
 {
     _channels_opened = false;
-    open_channels();
-
-    _joint_data = NULL;
-    _ft_data = NULL;
-    _imu_data = NULL;
+    _last_cmd_data = NULL;
 }
 
 void Receiver::_create_memory()
 {
-    free(_joint_data);
-    free(_ft_data);
-    free(_imu_data);
+    free(_last_cmd_data);
 
-    _joint_data = initialize_data<hubo_joint_state_t>(_desc.getJointCount());
+    _last_cmd_data = hubo_cmd_init_data(_desc.getJointCount());
+    joints.initialize(_desc.getJointCount(), HUBO_JOINT_SENSOR_CHANNEL);
 
     size_t imu_count = 0;
     size_t ft_count = 0;
@@ -76,20 +68,19 @@ void Receiver::_create_memory()
         }
     }
 
-    _imu_data = initialize_data<hubo_imu_state_t>(imu_count);
-    _ft_data  = initialize_data<hubo_imu_state_t>(ft_count);
+    imus.initialize(imu_count, HUBO_IMU_SENSOR_CHANNEL);
+    force_torques.initialize(ft_count, HUBO_FT_SENSOR_CHANNEL);
 }
 
-bool Receiver::open_channels()
+HuboCan::error_result_t Receiver::update(double timeout_sec)
 {
-    // TODO: Open channels
+    bool success = true;
+    success &= joints.receive_data(timeout_sec);
+    success &= imus.receive_data(0);
+    success &= force_torques.receive_data(0);
 
-    return true;
-}
-
-HuboCan::error_result_t Receiver::update()
-{
-    // TODO: Update
-
-    return HuboCan::OKAY;
+    if(success)
+        return HuboCan::OKAY;
+    else
+        return HuboCan::ACH_ERROR;
 }
