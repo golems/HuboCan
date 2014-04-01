@@ -8,14 +8,14 @@
 using namespace HuboCmd;
 
 Commander::Commander(double timeout) :
-    HuboState::Receiver(timeout)
+    HuboState::State(timeout)
 {
 //    _initialize();
 //    receive_description(timeout);
 }
 
 Commander::Commander(const HuboCan::HuboDescription& description) :
-    HuboState::Receiver(description)
+    HuboState::State(description)
 {
 //    _initialize();
 //    load_description(description);
@@ -31,7 +31,7 @@ void Commander::_initialize()
 
     _has_been_updated = false;
 
-    HuboState::Receiver::_initialize();
+    HuboState::State::_initialize();
 }
 
 bool Commander::open_channels()

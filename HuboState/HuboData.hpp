@@ -7,8 +7,10 @@ extern "C" {
 
 #include <vector>
 #include <string>
+#include <map>
 #include <iostream>
 #include <stdlib.h>
+#include "hubo_sensor_stream.hpp"
 
 namespace HuboState {
 
@@ -81,7 +83,24 @@ inline hubo_data_error_t set_data_timestamp(hubo_data* data, double time)
     return HUBO_DATA_IMPOSSIBLE;
 }
 
+inline double get_data_timestamp(hubo_data* data)
+{
+    if(NULL == data)
+        return HUBO_DATA_NULL;
 
+    if(hubo_data_header_check(data) == HUBO_DATA_OKAY)
+    {
+        hubo_data_header_t* header = (hubo_data_header_t*)data;
+        return header->time;
+    }
+    else
+    {
+        std::cout << "Requesting timestamp of hubo_data with malformed header!" << std::endl;
+        return -1;
+    }
+
+    return HUBO_DATA_IMPOSSIBLE;
+}
 
 template<class DataClass>
 DataClass* get_data_component(hubo_data* data, size_t index)
@@ -159,6 +178,8 @@ std::vector<DataClass> get_vector_from_data(hubo_data* data)
     return data_vector;
 }
 
+typedef std::map<std::string, size_t> NameMap;
+
 template<class DataClass>
 class HuboData
 {
@@ -205,11 +226,63 @@ public:
         
         return *result;
     }
+
+    const DataClass& const_entry(size_t index) const
+    {
+        if(!_check_initialized("const_entry member access"))
+        {
+            return _dummy_member;
+        }
+
+        DataClass* result = get_data_component<DataClass>(_raw_data, index);
+        if(NULL == result)
+        {
+            std::cout << "You have requested an out of bounds data member for channel '"
+                         << _channel_name << "'. Requested: " << index
+                         << ", Max: " << get_data_component_count(_raw_data)-1 << std::endl;
+            return _dummy_member;
+        }
+
+        return *result;
+    }
+
+    DataClass& operator[](const std::string& name)
+    {
+        NameMap::iterator it = _mapping.find(name);
+        if(it == _mapping.end())
+        {
+            std::cout << "You have requested a data member which does not exist for channel '"
+                         << "', Requested: '" << name << "'" << std::endl;
+            return _dummy_member;
+        }
+
+        return (*this)[it->second];
+    }
     
-    bool initialize(size_t array_size, const std::string& channel_name)
+    bool initialize(const std::vector<std::string>& names, const std::string& channel_name)
     {
         free(_raw_data);
-        _raw_data = initialize_data<DataClass>(array_size);
+        _raw_data = initialize_data<DataClass>(names.size());
+
+        _mapping.clear();
+        _names.clear();
+        for(size_t i=0; i<names.size(); ++i)
+        {
+            NameMap::iterator it = _mapping.find(names[i]);
+            if(it == _mapping.end())
+            {
+                _mapping[names[i]] = i;
+            }
+            else
+            {
+                std::cout << "You have a repeated data member name ('" << names[i] << "')\n"
+                            << " -- Already exists as entry #" << it->second << "\n"
+                            << " -- Attempted to assign it to entry #" << i << std::endl;
+                _mapping.clear();
+                return false;
+            }
+        }
+        _names = names;
         
         _channel_name = channel_name;
         ach_status_t r = ach_open(&_channel, channel_name.c_str(), NULL);
@@ -271,7 +344,7 @@ public:
     bool send_data(double timestamp)
     {
         if(!_check_initialized("send_data"))
-            return ACH_ENOENT;
+            return false;
         
         set_data_timestamp(_raw_data, timestamp);
         
@@ -297,6 +370,19 @@ public:
             receive_data(0);
         
         return get_vector_from_data<DataClass>(_raw_data);
+    }
+
+    const std::string& get_entry_name(size_t i) const
+    {
+        if( i < array_count() )
+            return _names[i];
+        else
+            return _dummy_string;
+    }
+
+    double get_time() const
+    {
+        return get_data_timestamp(_raw_data);
     }
     
     bool set_data(const std::vector<DataClass>& copy)
@@ -325,10 +411,10 @@ public:
         free(_raw_data);
     }
     
-    std::string get_channel_name() { return _channel_name; }
+    std::string get_channel_name() const { return _channel_name; }
     bool is_initialized() { return _initialized; }
     
-    size_t array_count()
+    size_t array_count() const
     {
         return get_data_component_count(_raw_data);
     }
@@ -345,6 +431,7 @@ protected:
         _initialized = false;
         verbose = false;
         memset(&_dummy_member, 0, sizeof(DataClass));
+        _dummy_string = "dummy";
     }
     
     void _deep_copy_data(const HuboData& copy)
@@ -355,7 +442,7 @@ protected:
     }
     
     bool _initialized;
-    bool _check_initialized(std::string operation = "an operation")
+    bool _check_initialized(std::string operation = "an operation") const
     {
         if(_initialized)
             return true;
@@ -367,14 +454,39 @@ protected:
         }
     }
     
+    NameMap _mapping;
+    std::vector<std::string> _names;
     std::string _channel_name;
     ach_channel_t _channel;
     DataClass _dummy_member;
+    std::string _dummy_string;
     
 };
 
 
 } // namespace HuboState
 
+template<class DataClass>
+std::ostream& operator<<(std::ostream& stream, const HuboState::HuboData<DataClass>& data)
+{
+    stream << "Channel: '" << data.get_channel_name() << "', timestamp: " << data.get_time()
+              << ", entry count: " << data.array_count() << "\n";
+
+    size_t s = 0;
+    for(size_t i=0; i<data.array_count(); ++i)
+    {
+        const std::string& entry_name = data.get_entry_name(i);
+        if(entry_name.size() > s)
+            s = entry_name.size();
+    }
+
+    for(size_t i=0; i<data.array_count(); ++i)
+    {
+        stream.width(s);
+        stream << data.get_entry_name(i) << " | " << data.const_entry(i) << "\n";
+    }
+
+    return stream;
+}
 
 #endif // HUBODATA_HPP

@@ -7,7 +7,19 @@ int main(int argc, char* argv[])
 {
     HuboData<hubo_joint_state_t> rec_data;
     rec_data.verbose = true;
-    rec_data.initialize(10, HUBO_JOINT_SENSOR_CHANNEL);
+    std::vector<std::string> joint_names;
+    joint_names.push_back("RSP");
+    joint_names.push_back("RSR");
+    joint_names.push_back("RSY");
+    joint_names.push_back("REP");
+    joint_names.push_back("RWY");
+    joint_names.push_back("LSP");
+    joint_names.push_back("LSR");
+    joint_names.push_back("LSY");
+    joint_names.push_back("LEP");
+    joint_names.push_back("LWY");
+
+    rec_data.initialize(joint_names, HUBO_JOINT_SENSOR_CHANNEL);
     
     std::vector<hubo_joint_state_t> vec;
     for(size_t i=0; i<10; ++i)

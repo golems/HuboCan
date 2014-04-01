@@ -19,7 +19,8 @@ int main(int argc, char* argv[])
     mgr.register_new_chan(std::string("aggregate:")+HUBO_AGG_CHANNEL+":20:4096:");
     
     mgr.register_new_chan(std::string("joint_state:")+HUBO_JOINT_SENSOR_CHANNEL+":10:4096:");
-    
+    mgr.register_new_chan(std::string("imu_state:")+HUBO_IMU_SENSOR_CHANNEL+":10:4096:");
+    mgr.register_new_chan(std::string("ft_state:")+HUBO_FT_SENSOR_CHANNEL+":10:4096:");
 
     return 0;
 }

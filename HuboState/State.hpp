@@ -1,5 +1,5 @@
-#ifndef RECEIVER_HPP
-#define RECEIVER_HPP
+#ifndef HUBOSTATE_HPP
+#define HUBOSTATE_HPP
 
 extern "C" {
 #include "HuboCan/AchIncludes.h"
@@ -12,17 +12,18 @@ extern "C" {
 
 namespace HuboState {
 
-class Receiver
+class State
 {
 public:
-    Receiver(double timeout=1);
-    Receiver(const HuboCan::HuboDescription& description);
-    ~Receiver();
+    State(double timeout=1);
+    State(const HuboCan::HuboDescription& description);
+    ~State();
 
     bool receive_description(double timeout_sec=2);
     void load_description(const HuboCan::HuboDescription& description);
 
     virtual HuboCan::error_result_t update(double timeout_sec=1);
+    virtual HuboCan::error_result_t publish();
     
     HuboData<hubo_joint_state_t>    joints;
     HuboData<hubo_imu_state_t>      imus;
@@ -38,11 +39,11 @@ protected:
     hubo_cmd_data*    _last_cmd_data;
     HuboCan::HuboDescription _desc;
 
-    inline Receiver(const Receiver& doNotCopy) { }
-    inline Receiver& operator=(const Receiver& doNotCopy) { return *this; }
+    inline State(const State& doNotCopy) { }
+    inline State& operator=(const State& doNotCopy) { return *this; }
 
 };
 
 } // namespace HuboState
 
-#endif // RECEIVER_HPP
+#endif // HUBOSTATE_HPP

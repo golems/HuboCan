@@ -55,8 +55,8 @@ typedef struct hubo_joint_status {
 typedef struct hubo_joint_state {
 
     double position;
-    double current;
     double duty;
+    double current;
     double temperature;
 
     double reference;
@@ -68,7 +68,7 @@ typedef struct hubo_joint_state {
 
 typedef struct hubo_imu_state {
 
-    char name[HUBO_COMPONENT_NAME_MAX_LENGTH];
+//    char name[HUBO_COMPONENT_NAME_MAX_LENGTH];
 
     double angular_position[3];
     double angular_velocity[3];
@@ -77,7 +77,7 @@ typedef struct hubo_imu_state {
 
 typedef struct hubo_ft_state {
 
-    char name[HUBO_COMPONENT_NAME_MAX_LENGTH];
+//    char name[HUBO_COMPONENT_NAME_MAX_LENGTH];
 
     double force[3];
     double torque[3];

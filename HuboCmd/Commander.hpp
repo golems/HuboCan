@@ -40,14 +40,14 @@
 #ifndef HUBOCOMMANDER_HPP
 #define HUBOCOMMANDER_HPP
 
-#include "HuboState/Receiver.hpp"
+#include "HuboState/State.hpp"
 
 
 namespace HuboCmd {
 
 typedef std::vector<hubo_cmd_mode_t> ModeArray;
 
-class Commander : public HuboState::Receiver
+class Commander : public HuboState::State
 {
 public:
 

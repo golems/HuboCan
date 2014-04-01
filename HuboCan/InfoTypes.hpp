@@ -14,7 +14,8 @@ enum error_flag {
     ACH_ERROR           = 1 >> 2,
     READ_ONLY           = 1 >> 3,
     INCOMPATIBLE_JOINT  = 1 >> 4,
-    INDEX_OUT_OF_BOUNDS = 1 >> 5
+    INDEX_OUT_OF_BOUNDS = 1 >> 5,
+    SYNCH_ERROR         = 1 >> 6
 
 };
 
