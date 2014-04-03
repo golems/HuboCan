@@ -27,15 +27,17 @@ State::~State()
 
 bool State::receive_description(double timeout_sec)
 {
-    int result = _desc.receiveInfo(timeout_sec);
+    HuboCan::error_result_t result = _desc.receiveInfo(timeout_sec);
+    _initialized = result == HuboCan::OKAY;
     _create_memory();
-    return result;
+    return _initialized;
 }
 
 void State::load_description(const HuboCan::HuboDescription &description)
 {
     _desc = description;
     _create_memory();
+    _initialized = true;
 }
 
 void State::_initialize()

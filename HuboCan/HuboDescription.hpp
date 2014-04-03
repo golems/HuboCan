@@ -32,14 +32,14 @@ public:
      * \param timeout
      * \return
      */
-    int receiveInfo(double timeout=2);
+    error_result_t receiveInfo(double timeout=2);
 
     /*!
      * \fn broadcastInfo()
      * \brief Sends out the HuboDescription info to the appropriate Ach Channels
      * \return
      */
-    int broadcastInfo();
+    error_result_t broadcastInfo();
 
     /*!
      * \fn jointCount()

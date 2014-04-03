@@ -72,13 +72,13 @@ HuboDescription::~HuboDescription()
     }
 }
 
-int HuboDescription::receiveInfo(double timeout)
+error_result_t HuboDescription::receiveInfo(double timeout)
 {
     free(_data);
     _data = hubo_info_receive_data(timeout);
 
     if(_data == NULL)
-        return -1;
+        return ACH_ERROR;
 
     size_t joint_count = hubo_info_get_joint_count(_data);
     for(size_t i=0; i < joint_count; ++i)
@@ -107,10 +107,10 @@ int HuboDescription::receiveInfo(double timeout)
     free(_data);
     _data = NULL;
 
-    return 0;
+    return OKAY;
 }
 
-int HuboDescription::broadcastInfo()
+error_result_t HuboDescription::broadcastInfo()
 {
     free(_data);
     _data = hubo_info_init_data(joints.size(), jmcs.size(), sensors.size());
@@ -138,7 +138,10 @@ int HuboDescription::broadcastInfo()
     free(_data);
     _data = NULL;
 
-    return result;
+    if(result==0)
+        return OKAY;
+    else
+        return ACH_ERROR;
 }
 
 std::string HuboDescription::getJointTable()
