@@ -16,6 +16,8 @@ typedef std::vector<can_frame_t> FrameArray;
 typedef std::vector<CanDevice*> CanDevicePtrArray;
 typedef struct timespec timespec_t;
 
+const int can_frame_bit_size = 108;
+
 class ChannelHandle
 {
 public:
@@ -23,6 +25,23 @@ public:
     int reply_expectation;
     FrameArray request_frames;
     FrameArray command_frames;
+    
+    inline int frame_count()
+    {
+        return request_frames.size()
+            + command_frames.size();
+    }
+    
+    inline int frame_expectation()
+    {
+        return reply_expectation + frame_count();
+    }
+    
+    inline void reset_counter()
+    {
+        net_lost_replies += reply_expectation;
+        reply_expectation = 0;
+    }
 };
 
 typedef std::vector<ChannelHandle> ChannelArray;
@@ -36,7 +55,7 @@ public:
     void addFrame(const can_frame_t& frame, size_t channel,
                   size_t expected_replies=0);
 
-    virtual bool pump();
+    bool pump();
 
     inline void addDevice(CanDevice* new_device)
     {
@@ -44,15 +63,23 @@ public:
     }
     
     double period_threshold;
+    
+    inline bool error() { return _can_error; }
+    
+    int channel_count() { return _channels.size(); }
 
 protected:
     
     bool _can_initialized;
+    bool _can_error;
     
-    virtual bool _send_frame();
-    virtual bool _wait_on_frames();
+    void _send_next_frames();
+    void _wait_on_next_frames(const timespec_t& timeout);
     
-    virtual void _decode_frame(const can_frame_t& frame, size_t channel);
+    virtual bool _send_frame(const can_frame_t& frame, size_t channel);
+    virtual bool _wait_on_frame(const timespec_t& relative_timeout);
+    
+    void _decode_frame(const can_frame_t& frame, size_t channel);
 
     ChannelArray _channels;
     
@@ -65,7 +92,11 @@ protected:
     timespec_t _deadline;
     
     void _increment_clock(timespec_t& clock, double seconds);
+    void _zero_clock(timespec_t& clock);
     double _clock_diff(const timespec_t& last, const timespec_t&first);
+    
+    int _get_max_frame_count();
+    int _get_max_frame_expectation();
 };
 
 } // namespace HuboCan

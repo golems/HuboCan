@@ -172,9 +172,9 @@ void Aggregator::_aggregator_loop()
         double quit_check = 1;
         struct timespec wait_time;
         clock_gettime( ACH_DEFAULT_CLOCK, &wait_time);
-        int nano_wait = wait_time.tv_nsec + (int)(quit_check*1E9);
-        wait_time.tv_sec += (int)(nano_wait/1E9);
-        wait_time.tv_nsec = (int)(nano_wait%((int)1E9));
+        long nano_wait = wait_time.tv_nsec + (long)(quit_check*1E9);
+        wait_time.tv_sec += (long)(nano_wait/1E9);
+        wait_time.tv_nsec = (long)(nano_wait%((long)1E9));
         ach_status_t result = ach_get(&_cmd_chan, _input_data, max_expected_size,
                                  &fs, &wait_time, ACH_O_WAIT);
 

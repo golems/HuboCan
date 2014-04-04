@@ -193,9 +193,9 @@ manager_err_t ManagerReq::_send_request(manager_cmd_t cmd, NameArray &reply, con
         size_t fs;
         struct timespec wait_time;
         clock_gettime( ACH_DEFAULT_CLOCK, &wait_time);
-        int nano_wait = wait_time.tv_nsec + (int)(timeout*1E9);
-        wait_time.tv_sec += (int)(nano_wait/1E9);
-        wait_time.tv_nsec = (int)(nano_wait%((int)1E9));
+        long nano_wait = wait_time.tv_nsec + (long)(timeout*1E9);
+        wait_time.tv_sec += (long)(nano_wait/1E9);
+        wait_time.tv_nsec = (long)(nano_wait%((long)1E9));
         r = ach_get(&_reply_chan, &raw_reply, sizeof(manager_reply_t),
                                  &fs, &wait_time, ACH_O_WAIT);
         
