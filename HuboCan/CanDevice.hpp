@@ -16,7 +16,7 @@ public:
     }
 
     inline virtual void update() { }
-    inline virtual void decode(const can_frame_t& frame) { }
+    inline virtual void decode(const can_frame_t& frame, size_t channel) { }
 
 protected:
 
