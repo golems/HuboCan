@@ -97,7 +97,7 @@ bool CanPump::pump()
 {
     if(!_can_initialized)
     {
-        std::cout << "WARNING: Attempting to pump the CanPump before the CAN"
+        std::cout << "WARNING: Attempting to pump the CanPump before the CAN "
                   << "communication has been initialized!" << std::endl;
         return false;
     }
