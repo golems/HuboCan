@@ -18,6 +18,8 @@ int main(int argc, char* argv[])
     HuboState::State state(desc);
     HuboCmd::Aggregator agg(desc);
 
+    std::cout << state.joints << "\n\n" << std::endl;
+
     for(size_t i=0; i<desc.jmcs.size(); ++i)
     {
         desc.jmcs[i]->assign_pointers(&agg, &state);
