@@ -74,7 +74,7 @@ bool SocketCanPump::initialize_devices(bool virtual_can)
         }
         else
         {
-            if(!_initialize_device(virtual_can_names[i], i))
+            if(!_initialize_device(can_device_names[i], i))
                 return false;
         }
     }
@@ -125,10 +125,10 @@ bool SocketCanPump::_initialize_device(const char *device_name, size_t index)
     
     if(bind(s, (struct sockaddr *)&addr, sizeof(addr)) < 0)
     {
-//        std::cout << "Error while binding a socket for " << device_name
-//                  << " (" << index << ")!\n"
-//                  << " -- " << strerror(errno) << " (" << errno << ")" << std::endl;
-        perror("error while binding a socket");
+        std::cout << "Error while binding a socket for " << device_name
+                  << " (" << index << ")!\n"
+                  << " -- " << strerror(errno) << " (" << errno << ")" << std::endl;
+//        perror("error while binding a socket");
         return false;
     }
     
