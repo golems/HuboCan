@@ -10,6 +10,8 @@ void Hubo2PlusBasicJmc::update()
     if(NULL == _pump)
         return;
 
+    // Somehow the JMCs are spewing out encoder readings even with this commented out
+    // What the hell??
 //    _request_encoder_readings();
     _send_reference_commands();
 }
