@@ -412,7 +412,7 @@ public:
     }
     
     std::string get_channel_name() const { return _channel_name; }
-    bool is_initialized() { return _initialized; }
+    bool is_initialized() const { return _initialized; }
     
     size_t array_count() const
     {
@@ -469,6 +469,12 @@ protected:
 template<class DataClass>
 std::ostream& operator<<(std::ostream& stream, const HuboState::HuboData<DataClass>& data)
 {
+    if(!data.is_initialized())
+    {
+        stream << "Uninitialized HuboData" << std::endl;
+        return stream;
+    }
+
     stream << "Channel: '" << data.get_channel_name() << "', timestamp: " << data.get_time()
               << ", entry count: " << data.array_count() << "\n";
 
