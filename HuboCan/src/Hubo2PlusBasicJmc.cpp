@@ -41,6 +41,8 @@ bool Hubo2PlusBasicJmc::decode(const can_frame_t &frame, size_t channel)
     {
         if(frame.can_dlc == 8)
         {
+            std::cout << "jmc name: " << info.name << std::endl;
+
             for(size_t i=0; i < joints.size(); ++i)
             {
                 int32_t encoder = 0;

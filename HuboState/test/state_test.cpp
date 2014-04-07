@@ -9,7 +9,7 @@ int main(int argc, char* argv[])
 
     State state(desc);
 
-
+    std::cout << state.joints << std::endl;
 
 
     return 0;
