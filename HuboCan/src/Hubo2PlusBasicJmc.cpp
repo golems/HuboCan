@@ -10,7 +10,7 @@ void Hubo2PlusBasicJmc::update()
     if(NULL == _pump)
         return;
 
-    _request_encoder_readings();
+//    _request_encoder_readings();
     _send_reference_commands();
 }
 
