@@ -10,6 +10,7 @@
 namespace HuboCan {
 
 class CanDevice;
+class HuboDescription;
 
 typedef struct can_frame can_frame_t;
 typedef std::vector<can_frame_t> FrameArray;
@@ -51,13 +52,15 @@ class CanPump
 public:
     
     CanPump(double nominal_frequency, double bitrate, size_t channels);
+
+    void load_description(HuboDescription& desc);
     
     void addFrame(const can_frame_t& frame, size_t channel,
                   size_t expected_replies=0);
 
     bool pump();
 
-    inline void addDevice(CanDevice* new_device)
+    inline void add_device(CanDevice* new_device)
     {
         _devices.push_back(new_device);
     }

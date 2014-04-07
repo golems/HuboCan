@@ -1,6 +1,7 @@
 
 #include "../CanPump.hpp"
 #include "../CanDevice.hpp"
+#include "../HuboDescription.hpp"
 #include <iostream>
 #include <errno.h>
 #include <string.h>
@@ -22,6 +23,19 @@ CanPump::CanPump(double nominal_frequency, double bitrate, size_t channels)
     
     _channels.resize(channels);
     
+}
+
+void CanPump::load_description(HuboDescription& desc)
+{
+    for(size_t i=0; i<desc.jmcs.size(); ++i)
+    {
+        desc.jmcs[i]->registerPump(*this);
+    }
+
+    for(size_t i=0; i<desc.sensors.size(); ++i)
+    {
+        desc.sensors[i]->registerPump(*this);
+    }
 }
 
 bool CanPump::_send_frame(const can_frame_t& frame, size_t channel)

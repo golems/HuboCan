@@ -16,7 +16,7 @@ public:
 
     inline virtual void registerPump(CanPump& pump)
     {
-        pump.addDevice(this);
+        pump.add_device(this);
         _pump = &pump;
     }
 
