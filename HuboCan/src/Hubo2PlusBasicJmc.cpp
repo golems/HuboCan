@@ -51,7 +51,9 @@ bool Hubo2PlusBasicJmc::decode(const can_frame_t &frame, size_t channel)
                     encoder = (encoder << 8) + frame.data[3 + j*4];
                 }
 
+                std::cout << "checking joint index..." << std::endl;
                 size_t joint_index = joints[i]->info.software_index;
+                std::cout << "joint_index: " << joint_index << std::endl;
                 _state->joints[joint_index].position =
                             joints[i]->encoder2radian(encoder);
 
