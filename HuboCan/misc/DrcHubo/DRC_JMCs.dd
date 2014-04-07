@@ -1,0 +1,216 @@
+
+
+begin JMC   # RHY RHR
+
+name    JMC0
+type    DRC_2CH
+
+can_channel     0
+hardware_index  0x00
+
+end JMC
+
+###########################
+
+begin JMC   # RHP
+
+name    JMC1
+type    DRC_2CH
+
+can_channel     0
+hardware_index  0x01
+
+end JMC
+
+###########################
+
+begin JMC   # RKP
+
+name    JMC2
+type    DRC_2CH
+
+can_channel     0
+hardware_index  0x02
+
+end JMC
+
+###########################
+
+begin JMC   # RAP RAR
+
+name    JMC3
+type    DRC_2CH
+
+can_channel     0
+hardware_index  0x03
+
+end JMC
+
+###########################
+
+begin JMC   # LHY LHR
+
+name    JMC4
+type    DRC_2CH
+
+can_channel     0
+hardware_index  0x04
+
+end JMC
+
+###########################
+
+begin JMC   # LHP
+
+name    JMC5
+type    DRC_2CH
+
+can_channel     0
+hardware_index  0x05
+
+end JMC
+
+###########################
+
+begin JMC   # LKP
+
+name    JMC6
+type    DRC_2CH
+
+can_channel     0
+hardware_index  0x06
+
+end JMC
+
+###########################
+
+begin JMC   # LAP LAR
+
+name    JMC7
+type    DRC_2CH
+
+can_channel     0
+hardware_index  0x07
+
+end JMC
+
+###########################
+
+begin JMC   # RSP RSR
+
+name    JMC8
+type    DRC_2CH
+
+can_channel     1
+hardware_index  0x08
+
+end JMC
+
+###########################
+
+begin JMC   # RSY REP
+
+name    JMC9
+type    DRC_2CH
+
+can_channel     1
+hardware_index  0x09
+
+end JMC
+
+###########################
+
+begin JMC   # LSP LSR
+
+name    JMC10
+type    DRC_2CH
+
+can_channel     1
+hardware_index  0x0A
+
+end JMC
+
+###########################
+
+begin JMC   # LSY LEP
+
+name    JMC11
+type    DRC_2CH
+
+can_channel     1
+hardware_index  0x0B
+
+end JMC
+
+###########################
+
+begin JMC   # RWY RWP
+
+name    EJMC0
+type    DRC_2CH
+
+can_channel     1
+hardware_index  0x20
+
+end JMC
+
+###########################
+
+begin JMC   # LWY LWP
+
+name    EJMC1
+type    DRC_2CH
+
+can_channel     1
+hardware_index  0x21
+
+end JMC
+
+# TODO: Decide if we should support the neck joints
+###########################
+
+#begin JMC   # NKY NK1 NK2
+
+#name    EJMC2
+#type    H2P_NCK
+
+#can_channel     1
+#hardware_index  0x22
+
+#end JMC
+
+###########################
+
+begin JMC   # WST
+
+name    EJMC3
+type    DRC_2CH
+
+can_channel     0
+hardware_index  0x23
+
+end JMC
+
+###########################
+
+begin JMC   # RWR RF1 RF2
+
+name    EJMC4
+type    DRC_3CH
+
+can_channel     1
+hardware_index  0x24
+
+end JMC
+
+###########################
+
+begin JMC   # LWR LF1
+
+name    EJMC5
+type    DRC_3CH
+
+can_channel     1
+hardware_index  0x25
+
+end JMC

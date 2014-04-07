@@ -5,7 +5,8 @@
 int main(int argc, char* argv[])
 {
     HuboCan::HuboDescription desc;
-    desc.parseFile("../HuboCan/misc/Hubo2Plus.dd");
+//    desc.parseFile("../HuboCan/misc/Hubo2Plus.dd");
+    desc.parseFile("../HuboCan/misc/DrcHubo.dd");
 
     std::cout << desc.getJointTable() << std::endl << std::endl;
 

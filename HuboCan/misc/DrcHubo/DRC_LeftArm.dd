@@ -1,0 +1,101 @@
+
+begin   Joint
+
+name            LSP
+software_index  13
+
+drive       10
+driven      25
+harmonic    100
+encoder     4000
+
+hardware_index  0
+jmc_name        JMC10
+
+end     Joint
+
+###########################
+
+begin   Joint
+
+name            LSR
+software_index  14
+
+drive       1
+driven      1
+harmonic    100
+encoder     4000
+
+hardware_index  1
+jmc_name        JMC10
+
+end     Joint
+
+###########################
+
+begin   Joint
+
+name            LSY
+software_index  15
+
+drive       1
+driven      1
+harmonic    100
+encoder     4000
+
+hardware_index  0
+jmc_name        JMC11
+
+end     Joint
+
+###########################
+
+begin   Joint
+
+name            LEP
+software_index  16
+
+drive       10
+driven      20
+harmonic    100
+encoder     4000
+
+hardware_index  1
+jmc_name        JMC11
+
+end     Joint
+
+###########################
+
+begin   Joint
+
+name            LWY
+software_index  17
+
+drive       1
+driven      1
+harmonic    100
+encoder     4000
+
+hardware_index  0
+jmc_name        EJMC1
+
+end     Joint
+
+###########################
+
+begin   Joint
+
+name            LWP
+software_index  18
+
+drive       1
+driven      2
+harmonic    100
+encoder     4000
+
+hardware_index  1
+jmc_name        EJMC1
+
+end     Joint
+

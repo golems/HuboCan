@@ -1,0 +1,16 @@
+
+include     DrcHubo/DRC_JMCs.dd
+
+include     DrcHubo/DRC_Body.dd         # Joint range: 00 - 00
+include     DrcHubo/DRC_LeftLeg.dd      # Joint range: 01 - 06
+include     DrcHubo/DRC_RightLeg.dd     # Joint range: 07 - 12
+include     DrcHubo/DRC_LeftArm.dd      # Joint range: 13 - 18
+include     DrcHubo/DRC_RightArm.dd     # Joint range: 19 - 24
+include     DrcHubo/DRC_LeftHand.dd     # Joint range: 25 - 26
+include     DrcHubo/DRC_RightHand.dd    # Joint range: 27 - 29
+
+
+
+# TODO: Decide if the neck should be included
+
+

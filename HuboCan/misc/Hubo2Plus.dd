@@ -1,11 +1,11 @@
 
-include     H2P_JMCs.dd
+include     Hubo2Plus/H2P_JMCs.dd
 
-include     H2P_Body.dd         # Joint range: 00 - 00
-include     H2P_Neck.dd         # Joint range: 01 - 03
-include     H2P_LeftLeg.dd      # Joint range: 04 - 09
-include     H2P_RightLeg.dd     # Joint range: 10 - 15
-include     H2P_LeftArm.dd      # Joint range: 16 - 21
-include     H2P_RightArm.dd     # Joint range: 22 - 27
-include     H2P_LeftHand.dd     # Joint range: 28 - 32
-include     H2P_RightHand.dd    # Joint range: 33 - 37
+include     Hubo2Plus/H2P_Body.dd           # Joint range: 00 - 00
+include     Hubo2Plus/H2P_Neck.dd           # Joint range: 01 - 03
+include     Hubo2Plus/H2P_LeftLeg.dd        # Joint range: 04 - 09
+include     Hubo2Plus/H2P_RightLeg.dd       # Joint range: 10 - 15
+include     Hubo2Plus/H2P_LeftArm.dd        # Joint range: 16 - 21
+include     Hubo2Plus/H2P_RightArm.dd       # Joint range: 22 - 27
+include     Hubo2Plus/H2P_LeftHand.dd       # Joint range: 28 - 32
+include     Hubo2Plus/H2P_RightHand.dd      # Joint range: 33 - 37

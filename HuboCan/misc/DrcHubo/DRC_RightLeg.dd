@@ -1,0 +1,100 @@
+
+begin   Joint
+
+name            RHY
+software_index  7
+
+drive       10
+driven      25
+harmonic    100
+encoder     4000
+
+hardware_index  0
+jmc_name        JMC0
+
+end     Joint
+
+###########################
+
+begin   Joint
+
+name            RHR
+software_index  8
+
+drive       324
+driven      1024
+harmonic    160
+encoder     4000
+
+hardware_index  1
+jmc_name        JMC0
+
+end     Joint
+
+###########################
+
+begin   Joint
+
+name            RHP
+software_index  9
+
+drive       16
+driven      20
+harmonic    160
+encoder     4000
+
+hardware_index  0
+jmc_name        JMC1
+
+end     Joint
+
+###########################
+
+begin   Joint
+
+name            RKP
+software_index  10
+
+drive       13
+driven      25
+harmonic    160
+encoder     4000
+
+hardware_index  0
+jmc_name        JMC2
+
+end     Joint
+
+###########################
+
+begin   Joint
+
+name            RAP
+software_index  11
+
+drive       10
+driven      25
+harmonic    100
+encoder     4000
+
+hardware_index  0
+jmc_name        JMC3
+
+end     Joint
+
+###########################
+
+begin   Joint
+
+name            RAR
+software_index  12
+
+drive       324
+driven      1024
+harmonic    100
+encoder     4000
+
+hardware_index  1
+jmc_name        JMC3
+
+end     Joint

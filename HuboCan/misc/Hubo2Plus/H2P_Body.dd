@@ -1,0 +1,19 @@
+
+begin   Joint
+
+name            WST
+software_index  0
+
+drive       10
+driven      25
+harmonic    100
+encoder     4000
+
+default_kp      0
+default_kd      0
+default_max_pwm 0
+
+hardware_index  0
+jmc_name        EJMC3
+
+end     Joint

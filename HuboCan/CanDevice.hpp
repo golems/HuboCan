@@ -21,7 +21,7 @@ public:
     }
 
     inline virtual void update() { }
-    inline virtual void decode(const can_frame_t& frame, size_t channel) { }
+    inline virtual bool decode(const can_frame_t& frame, size_t channel) { return false; }
 
 protected:
 

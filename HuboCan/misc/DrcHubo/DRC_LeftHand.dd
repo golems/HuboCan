@@ -1,0 +1,32 @@
+
+begin   Joint
+
+name            LWR
+software_index  25
+
+drive       1
+driven      2
+harmonic    100
+encoder     128
+
+hardware_index  0
+jmc_name        EJMC5
+
+end     Joint
+
+###########################
+
+begin   Joint
+
+name            LF1
+software_index  26
+
+drive       1
+driven      1
+harmonic    256
+encoder     128
+
+hardware_index  1
+jmc_name        EJMC5
+
+end     Joint

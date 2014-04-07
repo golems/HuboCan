@@ -1,0 +1,49 @@
+
+begin   Joint
+
+name            RWR
+software_index  27
+
+drive       1
+driven      2
+harmonic    100
+encoder     128
+
+hardware_index  0
+jmc_name        EJMC4
+
+end     Joint
+
+###########################
+
+begin   Joint
+
+name            RF1
+software_index  28
+
+drive       1
+driven      1
+harmonic    256
+encoder     128
+
+hardware_index  1
+jmc_name        EJMC4
+
+end     Joint
+
+###########################
+
+begin   Joint
+
+name            RF2
+software_index  29
+
+drive       1
+driven      1
+harmonic    256
+encoder     128
+
+hardware_index  2
+jmc_name        EJMC4
+
+end     Joint

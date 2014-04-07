@@ -7,19 +7,17 @@ extern "C" {
 
 #include "CanDevice.hpp"
 #include "HuboJoint.hpp"
-//#include "HuboCmd/Aggregator.hpp"
-//#include "HuboState/State.hpp"
 
 #include <string>
 #include <string.h>
 
 const char hubo2plus_1ch_code[] = "H2P_1CH";
 const char hubo2plus_2ch_code[] = "H2P_2CH";
-const char hubo2plus_3ch_code[] = "H2P_3CH";
+const char hubo2plus_nck_code[] = "H2P_NCK"; // Hubo2Plus neck board
 const char hubo2plus_5ch_code[] = "H2P_5CH";
 
 const char drchubo_2ch_code[] = "DRC_2CH";
-const char drchubo_hybrid_code[] = "DRC_HYBRID";
+const char drchubo_3ch_code[] = "DRC_3CH";
 
 namespace HuboCmd {
 
@@ -54,18 +52,9 @@ public:
     static std::string header();
 
     std::string table() const;
-    
-    virtual void update();
-    virtual void decode(const can_frame_t &frame, size_t channel);
 
 protected:
-    
-    void _request_encoder_readings();
-    void _send_reference_commands();
-    
-//    void _decode_2ch_enc(const can_frame_t& frame);
-//    void _decode_nck_enc(const can_frame_t& frame);
-//    void _decode_finger_enc(const can_frame_t& frame);
+
 
     HuboCmd::Aggregator* _agg;
     HuboState::State* _state;
@@ -83,8 +72,13 @@ class Hubo2PlusBasicJmc : public HuboJmc
 {
 public:
 
+    virtual void update();
+    virtual bool decode(const can_frame_t &frame, size_t channel);
+
 protected:
 
+    virtual void _request_encoder_readings();
+    virtual void _send_reference_commands();
 };
 
 class Hubo2Plus2chJmc : public Hubo2PlusBasicJmc
@@ -95,7 +89,7 @@ protected:
 
 };
 
-class Hubo2Plus3chJmc : public Hubo2PlusBasicJmc
+class Hubo2PlusNckJmc : public Hubo2PlusBasicJmc
 {
 public:
 
@@ -107,7 +101,12 @@ class Hubo2Plus5chJmc : public Hubo2PlusBasicJmc
 {
 public:
 
+    bool decode(const can_frame_t &frame, size_t channel);
+
 protected:
+
+    void _request_encoder_readings();
+    void _send_reference_commands();
 
 };
 
@@ -119,11 +118,15 @@ protected:
 
 };
 
-class DrcHuboHybridJmc : public Hubo2PlusBasicJmc
+class DrcHubo3chJmc : public Hubo2PlusBasicJmc
 {
 public:
 
+    bool decode(const can_frame_t &frame, size_t channel);
+
 protected:
+
+    void _send_reference_commands();
 
 };
 

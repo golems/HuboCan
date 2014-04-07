@@ -1,0 +1,102 @@
+
+begin   Joint
+
+name            RSP
+software_index  19
+
+drive       10
+driven      25
+harmonic    100
+encoder     4000
+
+hardware_index  0
+jmc_name        JMC8
+
+end     Joint
+
+###########################
+
+begin   Joint
+
+name            RSR
+software_index  20
+
+drive       1
+driven      1
+harmonic    100
+encoder     4000
+
+hardware_index  1
+jmc_name        JMC8
+
+end     Joint
+
+###########################
+
+begin   Joint
+
+name            RSY
+software_index  21
+
+drive       1
+driven      1
+harmonic    100
+encoder     4000
+
+hardware_index  0
+jmc_name        JMC9
+
+end     Joint
+
+###########################
+
+begin   Joint
+
+name            REP
+software_index  22
+
+drive       10
+driven      20
+harmonic    100
+encoder     4000
+
+hardware_index  1
+jmc_name        JMC9
+
+end     Joint
+
+###########################
+
+begin   Joint
+
+name            RWY
+software_index  23
+
+drive       1
+driven      1
+harmonic    100
+encoder     4000
+
+hardware_index  0
+jmc_name        EJMC0
+
+end     Joint
+
+###########################
+
+begin   Joint
+
+name            RWP
+software_index  24
+
+drive       1
+driven      2
+harmonic    100
+encoder     4000
+
+hardware_index  1
+jmc_name        EJMC0
+
+end     Joint
+
+

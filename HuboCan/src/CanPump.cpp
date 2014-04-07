@@ -187,11 +187,22 @@ void CanPump::_wait_on_next_frames(const timespec_t &timeout)
 
 void CanPump::_decode_frame(const can_frame_t& frame, size_t channel)
 {
+    bool decoded = false;
     for(size_t i=0; i<_devices.size(); ++i)
     {
-        _devices[i]->decode(frame, channel);
+        decoded |= _devices[i]->decode(frame, channel);
     }
     --_channels[channel].reply_expectation;
+
+    if(!decoded)
+    {
+        std::cout << "Could not decode frame! ID:" << std::hex << frame.can_id << " Data: ";
+        for(size_t i=0; i<8; ++i)
+        {
+            std::cout << std::hex << frame.data[i] << " ";
+        }
+        std::cout << " DLC:" << std::dec << frame.can_dlc << std::endl;
+    }
 }
 
 int CanPump::_get_max_frame_count()

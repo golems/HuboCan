@@ -170,7 +170,7 @@ end JMC
 begin JMC   # NKY NK1 NK2
 
 name    EJMC2
-type    H2P_3CH
+type    H2P_NCK
 
 can_channel     1
 hardware_index  0x22

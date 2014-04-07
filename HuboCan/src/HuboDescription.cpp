@@ -420,9 +420,9 @@ bool HuboDescription::_parseJMC(bool strict)
     {
         new_jmc = new Hubo2Plus2chJmc;
     }
-    else if(type_string == hubo2plus_3ch_code)
+    else if(type_string == hubo2plus_nck_code)
     {
-        new_jmc = new Hubo2Plus3chJmc;
+        new_jmc = new Hubo2PlusNckJmc;
     }
     else if(type_string == hubo2plus_5ch_code)
     {
@@ -432,9 +432,9 @@ bool HuboDescription::_parseJMC(bool strict)
     {
         new_jmc = new DrcHubo2chJmc;
     }
-    else if(type_string == drchubo_hybrid_code)
+    else if(type_string == drchubo_3ch_code)
     {
-        new_jmc = new DrcHuboHybridJmc;
+        new_jmc = new DrcHubo3chJmc;
     }
 
     if( NULL == new_jmc )

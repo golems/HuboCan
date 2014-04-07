@@ -18,6 +18,9 @@ public:
 
     hubo_joint_info_t info;
 
+    double encoder2radian(int encoder);
+    int radian2encoder(double radian);
+
     inline static std::string header()
     {
         std::stringstream str;
