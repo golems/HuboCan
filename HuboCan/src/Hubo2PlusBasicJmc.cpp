@@ -48,7 +48,7 @@ bool Hubo2PlusBasicJmc::decode(const can_frame_t &frame, size_t channel)
                 int32_t encoder = 0;
                 for(size_t j=3; j >= 0; --j)
                 {
-                    encoder = (encoder << 8) + frame.data[3 + j*4];
+                    encoder = (encoder << 8) + frame.data[j + i*4];
                 }
 
                 std::cout << "checking joint index..." << std::endl;
