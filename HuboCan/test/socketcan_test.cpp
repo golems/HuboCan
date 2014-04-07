@@ -25,11 +25,17 @@ int main(int argc, char* argv[])
         desc.jmcs[i]->assign_pointers(&agg, &state);
     }
 
+    size_t iter=0;
     while(can.pump())
     {
-        std::cout << "lost: " << can.channel(0).net_lost_replies << ", "
-                  << can.channel(1).net_lost_replies << std::endl;
-//        std::cout << state.joints << "\n\n" << std::endl;
+        if(iter > 200)
+        {
+            std::cout << "lost: " << can.channel(0).net_lost_replies << ", "
+                      << can.channel(1).net_lost_replies << std::endl;
+            std::cout << state.joints << "\n\n" << std::endl;
+            iter = 0;
+        }
+        ++iter;
     }
 
     return 0;
