@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
     while(true)
     {
         sleep(1);
-        const HuboCmd::JointCmdArray& cmds = agg.get_latest_commands();
+        const HuboCmd::JointCmdArray& cmds = agg.update();
         size_t stop = simple_min(10, desc.getJointCount());
         for(size_t i=0; i < stop; ++i)
         {

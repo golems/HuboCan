@@ -67,6 +67,13 @@ public:
     inline bool error() { return _can_error; }
     
     int channel_count() { return _channels.size(); }
+    
+    inline const timespec_t& last_deadline() { return _deadline; }
+    
+    double last_deadline_value()
+    {
+        return (double)(_deadline.tv_sec)+(double)(_deadline.tv_nsec)/1E9;
+    }
 
 protected:
     

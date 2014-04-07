@@ -33,7 +33,12 @@ public:
 
     bool run();
 
-    const JointCmdArray& get_latest_commands();
+    const JointCmdArray& update();
+    
+    inline const JointCmdArray& last_commands()
+    {
+        return _aggregated_cmds;
+    }
 
 protected:
 

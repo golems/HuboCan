@@ -305,11 +305,11 @@ void Aggregator::_accept_command(size_t joint_index)
 }
 
 
-const JointCmdArray& Aggregator::get_latest_commands()
+const JointCmdArray& Aggregator::update()
 {
     if(!_memory_set)
     {
-        std::cerr << "Trying to get the latest commands before a valid HuboDescription has been loaded! Don't do that!!" << std::endl;
+        std::cerr << "Trying to update commands before a valid HuboDescription has been loaded! Don't do that!!" << std::endl;
         return _aggregated_cmds;
     }
 

@@ -8,6 +8,11 @@ namespace HuboCan {
 class CanDevice
 {
 public:
+    
+    inline CanDevice()
+    {
+        _pump = NULL;
+    }
 
     inline virtual void registerPump(CanPump& pump)
     {

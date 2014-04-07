@@ -7,7 +7,11 @@ extern "C" {
 
 #include "CanDevice.hpp"
 #include "HuboJoint.hpp"
+//#include "HuboCmd/Aggregator.hpp"
+//#include "HuboState/State.hpp"
+
 #include <string>
+#include <string.h>
 
 const char hubo2plus_1ch_code[] = "H2P_1CH";
 const char hubo2plus_2ch_code[] = "H2P_2CH";
@@ -17,58 +21,59 @@ const char hubo2plus_5ch_code[] = "H2P_5CH";
 const char drchubo_2ch_code[] = "DRC_2CH";
 const char drchubo_hybrid_code[] = "DRC_HYBRID";
 
+namespace HuboCmd {
+
+class Aggregator;
+
+} // namespace HuboCmd
+
+namespace HuboState {
+
+class State;
+
+} // namespace HuboState
 
 namespace HuboCan {
 
 class HuboJmc : public CanDevice
 {
 public:
+    
+    inline void assign_pointers(HuboCmd::Aggregator* agg, HuboState::State* state)
+    {
+        _agg = agg;
+        _state = state;
+    }
 
     hubo_jmc_info_t info;
     HuboJointPtrArray joints;
 
     bool addJoint(HuboJoint* joint, std::string& error_report);
     bool sortJoints(std::string& error_report);
+    
+    static std::string header();
 
-    inline static std::string header()
-    {
-        std::stringstream str;
-        str.setf(std::ios::fixed);
-        str.setf(std::ios::right);
-
-        str.width(8);
-        str << "JMC Name";
-        str.width(12);
-        str << "JMC Type";
-        str.width(7);
-        str << "Index";
-        str.width(13);
-        str << "CAN Channel";
-
-        return str.str();
-    }
-
-    inline std::string table() const
-    {
-        std::stringstream str;
-        str.setf(std::ios::fixed);
-        str.setf(std::ios::right);
-
-        str.width(8);   // JMC Name
-        str << info.name;
-        str.width(12);  // JMC Type
-        str << info.type;
-        str.width(7);   // Index
-        str << info.hardware_index;
-        str.width(13);  // CAN Channel
-        str << info.can_channel;
-
-        return str.str();
-    }
+    std::string table() const;
+    
+    virtual void update();
+    virtual void decode(const can_frame_t &frame, size_t channel);
 
 protected:
+    
+    void _request_encoder_readings();
+    void _send_reference_commands();
+    
+//    void _decode_2ch_enc(const can_frame_t& frame);
+//    void _decode_nck_enc(const can_frame_t& frame);
+//    void _decode_finger_enc(const can_frame_t& frame);
 
+    HuboCmd::Aggregator* _agg;
+    HuboState::State* _state;
+    
     HuboJointPtrMap _tempJointMap;
+    can_frame_t _frame;
+    
+    inline bool _is_type(const char* type) { return strcmp(info.type, type) == 0; }
 
 };
 
@@ -124,10 +129,6 @@ protected:
 
 } // namespace HuboCan
 
-inline std::ostream& operator<<(std::ostream& oStrStream, const HuboCan::HuboJmc& jmc)
-{
-    oStrStream << jmc.table();
-    return oStrStream;
-}
+std::ostream& operator<<(std::ostream& oStrStream, const HuboCan::HuboJmc& jmc);
 
 #endif // HUBOJMC_HPP
