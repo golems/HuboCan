@@ -139,19 +139,26 @@ bool CanPump::pump()
                   << " -- This may result in frames being dropped!" << std::endl;
     }
     
-    double frame_dt = diff/(double)(_get_max_frame_count());
-    while(_clock_diff(_deadline, time) > 0)
+    if(_get_max_frame_count() > 0)
     {
-        _send_next_frames();
-        
-        if(_can_error)
-            return false;
-        
-        _increment_clock(time, frame_dt);
-        _wait_on_next_frames(time);
-        
-        if(_can_error)
-            return false;
+        double frame_dt = diff/(double)(_get_max_frame_count());
+        while(_clock_diff(_deadline, time) > 0)
+        {
+            _send_next_frames();
+
+            if(_can_error)
+                return false;
+
+            _increment_clock(time, frame_dt);
+            _wait_on_next_frames(time);
+
+            if(_can_error)
+                return false;
+        }
+    }
+    else
+    {
+        _wait_on_next_frames(_deadline);
     }
     
     for(size_t i=0; i<_channels.size(); ++i)
