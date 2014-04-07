@@ -6,6 +6,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <time.h>
+#include <iostream>
 
 namespace HuboCan {
 
@@ -55,7 +56,7 @@ public:
 
     void load_description(HuboDescription& desc);
     
-    void addFrame(const can_frame_t& frame, size_t channel,
+    void add_frame(const can_frame_t& frame, size_t channel,
                   size_t expected_replies=0);
 
     bool pump();
@@ -73,9 +74,21 @@ public:
     
     inline const timespec_t& last_deadline() { return _deadline; }
     
-    double last_deadline_value()
+    inline double last_deadline_value()
     {
         return (double)(_deadline.tv_sec)+(double)(_deadline.tv_nsec)/1E9;
+    }
+
+    inline const ChannelHandle& channel(size_t num)
+    {
+        if(num < _channels.size())
+            return _channels[num];
+        else
+        {
+            std::cout << "Trying to retrieve out-of-bounds channel handle (" << num << "), "
+                         << "max is " << _channels.size()-1 << std::endl;
+            return _channels[0];
+        }
     }
 
 protected:

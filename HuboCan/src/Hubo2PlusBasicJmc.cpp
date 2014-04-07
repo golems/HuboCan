@@ -24,7 +24,7 @@ void Hubo2PlusBasicJmc::_request_encoder_readings()
 
     _frame.can_dlc = 3;
 
-    _pump->addFrame(_frame, info.can_channel, 1);
+    _pump->add_frame(_frame, info.can_channel, 1);
 }
 
 void Hubo2PlusBasicJmc::_send_reference_commands()

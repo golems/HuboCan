@@ -25,12 +25,11 @@ int main(int argc, char* argv[])
         desc.jmcs[i]->assign_pointers(&agg, &state);
     }
 
-    std::cout << "About to pump once" << std::endl;
     while(can.pump())
     {
-        std::cout << "About to cout states" << std::endl;
-        std::cout << state.joints << "\n\n" << std::endl;
-        std::cout << "Did the cout on states" << std::endl;
+        std::cout << "lost: " << can.channel(0).net_lost_replies << ", "
+                  << can.channel(1).net_lost_replies << std::endl;
+//        std::cout << state.joints << "\n\n" << std::endl;
     }
 
     return 0;

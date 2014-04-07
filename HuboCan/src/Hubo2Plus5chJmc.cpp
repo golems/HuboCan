@@ -14,7 +14,7 @@ void Hubo2Plus5chJmc::_request_encoder_readings()
     _frame.data[2]  = 1; // An extra request frame to get the last two fingers on the hand
     _frame.can_dlc  = 3;
 
-    _pump->addFrame(_frame, info.can_channel, 1);
+    _pump->add_frame(_frame, info.can_channel, 1);
     // Minor gripe: The frames that get returned by this extra encoder request have the
     // same ID as frames which are returned by the standard encoder request, which means
     // the order in which they are received matters for interpreting them correctly. This

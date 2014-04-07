@@ -52,7 +52,7 @@ bool CanPump::_wait_on_frame(const timespec_t& relative_timeout)
     return false;
 }
 
-void CanPump::addFrame(const can_frame_t &frame, size_t channel, size_t expected_replies)
+void CanPump::add_frame(const can_frame_t &frame, size_t channel, size_t expected_replies)
 {
     if(channel >= _channels.size())
     {
