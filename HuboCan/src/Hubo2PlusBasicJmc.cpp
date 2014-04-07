@@ -48,6 +48,7 @@ bool Hubo2PlusBasicJmc::decode(const can_frame_t &frame, size_t channel)
                 int32_t encoder = 0;
                 for(size_t j=3; j >= 0; --j)
                 {
+                    std::cout << "frame index: " << j + i*4 << std::endl;
                     encoder = (encoder << 8) + frame.data[j + i*4];
                 }
 
