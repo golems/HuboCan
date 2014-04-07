@@ -41,20 +41,18 @@ bool Hubo2PlusBasicJmc::decode(const can_frame_t &frame, size_t channel)
     {
         if(frame.can_dlc == 8)
         {
-            std::cout << "jmc name: " << info.name << " | joint count: " << joints.size() << std::endl;
+//            std::cout << "jmc name: " << info.name << " | joint count: " << joints.size() << std::endl;
 
             for(size_t i=0; i < joints.size(); ++i)
             {
                 int32_t encoder = 0;
                 for(int j=3; j >= 0; --j)
                 {
-                    std::cout << "frame index: " << j + i*4 << std::endl;
                     encoder = (encoder << 8) + frame.data[j + i*4];
                 }
 
-                std::cout << "checking joint index..." << std::endl;
                 size_t joint_index = joints[i]->info.software_index;
-                std::cout << "joint_index: " << joint_index << std::endl;
+//                std::cout << "joint_index: " << joint_index << std::endl;
                 _state->joints[joint_index].position =
                             joints[i]->encoder2radian(encoder);
 

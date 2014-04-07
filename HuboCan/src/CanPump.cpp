@@ -213,9 +213,9 @@ void CanPump::_decode_frame(const can_frame_t& frame, size_t channel)
         std::cout << "Could not decode frame! ID:" << std::hex << frame.can_id << " Data: ";
         for(size_t i=0; i<8; ++i)
         {
-            std::cout << std::hex << frame.data[i] << " ";
+            std::cout << /*std::hex <<*/ frame.data[i] << " ";
         }
-        std::cout << " DLC:" << std::dec << frame.can_dlc << std::endl;
+        std::cout << " DLC:" << /*std::dec <<*/ frame.can_dlc << std::endl;
     }
 }
 
