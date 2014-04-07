@@ -29,6 +29,8 @@ bool DrcHubo3chJmc::decode(const can_frame_t& frame, size_t channel)
             _state->joints[joint_index].position =
                         joints[i]->encoder2radian(encoder);
         }
+
+        return true;
     }
 
     return Hubo2PlusBasicJmc::decode(frame, channel);
