@@ -81,6 +81,9 @@ protected:
     bool _encoders_requested;
     virtual void _request_encoder_readings();
     virtual void _send_reference_commands();
+
+    virtual bool _decode_encoder_reading(const can_frame_t& frame);
+    virtual bool _decode_status_reading(const can_frame_t& frame);
 };
 
 class Hubo2Plus2chJmc : public Hubo2PlusBasicJmc
@@ -103,12 +106,13 @@ class Hubo2Plus5chJmc : public Hubo2PlusBasicJmc
 {
 public:
 
-    bool decode(const can_frame_t &frame, size_t channel);
-
 protected:
 
     void _request_encoder_readings();
     void _send_reference_commands();
+
+    bool _decode_encoder_reading(const can_frame_t& frame);
+    bool _decode_status_reading(const can_frame_t &frame);
 
 };
 
@@ -124,11 +128,12 @@ class DrcHubo3chJmc : public Hubo2PlusBasicJmc
 {
 public:
 
-    bool decode(const can_frame_t &frame, size_t channel);
 
 protected:
 
     void _send_reference_commands();
+
+    bool _decode_encoder_reading(const can_frame_t& frame);
 
 };
 

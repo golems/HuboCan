@@ -26,6 +26,23 @@ typedef struct hubo_data_header {
 
 }__attribute__((packed)) hubo_data_header_t;
 
+typedef struct hubo_joint_error {
+
+    uint8_t jam;
+    uint8_t pwm_saturated;
+    uint8_t big;
+    uint8_t encoder;
+    uint8_t driver_fault;
+    uint8_t motor_fail_0;
+    uint8_t motor_fail_1;
+
+    uint8_t min_position;
+    uint8_t max_position;
+    uint8_t velocity;
+    uint8_t acceleration;
+    uint8_t temperature;
+
+}__attribute__((packed)) hubo_joint_error_t;
 
 typedef struct hubo_joint_status {
 
@@ -36,21 +53,9 @@ typedef struct hubo_joint_status {
 
     uint8_t home_flag;
 
-    uint8_t jam_error;
-    uint8_t pwm_saturated;
-    uint8_t big_error;
-    uint8_t encoder_error;
-    uint8_t driver_fault;
-    uint8_t motor_fail_0;
-    uint8_t motor_fail_1;
+    hubo_joint_error_t error;
 
-    uint8_t min_position_error;
-    uint8_t max_position_error;
-    uint8_t velocity_error;
-    uint8_t acceleration_error;
-    uint8_t temperature_error; // 17 bytes total
-
-}__attribute__((packed)) hubo_joint_status_t;
+}__attribute__((packed)) hubo_joint_status_t; // 17 bytes total
 
 typedef struct hubo_joint_state {
 

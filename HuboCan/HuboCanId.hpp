@@ -66,7 +66,7 @@ typedef enum {
 typedef enum {
     
     ENCODER_REPLY       = 0x60,
-    
+    STATUS_REPORT       = 0x150
     
 } can_reply_id_t;
 
