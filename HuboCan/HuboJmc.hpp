@@ -72,11 +72,13 @@ class Hubo2PlusBasicJmc : public HuboJmc
 {
 public:
 
+    Hubo2PlusBasicJmc();
     virtual void update();
     virtual bool decode(const can_frame_t &frame, size_t channel);
 
 protected:
 
+    bool _encoders_requested;
     virtual void _request_encoder_readings();
     virtual void _send_reference_commands();
 };

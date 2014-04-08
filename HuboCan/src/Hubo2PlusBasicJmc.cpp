@@ -5,12 +5,22 @@
 
 using namespace HuboCan;
 
+Hubo2PlusBasicJmc::Hubo2PlusBasicJmc()
+{
+    _encoders_requested = false;
+}
+
 void Hubo2PlusBasicJmc::update()
 {
     if(NULL == _pump)
         return;
 
-//    _request_encoder_readings();
+    if(!_encoders_requested)
+    {
+        _request_encoder_readings();
+        _encoders_requested = true;
+    }
+
     _send_reference_commands();
 }
 

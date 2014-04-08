@@ -2,7 +2,7 @@
 begin   Joint
 
 name            LWR
-software_index  25
+software_index  19
 
 drive       1
 driven      2
@@ -19,7 +19,7 @@ end     Joint
 begin   Joint
 
 name            LF1
-software_index  26
+software_index  20
 
 drive       1
 driven      1
