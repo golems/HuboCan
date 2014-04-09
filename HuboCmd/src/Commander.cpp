@@ -10,15 +10,15 @@ using namespace HuboCmd;
 Commander::Commander(double timeout) :
     HuboState::State(timeout)
 {
-//    _initialize();
-//    receive_description(timeout);
+    _initialize();
+    receive_description(timeout);
 }
 
 Commander::Commander(const HuboCan::HuboDescription& description) :
     HuboState::State(description)
 {
-//    _initialize();
-//    load_description(description);
+    _initialize();
+    load_description(description);
 }
 
 void Commander::_initialize()
@@ -26,8 +26,8 @@ void Commander::_initialize()
     cmd_data = NULL;
     _compressed_data = NULL;
 
-//    _channels_opened = false;
-//    open_channels();
+    _channels_opened = false;
+    open_channels();
 
     _has_been_updated = false;
 
@@ -39,16 +39,14 @@ bool Commander::open_channels()
     if(_channels_opened)
         return true;
 
+    _channels_opened = true;
+
     ach_status_t result = ach_open(&_cmd_chan, HUBO_CMD_CHANNEL, NULL);
     if(ACH_OK != result)
     {
         fprintf(stderr, "Error opening command channel: %s (%d)\n",
                 ach_result_to_string(result), (int)result);
         _channels_opened = false;
-    }
-    else
-    {
-        _channels_opened = true;
     }
 
     return _channels_opened;

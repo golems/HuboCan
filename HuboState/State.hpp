@@ -77,7 +77,7 @@ public:
      * You can check whether the state has successfully been initialized by checking the value of
      * the initalized() function.
      *
-     * THis function can also be used to clear away the current description and load a new one in
+     * This function can also be used to clear away the current description and load a new one in
      * the event that you want a different description to be used (but this is not recommended
      * behavior, since your physical Hubo should not be able to change spontaneously during
      * runtime).

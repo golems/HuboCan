@@ -3,6 +3,7 @@
 
 extern "C" {
 #include "hubo_info_c.h"
+#include "HuboCmd/hubo_aux_cmd_c.h"
 }
 
 #include "CanDevice.hpp"
@@ -22,6 +23,7 @@ const char drchubo_3ch_code[] = "DRC_3CH";
 namespace HuboCmd {
 
 class Aggregator;
+typedef std::vector<hubo_aux_cmd_t> HuboAuxArray;
 
 } // namespace HuboCmd
 
@@ -48,6 +50,8 @@ public:
 
     bool addJoint(HuboJoint* joint, std::string& error_report);
     bool sortJoints(std::string& error_report);
+
+    void auxiliary_command(const hubo_aux_cmd_t& command);
     
     static std::string header();
 
@@ -55,6 +59,7 @@ public:
 
 protected:
 
+    HuboCmd::HuboAuxArray _aux_commands;
 
     HuboCmd::Aggregator* _agg;
     HuboState::State* _state;
@@ -78,12 +83,18 @@ public:
 
 protected:
 
-    bool _encoders_requested;
+    bool _startup;
+    virtual void _process_auxiliary_commands();
     virtual void _request_encoder_readings();
     virtual void _send_reference_commands();
 
     virtual bool _decode_encoder_reading(const can_frame_t& frame);
     virtual bool _decode_status_reading(const can_frame_t& frame);
+
+    virtual void _handle_auxiliary_command(const hubo_aux_cmd_t& cmd);
+    virtual void _handle_home_joint(const hubo_aux_cmd_t& cmd);
+    virtual void _handle_home_all_joints();
+
 };
 
 class Hubo2Plus2chJmc : public Hubo2PlusBasicJmc

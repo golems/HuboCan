@@ -47,6 +47,11 @@ bool HuboJmc::sortJoints(std::string& error_report)
     return true;
 }
 
+void HuboJmc::auxiliary_command(const hubo_aux_cmd_t &command)
+{
+    _aux_commands.push_back(command);
+}
+
 std::string HuboJmc::header()
 {
     std::stringstream str;

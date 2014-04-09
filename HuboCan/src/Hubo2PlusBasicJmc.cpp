@@ -7,7 +7,7 @@ using namespace HuboCan;
 
 Hubo2PlusBasicJmc::Hubo2PlusBasicJmc()
 {
-    _encoders_requested = false;
+    _startup = true;
 }
 
 void Hubo2PlusBasicJmc::update()
@@ -15,13 +15,26 @@ void Hubo2PlusBasicJmc::update()
     if(NULL == _pump)
         return;
 
-    if(!_encoders_requested)
+    if(_startup)
     {
-        _request_encoder_readings();
-        _encoders_requested = true;
+        // TODO: handle any startup routines here
+        // such as grabbing the first status reading for the JMC
+
+        _startup = false;
     }
 
-    _send_reference_commands();
+    if(_aux_commands.size() > 0)
+    {
+        _process_auxiliary_commands();
+        // If there are auxiliary commands that need to be handled, we put off requesting
+        // encoder readings and sending position commands in order to reduce the load on
+        // the CAN bus
+    }
+    else
+    {
+        _request_encoder_readings();
+        _send_reference_commands();
+    }
 }
 
 void Hubo2PlusBasicJmc::_request_encoder_readings()
@@ -83,7 +96,7 @@ bool Hubo2PlusBasicJmc::_decode_encoder_reading(const can_frame_t& frame)
     return false;
 }
 
-bool Hubo2PlusBasicJmc::_decode_status_reading(const can_frame_t &frame)
+bool Hubo2PlusBasicJmc::_decode_status_reading(const can_frame_t& frame)
 {
     // TODO: Check can_dlc?
     for(size_t i=0; i<joints.size(); ++i)
@@ -119,11 +132,84 @@ bool Hubo2PlusBasicJmc::_decode_status_reading(const can_frame_t &frame)
 }
 
 
+void Hubo2PlusBasicJmc::_process_auxiliary_commands()
+{
+    while(_aux_commands.size() > 0)
+    {
+        _handle_auxiliary_command(_aux_commands.back());
+        _aux_commands.pop_back();
+    }
+}
 
+void Hubo2PlusBasicJmc::_handle_auxiliary_command(const hubo_aux_cmd_t& cmd)
+{
+    switch(cmd.id)
+    {
+        case HOME_JOINT:
+            _handle_home_joint(cmd); break;
+        case HOME_ALL_JOINTS:
+            _handle_home_all_joints(); break;
 
+        default:
+            std::cerr << "Unknown/Unsupported auxiliary command type: " << cmd.id << std::endl;
+            break;
+    }
+}
 
+void Hubo2PlusBasicJmc::_handle_home_joint(const hubo_aux_cmd_t& cmd)
+{
+    if(cmd.joint >= joints.size())
+    {
+        std::cerr << "Requested homing for invalid joint on " << info.name << " ("
+                  << cmd.joint << ". Max joint size is " << joints.size() << std::endl;
+        return;
+    }
 
+    memset(&_frame, 0, sizeof(_frame));
 
+    _frame.can_id   = CMD_BYTE;
+
+    _frame.data[0]  = info.hardware_index;
+    _frame.data[1]  = GOTO_HOME;
+    _frame.data[2]  = ((cmd.joint+1) << 4) | ( 0x01 << 1 );
+    // Why do we add 1 to the joint index? This does not seem necessary according to
+    // the CAN documentation. Does the firmware index the joints starting at 1 instead
+    // of 0?
+
+    // ( 0x01 << 1 ) is used to specify that we want the joint to home according to
+    // the settings which are stored in the firmware and to ignore all remaining bytes
+    // in the CAN frame.
+
+    // All other bytes are ignored, so we will leave them as 0.
+
+    _pump->add_frame(_frame, info.can_channel);
+
+    // TODO: Decide what other bookkeeping should be done when a joint gets homed.
+}
+
+void Hubo2PlusBasicJmc::_handle_home_all_joints()
+{
+    memset(&_frame, 0, sizeof(_frame));
+
+    _frame.can_id   = CMD_BYTE;
+
+    _frame.data[0]  = info.hardware_index;
+    _frame.data[1]  = GOTO_HOME;
+    _frame.data[2]  = ( 0x0F << 4 ) | ( 0x01 << 1 );
+
+    // TODO: According to the CAN documentation 0x0F will instruct all joints to home,
+    // but this has never been tested by us Linux users.
+
+    // ( 0x01 << 1 ) is used to specify that we want the joint to home according to
+    // the settings which are stored in the firmware and to ignore all remaining bytes
+    // in the CAN frame.
+
+    // All other bytes are ignored, so we will leave them as 0.
+
+    _pump->add_frame(_frame, info.can_channel);
+
+    // TODO: Decide what other bookkeeping should be done when a joint gets homed.
+}
 
 
 
