@@ -34,6 +34,13 @@ bool AuxReceiver::open_channels()
 
 bool AuxReceiver::update()
 {
+    if(!_channels_opened)
+    {
+        std::cout << "Attempting to receive auxiliary commands when the channel was not "
+                  << "successfully opened!" << std::endl;
+        return false;
+    }
+
     size_t fs;
     ach_status_t result = ACH_OK;
     while( ACH_OK == result || ACH_MISSED_FRAME == result )
@@ -43,8 +50,8 @@ bool AuxReceiver::update()
             break;
         else if( ACH_OK != result && ACH_MISSED_FRAME != result )
         {
-            fprintf(stderr, "Unexpected Ach Result in auxiliary command channel: %s (%d)\n",
-                    ach_result_to_string(result), (int)result);
+            fprintf(stdout, "Unexpected Ach Result in auxiliary command channel: %s (%d)\n",
+                    ach_result_to_string(result), (int)result); fflush(stdout);
             return false;
         }
         else
@@ -60,7 +67,7 @@ bool AuxReceiver::update()
             }
             else
             {
-                std::cerr << "Requested an auxiliary command on an out-of-bounds JMC: "
+                std::cout << "Requested an auxiliary command on an out-of-bounds JMC: "
                           << _cmd.jmc << " (max JMC index is " << _desc->getJmcCount()-1
                           << ")" << std::endl;
                 continue;
