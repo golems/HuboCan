@@ -3,6 +3,7 @@
 #include "../HuboDescription.hpp"
 #include "HuboState/State.hpp"
 #include "HuboCmd/Aggregator.hpp"
+#include "HuboCmd/AuxReceiver.hpp"
 
 using namespace HuboCan;
 
@@ -12,11 +13,13 @@ int main(int argc, char* argv[])
 
     HuboDescription desc;
     desc.parseFile("../HuboCan/misc/DrcHubo.dd");
+    desc.broadcastInfo();
 
     can.load_description(desc);
 
     HuboState::State state(desc);
     HuboCmd::Aggregator agg(desc);
+    HuboCmd::AuxReceiver aux(&desc);
 
     std::cout << state.joints << "\n\n" << std::endl;
 
@@ -28,6 +31,7 @@ int main(int argc, char* argv[])
     size_t iter=0, count=1;
     while(can.pump())
     {
+        aux.update();
         if(iter > 200)
         {
             std::cout << "lost: " << can.channel(0).net_lost_replies << ", "
