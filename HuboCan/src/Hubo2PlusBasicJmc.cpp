@@ -164,6 +164,9 @@ void Hubo2PlusBasicJmc::_handle_home_joint(const hubo_aux_cmd_t& cmd)
                   << cmd.joint << ". Max joint size is " << joints.size() << std::endl;
         return;
     }
+    std::cout << "Sending home command for joint " << joints[cmd.joint]->info.name
+    << " (" << joints[cmd.joint]->info.software_index << ") " << " on board " << info.name
+    << " (" << info.hardware_index << ")" << std::endl;
 
     memset(&_frame, 0, sizeof(_frame));
 
@@ -174,13 +177,14 @@ void Hubo2PlusBasicJmc::_handle_home_joint(const hubo_aux_cmd_t& cmd)
     _frame.data[2]  = ((cmd.joint+1) << 4) | ( 0x01 << 1 );
     // Why do we add 1 to the joint index? This does not seem necessary according to
     // the CAN documentation. Does the firmware index the joints starting at 1 instead
-    // of 0?
+    // of 0? According to experimental observation, IT DOES!
 
     // ( 0x01 << 1 ) is used to specify that we want the joint to home according to
     // the settings which are stored in the firmware and to ignore all remaining bytes
     // in the CAN frame.
 
     // All other bytes are ignored, so we will leave them as 0.
+    _frame.can_dlc = 8;
 
     _pump->add_frame(_frame, info.can_channel);
 
@@ -189,6 +193,13 @@ void Hubo2PlusBasicJmc::_handle_home_joint(const hubo_aux_cmd_t& cmd)
 
 void Hubo2PlusBasicJmc::_handle_home_all_joints()
 {
+    for(size_t i=0; i<joints.size(); ++i)
+    {
+        std::cout << "Sending home command for joint " << joints[i]->info.name
+        << " (" << joints[i]->info.software_index << ") " << " \ton board " << info.name
+        << " (" << info.hardware_index << ")" << std::endl;
+    }
+
     memset(&_frame, 0, sizeof(_frame));
 
     _frame.can_id   = CMD_BYTE;
@@ -205,6 +216,7 @@ void Hubo2PlusBasicJmc::_handle_home_all_joints()
     // in the CAN frame.
 
     // All other bytes are ignored, so we will leave them as 0.
+    _frame.can_dlc = 8;
 
     _pump->add_frame(_frame, info.can_channel);
 

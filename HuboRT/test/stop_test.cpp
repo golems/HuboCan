@@ -8,6 +8,9 @@ int main(int argc, char* argv[])
 {
     HuboRT::Manager mgr;
 
+    mgr.shut_down();
+
+/*
     for(int i=0; i<argc; ++i)
     {
         if(strcmp(argv[i], "-k")==0)
@@ -18,6 +21,7 @@ int main(int argc, char* argv[])
     }
 
     mgr.stop_all_processes();
+*/
 
     return 0;
 }

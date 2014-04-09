@@ -5,9 +5,9 @@
 
 hubo_data_error_t hubo_aux_cmd_header_check(const hubo_aux_cmd_t *cmd)
 {
-    if( strcmp(cmd->code, HUBO_CMD_HEADER_CODE) != 0 )
+    if( strcmp(cmd->code, HUBO_AUX_CMD_HEADER_CODE) != 0 )
     {
-        fprintf(stderr, "Your hubo_aux_cmd_t has a malformed header!!\n");
+        fprintf(stderr, "Your hubo_aux_cmd_t has a malformed header: %s\n", cmd->code);
         return HUBO_DATA_MALFORMED_HEADER;
     }
     else
