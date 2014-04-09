@@ -32,14 +32,16 @@ int main(int argc, char* argv[])
     while(can.pump())
     {
         aux.update();
-        if(iter > 200)
+        if(iter > 600)
         {
+/*
             std::cout << "lost: " << can.channel(0).net_lost_replies << ", "
                       << can.channel(1).net_lost_replies << std::endl;
             std::cout << "per iteration: " << (double)(can.channel(0).net_lost_replies)/count << ", "
                       << (double)(can.channel(1).net_lost_replies)/count << std::endl;
             std::cout << state.joints << "\n\n" << std::endl;
             iter = 0;
+*/
         }
         ++iter;
         ++count;

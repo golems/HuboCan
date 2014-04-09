@@ -28,6 +28,10 @@ bool AuxReceiver::open_channels()
                 ach_result_to_string(result), (int)result);
         _channels_opened = false;
     }
+    else
+    {
+        ach_flush(&_aux_cmd_chan);
+    }
 
     return _channels_opened;
 }
@@ -40,11 +44,13 @@ bool AuxReceiver::update()
     {
         result = ach_get(&_aux_cmd_chan, &_cmd, sizeof(_cmd), &fs, NULL, 0);
         if(ACH_STALE_FRAMES == result)
+        {
             break;
+        }
         else if( ACH_OK != result && ACH_MISSED_FRAME != result )
         {
-            fprintf(stderr, "Unexpected Ach Result in auxiliary command channel: %s (%d)\n",
-                    ach_result_to_string(result), (int)result);
+            fprintf(stdout, "Unexpected Ach Result in auxiliary command channel: %s (%d)\n",
+                    ach_result_to_string(result), (int)result); fflush(stdout);
             return false;
         }
         else
@@ -66,6 +72,7 @@ bool AuxReceiver::update()
                 continue;
             }
         }
+
     }
 
     return true;

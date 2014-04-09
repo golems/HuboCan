@@ -8,12 +8,16 @@ Initializer::Initializer(double timeout_sec)
 {
     _channels_opened = false;
     receive_description(timeout_sec);
+    open_channels();
+    _clear_command();
 }
 
 Initializer::Initializer(const HuboCan::HuboDescription& description)
 {
     _channels_opened = false;
     load_description(description);
+    open_channels();
+    _clear_command();
 }
 
 bool Initializer::ready() { return _description_loaded && _channels_opened; }
@@ -54,10 +58,17 @@ bool Initializer::open_channels()
 void Initializer::_clear_command()
 {
     memset(&_cmd, 0, sizeof(_cmd));
+    strcpy(_cmd.code, HUBO_AUX_CMD_HEADER_CODE);
 }
 
 bool Initializer::_send_command()
 {
+    if(!_channels_opened)
+    {
+        std::cout << "WARNING: Cannot send auxiliary commands because the Initializer's ach channel "
+                  << "has not been opened!" << std::endl;
+    }
+
     ach_status_t result = ach_put(&_aux_cmd_chan, &_cmd, sizeof(_cmd));
     if( ACH_OK != result)
     {
