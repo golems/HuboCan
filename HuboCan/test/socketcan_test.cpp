@@ -43,6 +43,19 @@ int main(int argc, char* argv[])
             iter = 0;
 */
         }
+
+        bool missed_one = false;
+        for(size_t i=0; i<desc.joints.size(); ++i)
+        {
+            if(!desc.joints[i]->updated)
+            {
+                std::cout << "Missed " << desc.joints[i]->info.name << "\t";
+                missed_one = true;
+            }
+        }
+        if(missed_one)
+            std::cout << std::endl;
+
         ++iter;
         ++count;
     }

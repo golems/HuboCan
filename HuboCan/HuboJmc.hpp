@@ -84,6 +84,7 @@ public:
 protected:
 
     bool _startup;
+    virtual void _cycle_reset();
     virtual void _process_auxiliary_commands();
     virtual void _request_encoder_readings();
     virtual void _send_reference_commands();

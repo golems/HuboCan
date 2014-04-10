@@ -22,6 +22,8 @@ bool DrcHubo3chJmc::_decode_encoder_reading(const can_frame_t& frame)
         size_t joint_index = joints[i]->info.software_index;
         _state->joints[joint_index].position =
                     joints[i]->encoder2radian(encoder);
+
+        joints[i]->updated = true;
     }
 
     return true;

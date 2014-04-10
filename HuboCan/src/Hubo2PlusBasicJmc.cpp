@@ -15,6 +15,8 @@ void Hubo2PlusBasicJmc::update()
     if(NULL == _pump)
         return;
 
+    _cycle_reset();
+
     if(_startup)
     {
         // TODO: handle any startup routines here
@@ -34,6 +36,14 @@ void Hubo2PlusBasicJmc::update()
     {
         _request_encoder_readings();
         _send_reference_commands();
+    }
+}
+
+void Hubo2PlusBasicJmc::_cycle_reset()
+{
+    for(size_t i=0; i<joints.size(); ++i)
+    {
+        joints[i]->updated = false;
     }
 }
 
@@ -90,6 +100,8 @@ bool Hubo2PlusBasicJmc::_decode_encoder_reading(const can_frame_t& frame)
                         joints[i]->encoder2radian(encoder);
 
             // TODO: Decide if velocity should be computed here
+
+            joints[i]->updated = true;
         }
         return true;
     }

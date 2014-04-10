@@ -74,6 +74,8 @@ public:
         return str.str();
     }
 
+    bool updated;
+
 protected:
 
 
