@@ -19,7 +19,7 @@ CanPump::CanPump(double nominal_frequency, double bitrate, size_t channels)
     
     _bitrate = bitrate;
     
-    period_threshold = 1E-3;
+    period_threshold = 3E-3;
     
     _channels.resize(channels);
     
@@ -133,9 +133,10 @@ bool CanPump::pump()
     }
     
     int expectation = _get_max_frame_expectation();
-    if(expectation * can_frame_bit_size > _bitrate * _timestep) // TODO: Use diff here instead of _timestep?
+    if(expectation * can_frame_bit_size > _bitrate * diff /*_timestep*/) // TODO: Use diff here instead of _timestep?
     {
-        std::cout << "WARNING: Expected size of CAN frame transfer exceeds the bitrate setting\n"
+        std::cout << "WARNING: Expected size of CAN frame transfer (" << expectation*can_frame_bit_size
+                  << ") exceeds the bitrate setting (" << _bitrate * diff << ")\n"
                   << " -- This may result in frames being dropped!" << std::endl;
     }
     
