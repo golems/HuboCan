@@ -314,6 +314,15 @@ public:
         ach_status_t r = ach_get(&_channel, _raw_data,
                                  get_data_size<DataClass>(_raw_data),
                                  &fs, &wait_time, ACH_O_LAST | ACH_O_WAIT);
+
+        if( ACH_TIMEOUT == r )
+        {
+            if(verbose)
+            {
+                std::cout << "Ach channel '" << _channel_name << "' timed out!" << std::endl;
+            }
+            return false;
+        }
         
         if(fs != get_data_size<DataClass>(_raw_data))
         {
@@ -321,20 +330,19 @@ public:
                       << get_data_size<DataClass>(_raw_data) << " expected!" << std::endl;
         }
         
-        if( ACH_OK == r || ACH_STALE_FRAMES == r
-                || ACH_MISSED_FRAME == r || ACH_TIMEOUT == r)
+        if( ACH_OK == r || ACH_STALE_FRAMES == r || ACH_MISSED_FRAME == r )
         {
-            std::cout << "Ach result for channel '" << _channel_name << "': "
-                         << ach_result_to_string(r) << std::endl;
+            if(verbose)
+            {
+                std::cout << "Ach result for channel '" << _channel_name << "': "
+                             << ach_result_to_string(r) << std::endl;
+            }
             return true;
         }
         else
         {
-            if(verbose)
-            {
-                std::cout << "Unexpected ach_get result for channel '" << _channel_name <<"': "
-                          << ach_result_to_string(r) << std::endl;
-            }
+            std::cout << "Unexpected ach_get result for channel '" << _channel_name <<"': "
+                      << ach_result_to_string(r) << std::endl;
             return false;
         }
         

@@ -159,7 +159,7 @@ hubo_data_error_t hubo_cmd_data_set_joint_cmd(hubo_cmd_data *data, const hubo_jo
         if(joint_index == (size_t)(-1))
         {
             fprintf(stderr, "You have requested an InvalidIndex from your hubo_cmd_data!\n"
-                    " -- Joint count:%zu", total_num_joints);
+                    " -- Joint count:%zu\n", total_num_joints);
             return HUBO_DATA_OUT_OF_BOUNDS;
         }
 
@@ -190,7 +190,7 @@ hubo_data_error_t hubo_cmd_data_register_joint(hubo_cmd_data *data, size_t joint
         if(joint_index == (size_t)(-1))
         {
             fprintf(stderr, "Attempting to register an InvalidIndex in your hubo_cmd_data!\n"
-                    " -- Joint count:%zu", total_num_joints);
+                    " -- Joint count:%zu\n", total_num_joints);
             return HUBO_DATA_OUT_OF_BOUNDS;
         }
 
@@ -219,7 +219,7 @@ hubo_joint_cmd_t* hubo_cmd_data_access_joint_cmd(hubo_cmd_data *data, size_t joi
         if(joint_index == (size_t)(-1))
         {
             fprintf(stderr, "Attempting to access an InvalidIndex from your hubo_cmd_data!\n"
-                    " -- Joint count:%zu", total_num_joints);
+                    " -- Joint count:%zu\n", total_num_joints);
             return NULL;
         }
 
@@ -245,7 +245,7 @@ hubo_data_error_t hubo_cmd_data_get_joint_cmd(hubo_joint_cmd_t *output, const hu
         if(joint_index == (size_t)(-1))
         {
             fprintf(stderr, "Attempting to get an InvalidIndex from your hubo_cmd_data!\n"
-                    " -- Joint count:%zu", total_num_joints);
+                    " -- Joint count:%zu\n", total_num_joints);
             return HUBO_DATA_OUT_OF_BOUNDS;
         }
 
