@@ -45,7 +45,9 @@ void Hubo2PlusBasicJmc::_cycle_reset()
     for(size_t i=0; i<joints.size(); ++i)
     {
         if(joints[i]->updated == false)
-            ++joints[i]->dropped_count;
+        {
+            ++(joints[i]->dropped_count);
+        }
         joints[i]->updated = false;
     }
 }
