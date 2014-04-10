@@ -116,7 +116,8 @@ public:
      * \brief Indicates whether this State instance has been successfully initialized.
      * \return
      */
-    inline bool initialized() { return _initialized; }
+    inline bool initialized() { return _initialized && joints.is_initialized()
+                && imus.is_initialized() && force_torques.is_initialized(); }
     
 protected:
 
