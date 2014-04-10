@@ -218,10 +218,18 @@ public:
         DataClass* result = get_data_component<DataClass>(_raw_data, index);
         if(NULL == result)
         {
-            std::cout << "You have requested an out of bounds data member for channel '"
-                         << _channel_name << "'. Requested: " << index
-                         << ", Max: " << get_data_component_count(_raw_data)-1 << std::endl;
-            return _dummy_member;
+            if(index == (size_t)(-1))
+            {
+                std::cout << "You have requested an InvalidIndex for channel '"
+                          << _channel_name << "'.\n Requested: " << index
+                          << ", Data Count: " << get_data_component_count(_raw_data) << std::endl;
+            }
+            else
+            {
+                std::cout << "You have requested an out of bounds data member for channel '"
+                         << _channel_name << "'.\n Requested: " << index
+                         << ", Data Count: " << get_data_component_count(_raw_data) << std::endl;
+            }
         }
         
         return *result;
@@ -237,9 +245,18 @@ public:
         DataClass* result = get_data_component<DataClass>(_raw_data, index);
         if(NULL == result)
         {
-            std::cout << "You have requested an out of bounds data member for channel '"
-                         << _channel_name << "'. Requested: " << index
-                         << ", Max: " << get_data_component_count(_raw_data)-1 << std::endl;
+            if(index == (size_t)(-1))
+            {
+                std::cout << "You have requested an InvalidIndex for channel '"
+                          << _channel_name << "'.\n Requested: " << index
+                          << ", Data Count: " << get_data_component_count(_raw_data) << std::endl;
+            }
+            else
+            {
+                std::cout << "You have requested an out of bounds data member for channel '"
+                         << _channel_name << "'.\n Requested: " << index
+                         << ", Data Count: " << get_data_component_count(_raw_data) << std::endl;
+            }
             return _dummy_member;
         }
 

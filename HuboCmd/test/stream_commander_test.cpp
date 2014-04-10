@@ -9,6 +9,7 @@ int main(int argc, char* argv[])
     if(!cmd.initialized())
     {
         std::cout << "Commander was not initialized successfully!" << std::endl;
+        return 1;
     }
 
     StringArray joint_names;

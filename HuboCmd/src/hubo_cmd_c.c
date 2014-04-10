@@ -37,6 +37,12 @@ size_t hubo_cmd_data_get_total_num_joints(const hubo_cmd_data* data)
 
 hubo_data_error_t hubo_cmd_header_check(const hubo_cmd_data *cmd_message)
 {
+    if(cmd_message==NULL)
+    {
+        fprintf(stderr, "Attempting to check the header on a null hubo_cmd_data!\n");
+        return HUBO_DATA_NULL;
+    }
+
     const hubo_cmd_header_t* header_check = (hubo_cmd_header_t*)cmd_message;
     if( strcmp(header_check->code, HUBO_CMD_HEADER_CODE) != 0)
     {
