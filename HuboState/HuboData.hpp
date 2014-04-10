@@ -221,8 +221,9 @@ public:
             if(index == (size_t)(-1))
             {
                 std::cout << "You have requested an InvalidIndex for channel '"
-                          << _channel_name << "'.\n Requested: " << index
-                          << ", Data Count: " << get_data_component_count(_raw_data) << std::endl;
+                          << _channel_name << "'.\n"
+                          << "(Data Count: " << get_data_component_count(_raw_data)
+                          << ")" << std::endl;
             }
             else
             {
@@ -248,8 +249,9 @@ public:
             if(index == (size_t)(-1))
             {
                 std::cout << "You have requested an InvalidIndex for channel '"
-                          << _channel_name << "'.\n Requested: " << index
-                          << ", Data Count: " << get_data_component_count(_raw_data) << std::endl;
+                          << _channel_name << "'.\n"
+                          << "(Data Count: " << get_data_component_count(_raw_data)
+                          << ")" << std::endl;
             }
             else
             {
