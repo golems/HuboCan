@@ -48,7 +48,6 @@ void Hubo2PlusBasicJmc::_cycle_reset()
         {
             ++(joints[i]->dropped_count);
         }
-        joints[i]->updated = false;
     }
 }
 
@@ -61,6 +60,11 @@ void Hubo2PlusBasicJmc::_request_encoder_readings()
     _frame.data[2] = 0;
 
     _frame.can_dlc = 3;
+
+    for(size_t i=0; i<joints.size(); ++i)
+    {
+        joints[i]->updated = false;
+    }
 
     _pump->add_frame(_frame, info.can_channel, 1);
 }
