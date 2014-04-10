@@ -6,6 +6,10 @@
 int main(int argc, char* argv[])
 {
     HuboCmd::Commander cmd;
+    if(!cmd.initialized())
+    {
+        std::cout << "Commander was not initialized successfully!" << std::endl;
+    }
 
     StringArray joint_names;
     ValueArray joint_values;

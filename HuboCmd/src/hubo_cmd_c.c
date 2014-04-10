@@ -156,8 +156,15 @@ hubo_data_error_t hubo_cmd_data_set_joint_cmd(hubo_cmd_data *data, const hubo_jo
     size_t total_num_joints = hubo_cmd_data_get_total_num_joints(data);
     if(joint_index >= total_num_joints)
     {
+        if(joint_index == (size_t)(-1))
+        {
+            fprintf(stderr, "You have requested an InvalidIndex from your hubo_cmd_data!\n"
+                    " -- Joint count:%zu", total_num_joints);
+            return HUBO_DATA_OUT_OF_BOUNDS;
+        }
+
         fprintf(stderr, "Attempting to set an out-of-bounds joint value in a hubo_cmd_data!\n"
-                " -- Index:%zu, Maximum:%zu\n", joint_index, total_num_joints-1);
+                " -- Index:%zu, Joint count:%zu\n", joint_index, total_num_joints);
         return HUBO_DATA_OUT_OF_BOUNDS;
     }
 
@@ -180,8 +187,15 @@ hubo_data_error_t hubo_cmd_data_register_joint(hubo_cmd_data *data, size_t joint
     size_t total_num_joints = hubo_cmd_data_get_total_num_joints(data);
     if(joint_index >= total_num_joints)
     {
-        fprintf(stderr, "Attempting to register an out-of-bounds joint value in a hubo_cmd_data!\n"
-                " -- Index:%zu, Maximum:%zu\n", joint_index, total_num_joints-1);
+        if(joint_index == (size_t)(-1))
+        {
+            fprintf(stderr, "Attempting to register an InvalidIndex in your hubo_cmd_data!\n"
+                    " -- Joint count:%zu", total_num_joints);
+            return HUBO_DATA_OUT_OF_BOUNDS;
+        }
+
+        fprintf(stderr, "Attempting to register an out-of-bounds joint value in your hubo_cmd_data!\n"
+                " -- Index:%zu, Joint count:%zu\n", joint_index, total_num_joints);
         return HUBO_DATA_OUT_OF_BOUNDS;
     }
 
@@ -202,6 +216,13 @@ hubo_joint_cmd_t* hubo_cmd_data_access_joint_cmd(hubo_cmd_data *data, size_t joi
     size_t total_num_joints = hubo_cmd_data_get_total_num_joints(data);
     if(joint_index >= total_num_joints)
     {
+        if(joint_index == (size_t)(-1))
+        {
+            fprintf(stderr, "Attempting to access an InvalidIndex from your hubo_cmd_data!\n"
+                    " -- Joint count:%zu", total_num_joints);
+            return NULL;
+        }
+
         fprintf(stderr, "Attempting to access an out-of-bounds joint value in a hubo_cmd_data!\n"
                 " -- Index:%zu, Maximum:%zu\n", joint_index, total_num_joints-1);
         return NULL;
@@ -221,7 +242,14 @@ hubo_data_error_t hubo_cmd_data_get_joint_cmd(hubo_joint_cmd_t *output, const hu
     size_t total_num_joints = hubo_cmd_data_get_total_num_joints(data);
     if(joint_index >= total_num_joints)
     {
-        fprintf(stderr, "Attempting to get an out-of-bounds joint value in a hubo_cmd_cx_t!\n"
+        if(joint_index == (size_t)(-1))
+        {
+            fprintf(stderr, "Attempting to get an InvalidIndex from your hubo_cmd_data!\n"
+                    " -- Joint count:%zu", total_num_joints);
+            return HUBO_DATA_OUT_OF_BOUNDS;
+        }
+
+        fprintf(stderr, "Attempting to get an out-of-bounds joint value from your hubo_cmd_data!\n"
                 " -- Index:%zu, Maximum:%zu\n", joint_index, total_num_joints-1);
         return HUBO_DATA_OUT_OF_BOUNDS;
     }
@@ -254,7 +282,8 @@ hubo_data_error_t hubo_cmd_data_get_joint_cmd(hubo_joint_cmd_t *output, const hu
     }
     else
     {
-        fprintf(stderr, "Your hubo_cmd_cx_t is malformed!! The compressed flag believes it is '%d'\n", hubo_cmd_data_is_compressed(data));
+        fprintf(stderr, "Your hubo_cmd_data is malformed!! The compressed flag believes it is '%d'\n",
+                hubo_cmd_data_is_compressed(data));
         return HUBO_DATA_MALFORMED_HEADER;
     }
 

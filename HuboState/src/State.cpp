@@ -28,7 +28,7 @@ State::~State()
 bool State::receive_description(double timeout_sec)
 {
     HuboCan::error_result_t result = _desc.receiveInfo(timeout_sec);
-    _initialized = result == HuboCan::OKAY;
+    _initialized = (result == HuboCan::OKAY);
     _create_memory();
     return _initialized;
 }
