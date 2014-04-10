@@ -58,6 +58,7 @@ int main(int argc, char* argv[])
             }
             if(missed_one)
                 std::cout << std::endl;
+            iter = 0;
         }
 
         ++iter;
