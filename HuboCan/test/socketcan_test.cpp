@@ -30,9 +30,9 @@ int main(int argc, char* argv[])
 
     if(!state.initialized())
     {
-        std::cout << "State was not initialized correctly, so we are quitting."
+        std::cout << "State was not initialized correctly, so we are quitting.\n"
                   << " -- Either your ach channels are not open"
-                  << " or your HuboDescription was not valid!" << std::endl;
+                  << " or your HuboDescription was not valid!\n" << std::endl;
         return 1;
     }
 
