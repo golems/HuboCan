@@ -46,27 +46,19 @@ int main(int argc, char* argv[])
         agg.update();
         if(iter > 600)
         {
-/*
-            std::cout << "lost: " << can.channel(0).net_lost_replies << ", "
-                      << can.channel(1).net_lost_replies << std::endl;
-            std::cout << "per iteration: " << (double)(can.channel(0).net_lost_replies)/count << ", "
-                      << (double)(can.channel(1).net_lost_replies)/count << std::endl;
-            std::cout << state.joints << "\n\n" << std::endl;
-            iter = 0;
-*/
-        }
-
-        bool missed_one = false;
-        for(size_t i=0; i<desc.joints.size(); ++i)
-        {
-            if(!desc.joints[i]->updated)
+            bool missed_one = false;
+            for(size_t i=0; i<desc.joints.size(); ++i)
             {
-                std::cout << "Missed " << desc.joints[i]->info.name << "\t";
-                missed_one = true;
+                if(desc.joints[i]->dropped_count > 0)
+                {
+                    std::cout << "Dropped " << desc.joints[i]->info.name << ":"
+                              << desc.joints[i]->dropped_count << "\t";
+                    missed_one = true;
+                }
             }
+            if(missed_one)
+                std::cout << std::endl;
         }
-        if(missed_one)
-            std::cout << std::endl;
 
         ++iter;
         ++count;
