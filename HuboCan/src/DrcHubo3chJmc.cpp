@@ -13,7 +13,14 @@ void DrcHubo3chJmc::_send_reference_commands()
 bool DrcHubo3chJmc::_decode_encoder_reading(const can_frame_t& frame)
 {
     // TODO: Decide if frame.can_dlc should be checked
-    for(size_t i=0; i<2; ++i)
+    if(joints.size() > 3)
+    {
+        std::cout << "WARNING: Expected 3 joints in the DrcHubo3chJmc named " << info.name
+                  << " but instead there are " << joints.size() << "!" << std::endl;
+        return false;
+    }
+
+    for(size_t i=0; i<joints.size(); ++i)
     {
         int16_t encoder = 0;
         encoder = (encoder << 8) + frame.data[1 + i*2];
