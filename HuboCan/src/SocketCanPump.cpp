@@ -150,6 +150,9 @@ bool SocketCanPump::_send_frame(const can_frame_t &frame, size_t channel)
 //        if( errno != ENOBUFS && errno != EAGAIN ) // Why not report this?
         {
             perror("send frame over SocketCan");
+            std::cout << "Error found on CAN bus " << channel << ", we will quit pumping" << std::endl;
+            // TODO: Write a print out that explains appropriate usage
+            _can_error = true;
         }
     }
     
