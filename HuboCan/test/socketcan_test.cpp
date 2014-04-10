@@ -28,6 +28,14 @@ int main(int argc, char* argv[])
         desc.jmcs[i]->assign_pointers(&agg, &state);
     }
 
+    if(!state.initialized())
+    {
+        std::cout << "State was not initialized correctly, so we are quitting."
+                  << " -- Either your ach channels are not open"
+                  << " or your HuboDescription was not valid!" << std::endl;
+        return 1;
+    }
+
     size_t iter=0, count=1;
     while(can.pump())
     {
