@@ -151,6 +151,8 @@ bool SocketCanPump::_send_frame(const can_frame_t &frame, size_t channel)
         {
             perror("send frame over SocketCan");
             std::cout << "Error found on CAN bus " << channel << ", we will quit pumping" << std::endl;
+            std::cout << "Check to make sure hardware power is on." << std::endl;
+            std::cout << "If the problem persists, you may need to restart the computer :(" << std::endl;
             // TODO: Write a print out that explains appropriate usage
             _can_error = true;
         }
