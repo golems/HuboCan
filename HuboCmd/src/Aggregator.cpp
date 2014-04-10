@@ -74,6 +74,7 @@ void Aggregator::close_channels()
 
 void Aggregator::_create_memory()
 {
+    memset(&_dummy, 0, sizeof(_dummy));
     free(_input_data);
     free(_output_data);
     free(_final_data);

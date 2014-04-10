@@ -180,6 +180,17 @@ HuboCan::error_result_t Commander::set_modes(const IndexArray& joints, const Mod
     return result;
 }
 
+HuboCan::error_result_t Commander::set_modes(const IndexArray &joints, hubo_cmd_mode_t mode)
+{
+    HuboCan::error_result_t result = HuboCan::OKAY;
+    for(size_t i=0; i<joints.size(); ++i)
+    {
+        result |= set_mode(joints[i], mode);
+    }
+
+    return result;
+}
+
 hubo_cmd_mode_t Commander::get_mode(size_t joint_index)
 {
     _fill_container(joint_index);
@@ -377,12 +388,11 @@ IndexArray Commander::get_indices(const StringArray& joint_names)
     return _desc.getJointIndices(joint_names);
 }
 
-HuboCan::error_result_t Commander::update()
+HuboCan::error_result_t Commander::update(double timeout_sec)
 {
     _has_been_updated = true;
 
-    // TODO: Inherit the state class, and call its update function here
-    return HuboCan::OKAY;
+    return HuboState::State::update(timeout_sec);
 }
 
 HuboCan::error_result_t Commander::send_commands()

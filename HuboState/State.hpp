@@ -112,6 +112,16 @@ public:
     HuboData<hubo_ft_state_t>       force_torques;
 
     /*!
+     * \fn get_time()
+     * \brief Returns the timestamp of the latest joint data
+     * \return
+     *
+     * The timestamp of the latest joint data should be equivalent to the timestamp of the
+     * rest of the sensor data, unless there is a major timing issue happening.
+     */
+    double get_time();
+
+    /*!
      * \fn initialized()
      * \brief Indicates whether this State instance has been successfully initialized.
      * \return

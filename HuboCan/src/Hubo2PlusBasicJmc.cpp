@@ -2,6 +2,7 @@
 #include "../HuboJmc.hpp"
 #include "../HuboCanId.hpp"
 #include "HuboState/State.hpp"
+#include "HuboCmd/Aggregator.hpp"
 
 using namespace HuboCan;
 
@@ -63,6 +64,14 @@ void Hubo2PlusBasicJmc::_request_encoder_readings()
 void Hubo2PlusBasicJmc::_send_reference_commands()
 {
     // TODO
+    for(size_t i=0; i<joints.size(); ++i)
+    {
+        hubo_joint_cmd_t& cmd = _agg->joint(joints[i]->info.software_index);
+        if(cmd.mode != HUBO_CMD_IGNORE)
+        {
+            std::cout << joints[i]->info.name << ":" << cmd.position << "  ";
+        }
+    }
 }
 
 bool Hubo2PlusBasicJmc::decode(const can_frame_t &frame, size_t channel)

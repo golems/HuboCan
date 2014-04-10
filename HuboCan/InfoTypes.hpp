@@ -20,6 +20,8 @@ enum error_flag {
 };
 
 typedef int error_result_t;
+// TODO: Write a stream operator for error_result_t
+
 } // namespace HuboState
 
 typedef std::vector<size_t> IndexArray;

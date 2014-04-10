@@ -35,9 +35,17 @@ public:
 
     const JointCmdArray& update();
     
-    inline const JointCmdArray& last_commands()
+    inline JointCmdArray& last_commands()
     {
         return _aggregated_cmds;
+    }
+
+    inline hubo_joint_cmd_t& joint(size_t index)
+    {
+        if(index >= _aggregated_cmds.size())
+            return _dummy;
+
+        return _aggregated_cmds[index];
     }
 
 protected:
@@ -83,6 +91,8 @@ protected:
 
     inline Aggregator(const Aggregator& doNotCopy) { }
     inline Aggregator& operator=(const Aggregator& doNotCopy) { return *this; }
+
+    hubo_joint_cmd_t _dummy;
 
 };
 

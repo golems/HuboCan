@@ -32,7 +32,7 @@ public:
      * \param timeout
      * \return
      */
-    error_result_t receiveInfo(double timeout=2);
+    error_result_t receiveInfo(double timeout_sec=1);
 
     /*!
      * \fn broadcastInfo()

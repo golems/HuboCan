@@ -72,10 +72,10 @@ HuboDescription::~HuboDescription()
     }
 }
 
-error_result_t HuboDescription::receiveInfo(double timeout)
+error_result_t HuboDescription::receiveInfo(double timeout_sec)
 {
     free(_data);
-    _data = hubo_info_receive_data(timeout);
+    _data = hubo_info_receive_data(timeout_sec);
 
     if(_data == NULL)
         return ACH_ERROR;

@@ -57,6 +57,7 @@ public:
 
     HuboCan::error_result_t set_mode(size_t joint_index, hubo_cmd_mode_t mode);
     HuboCan::error_result_t set_modes(const IndexArray& joints, const ModeArray& modes);
+    HuboCan::error_result_t set_modes(const IndexArray &joints, hubo_cmd_mode_t mode);
 
     hubo_cmd_mode_t get_mode(size_t joint_index);
     ModeArray       get_modes(const IndexArray& joints);
@@ -93,7 +94,7 @@ public:
         return _desc.getJointCount();
     }
 
-    virtual HuboCan::error_result_t update();
+    virtual HuboCan::error_result_t update(double timeout_sec=1);
     HuboCan::error_result_t send_commands();
 
     HuboCan::error_result_t release_joint(size_t joint_index);
@@ -106,6 +107,8 @@ public:
     virtual bool open_channels();
 
     hubo_cmd_data* cmd_data;
+
+    inline const HuboCan::HuboDescription& description() { return _desc; }
 
 protected:
 

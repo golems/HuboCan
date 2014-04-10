@@ -109,3 +109,8 @@ HuboCan::error_result_t State::publish()
     else
         return HuboCan::ACH_ERROR;
 }
+
+double State::get_time()
+{
+    return joints.get_time();
+}
