@@ -82,6 +82,13 @@ protected:
 
 };
 
+inline std::ostream& operator<<(std::ostream& oStrStream, const HuboCan::DdLine& desc)
+{
+    oStrStream << "Filename:" << desc.file <<", Line:" << desc.line_num << "\n"
+                  << " < " << desc.data << " > " << std::endl;
+    return oStrStream;
+}
+
 } // namespace HuboCan
 
 

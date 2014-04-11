@@ -124,8 +124,6 @@ protected:
 
     hubo_joint_cmd_t _container;
 
-    HuboCan::HuboDescription _desc;
-
     ach_channel_t _cmd_chan;
 
     inline Commander(const Commander& doNotCopy) { }

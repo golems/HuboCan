@@ -11,6 +11,7 @@ extern "C" {
 #include <iostream>
 #include <stdlib.h>
 #include "hubo_sensor_stream.hpp"
+#include "HuboCan/InfoTypes.hpp"
 
 namespace HuboState {
 
@@ -319,10 +320,10 @@ public:
         return false;
     }
     
-    bool receive_data(double timeout_seconds = 0)
+    HuboCan::error_result_t receive_data(double timeout_seconds = 0)
     {
         if(!_check_initialized("receive_data"))
-            return ACH_ENOENT;
+            return HuboCan::ACH_ERROR;
         
         size_t fs;
         struct timespec wait_time;
@@ -340,7 +341,7 @@ public:
             {
                 std::cout << "Ach channel '" << _channel_name << "' timed out!" << std::endl;
             }
-            return false;
+            return HuboCan::TIMEOUT;
         }
         
         if(fs != get_data_size<DataClass>(_raw_data))
@@ -356,16 +357,16 @@ public:
                 std::cout << "Ach result for channel '" << _channel_name << "': "
                              << ach_result_to_string(r) << std::endl;
             }
-            return true;
+            return HuboCan::OKAY;
         }
         else
         {
             std::cout << "Unexpected ach_get result for channel '" << _channel_name <<"': "
                       << ach_result_to_string(r) << std::endl;
-            return false;
+            return HuboCan::ACH_ERROR;
         }
         
-        return false;
+        return HuboCan::UNDEFINED_ERROR;
     }
     
     bool send_data(double timestamp)

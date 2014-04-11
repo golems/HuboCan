@@ -70,12 +70,6 @@ std::string HuboJmc::header()
     return str.str();
 }
 
-std::ostream& operator<<(std::ostream& oStrStream, const HuboCan::HuboJmc& jmc)
-{
-    oStrStream << jmc.table();
-    return oStrStream;
-}
-
 std::string HuboJmc::table() const
 {
     std::stringstream str;

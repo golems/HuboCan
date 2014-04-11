@@ -58,7 +58,11 @@ void Manager::_create_channel(const std::string &channel_name,
                     << " -n " << nominal_size
                     << " -o 666";
     
-    system(command_stream.str().c_str());
+    int exit_code = system(command_stream.str().c_str());
+    if(exit_code != 0)
+    {
+        std::cout << "Unexpected exit code from 'ach mk': " << exit_code << std::endl;
+    }
 }
 
 void Manager::launch()
@@ -390,7 +394,11 @@ bool Manager::_close_ach_channel_raw(const std::string &name)
         {
             chan_name = components[0];
             
-            system( ("ach rm "+chan_name).c_str());
+            int exit_code = system( ("ach rm "+chan_name).c_str());
+            if(exit_code != 0)
+            {
+                std::cout << "Unexpected exit code from 'ach rm': " << exit_code << std::endl;
+            }
             
             return true;
         }
@@ -786,7 +794,8 @@ void Manager::_fork_process_raw(const std::string &proc_name, std::string args)
         pid_t child = fork();
         if(child == 0)
         {
-            system( (components[0] + " " + args).c_str() );
+            int exit_code = system( (components[0] + " " + args).c_str() );
+            std::cout << "Process " << proc_name << " exited with code " << exit_code << std::endl;
             exit(0);
         }
     }

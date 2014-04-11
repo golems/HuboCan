@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 2.6)
 project(HuboCan)
 
+if(NOT CMAKE_BUILD_TYPE)
+  message(STATUS "No build type selected. Default to Release!")
+  set(CMAKE_BUILD_TYPE "Release")
+endif(NOT CMAKE_BUILD_TYPE)
+
 add_definitions("-Wall")
 
 set(LIBRARY_INSTALL_PATH ${CMAKE_INSTALL_PREFIX}/lib)

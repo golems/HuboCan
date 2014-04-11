@@ -40,10 +40,13 @@ int main(int argc, char* argv[])
     {
         joint_values[0] = M_PI/4.0*sin(elapsed/T);
         joint_values[1] = -M_PI/2.0*(1.0/2.0)*(1-cos(elapsed/T));
+        
+        std::cout << joint_values[0] << "\t" << joint_values[1] << std::endl;
 
         cmd.set_positions(indices, joint_values);
 
         cmd.send_commands();
+        
         HuboCan::error_result_t result = cmd.update();
         if(result != HuboCan::OKAY)
         {

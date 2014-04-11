@@ -9,7 +9,16 @@ using namespace HuboCan;
 
 int main(int argc, char* argv[])
 {
-    SocketCanPump can(200, 1e6, 2);
+    bool virtual_can = false;
+    for(int i=1; i<argc; ++i)
+    {
+        if(strcmp(argv[i],"virtual")==0)
+        {
+            virtual_can = true;
+        }
+    }
+    
+    SocketCanPump can(200, 1e6, 2, virtual_can);
 
     HuboDescription desc;
     desc.parseFile("../HuboCan/misc/DrcHubo.dd");
@@ -49,7 +58,7 @@ int main(int argc, char* argv[])
             bool missed_one = false;
             for(size_t i=0; i<desc.joints.size(); ++i)
             {
-                if(desc.joints[i]->dropped_count > 0)
+                if(desc.joints[i]->dropped_count > 0 && !virtual_can)
                 {
                     std::cout << "Dropped " << desc.joints[i]->info.name << ":"
                               << desc.joints[i]->dropped_count << "\t";

@@ -75,10 +75,10 @@ void State::_create_memory()
 
 HuboCan::error_result_t State::update(double timeout_sec)
 {
-    bool success = true;
-    success &= joints.receive_data(timeout_sec);
-    success &= imus.receive_data(0);
-    success &= force_torques.receive_data(0);
+    HuboCan::error_result_t result = HuboCan::OKAY;
+    result |= joints.receive_data(timeout_sec);
+    result |= imus.receive_data(0);
+    result |= force_torques.receive_data(0);
 
     if( joints.get_time() != imus.get_time()
      || joints.get_time() != force_torques.get_time())
@@ -86,10 +86,7 @@ HuboCan::error_result_t State::update(double timeout_sec)
         return HuboCan::SYNCH_ERROR;
     }
 
-    if(success)
-        return HuboCan::OKAY;
-    else
-        return HuboCan::ACH_ERROR;
+    return result;
 }
 
 HuboCan::error_result_t State::publish()

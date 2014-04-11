@@ -149,8 +149,18 @@ protected:
 
 };
 
+inline std::ostream& operator<<(std::ostream& oStrStream, const HuboCan::HuboJmc& jmc)
+{
+    oStrStream << jmc.table();
+    return oStrStream;
+}
+
 } // namespace HuboCan
 
-std::ostream& operator<<(std::ostream& oStrStream, const HuboCan::HuboJmc& jmc);
+inline std::ostream& operator<<(std::ostream& oStrStream, const HuboCan::HuboJmc& jmc)
+{
+    oStrStream << jmc.table();
+    return oStrStream;
+}
 
 #endif // HUBOJMC_HPP

@@ -38,6 +38,12 @@ protected:
 typedef std::vector<HuboJoint*> HuboJointPtrArray;
 typedef std::map<size_t,HuboJoint*> HuboJointPtrMap;
 
+inline std::ostream& operator<<(std::ostream& oStrStream, const HuboCan::HuboJoint& joint)
+{
+    oStrStream << joint.table();
+    return oStrStream;
+}
+
 } // namespace HuboCan
 
 inline std::ostream& operator<<(std::ostream& oStrStream, const HuboCan::HuboJoint& joint)
