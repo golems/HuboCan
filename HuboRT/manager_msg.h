@@ -82,4 +82,12 @@ typedef struct manager_reply {
     
 } manager_reply_t;
 
+typedef enum {
+    
+    ACHD_NOTHING,
+    ACHD_PULL_FROM_ROBOT,
+    ACHD_PUSH_TO_ROBOT,
+    
+} achd_network_t;
+
 #endif // MANAGERMSGS_H

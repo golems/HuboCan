@@ -232,6 +232,7 @@ public:
      */
     manager_err_t register_new_channel(const std::string& list_name,
                                        const std::string& ach_channel_name,
+                                       achd_network_t push_or_pull,
                                        size_t message_count = 10,
                                        size_t nominal_size = 4096);
     

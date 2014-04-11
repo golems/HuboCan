@@ -54,7 +54,7 @@ endforeach(utest_src_file)
 install(TARGETS ${library_name} DESTINATION ${LIBRARY_INSTALL_PATH})
 
 if(BuildHuboQt)
-  add_subdirectory(HuboQt)
   include_directories(${CMAKE_BINARY_DIR}/HuboQt)
+  add_subdirectory(HuboQt)
 endif(BuildHuboQt)
 

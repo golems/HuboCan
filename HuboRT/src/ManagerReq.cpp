@@ -118,10 +118,21 @@ manager_err_t ManagerReq::unregister_old_process(const std::string &list_name)
 
 manager_err_t ManagerReq::register_new_channel(const std::string &list_name,
                                                const std::string &ach_channel_name,
+                                               achd_network_t push_or_pull,
                                                size_t message_count, size_t nominal_size)
 {
     std::stringstream stream;
     stream << list_name << ":" << ach_channel_name << ":" << message_count << ":" << nominal_size << ":";
+    switch(push_or_pull)
+    {
+        case ACHD_PULL_FROM_ROBOT:
+            stream << "PULL"; break;
+        case ACHD_PUSH_TO_ROBOT:
+            stream << "PUSH"; break;
+        default:
+            stream << "NOTHING"; break;
+    }
+    
     return _send_request(REGISTER_NEW_CHAN, stream.str());
 }
 

@@ -2,14 +2,29 @@
 #define ACHNETWORKWIDGET_H
 
 #include <QWidget>
+#include "ui_AchNetworkWidget.h"
 
-namespace Ui {
-    class AchNetworkWidget;
-}
+namespace HuboQt {
+
 
 class AchNetworkWidget : public QWidget
 {
+    Q_OBJECT
+    
+public:
+    AchNetworkWidget();
+    
+    void load_hostname();
+    
+protected:
+    
+    Ui::AchNetworkWidget* _ui;
+    
+protected Q_SLOTS:
+    void save_hostname();
     
 };
+
+} // namespace HuboQt
 
 #endif // ACHNETWORKWIDGET_H

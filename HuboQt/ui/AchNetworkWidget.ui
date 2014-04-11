@@ -1,14 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Form</class>
- <widget class="QWidget" name="Form">
+ <class>AchNetworkWidget</class>
+ <widget class="QWidget" name="AchNetworkWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>547</width>
-    <height>275</height>
+    <width>399</width>
+    <height>129</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Form</string>
@@ -16,11 +22,30 @@
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
-     <x>50</x>
-     <y>40</y>
-     <width>441</width>
-     <height>151</height>
+     <x>7</x>
+     <y>7</y>
+     <width>381</width>
+     <height>111</height>
     </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QGroupBox {
+    border: 1px solid gray;
+    border-radius: 9px;
+    margin-top: 0.5em;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 10px;
+    padding: 0 3px 0 3px;
+}</string>
    </property>
    <property name="title">
     <string>Ach Networking</string>
@@ -28,8 +53,8 @@
    <widget class="QWidget" name="horizontalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>50</y>
+      <x>20</x>
+      <y>20</y>
       <width>351</width>
       <height>80</height>
      </rect>
@@ -120,7 +145,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="lineEdit">
+        <widget class="QLineEdit" name="hostname_edit">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -147,8 +172,6 @@
     </layout>
    </widget>
   </widget>
-  <zorder>label</zorder>
-  <zorder>groupBox</zorder>
  </widget>
  <resources/>
  <connections/>

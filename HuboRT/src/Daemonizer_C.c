@@ -106,12 +106,12 @@ static int hubo_rt_make_directory_component(const char* subdirectory)
     struct stat st = {0};
     if( stat(subdirectory, &st) == -1 )
     {
-        if( mkdir(subdirectory, S_IRUSR | S_IXUSR |
-                                S_IRGRP | S_IXGRP |
-                                S_IROTH | S_IXOTH) != 0 )
+        if( mkdir(subdirectory, S_IRUSR | S_IXUSR | S_IWUSR |
+                                S_IRGRP | S_IXGRP | S_IWGRP |
+                                S_IROTH | S_IXOTH | S_IWOTH ) != 0 )
         {
-            syslog( LOG_ERR, "Unable to create directory %s, code=%d (%s)",
-                    subdirectory, errno, strerror(errno) );
+            fprintf( stdout, "Unable to create directory %s, code=%d (%s)\n",
+                    subdirectory, errno, strerror(errno) ); fflush(stdout);
             return -1;
         }
     }

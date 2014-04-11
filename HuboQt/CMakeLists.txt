@@ -24,5 +24,9 @@ QT4_ADD_RESOURCES(resources ${rc_files})
 file(GLOB huboqt_sources "src/*.cpp" "*.h")
 
 add_library(HuboQt SHARED ${huboqt_sources} ${ui} ${moc} ${resources})
+target_link_libraries(HuboQt ${QT_LIBRARIES} HuboCan ach rt)
 
+file(GLOB window_sources "window/*.cpp")
 
+add_executable(huboqt_window ${window_sources})
+target_link_libraries(huboqt_window ${QT_LIBRARIES} HuboQt HuboCan ach rt)
