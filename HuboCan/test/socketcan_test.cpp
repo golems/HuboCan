@@ -50,6 +50,7 @@ int main(int argc, char* argv[])
     size_t iter=0, count=1;
     while(can.pump())
     {
+        std::cout << std::endl;
         state.publish();
         aux.update();
         agg.update();

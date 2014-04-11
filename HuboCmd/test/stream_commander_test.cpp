@@ -19,6 +19,10 @@ int main(int argc, char* argv[])
     joint_values.resize(joint_names.size());
 
     IndexArray indices = cmd.get_indices(joint_names);
+    
+    cmd.claim_joints(indices);
+    cmd.send_commands();
+    cmd.update();
 
     cmd.set_modes(indices, HUBO_CMD_RIGID);
 
@@ -38,8 +42,8 @@ int main(int argc, char* argv[])
     double elapsed = 0;
     while(elapsed <= T)
     {
-        joint_values[0] = M_PI/4.0*sin(elapsed/T);
-        joint_values[1] = -M_PI/2.0*(1.0/2.0)*(1-cos(elapsed/T));
+        joint_values[0] = M_PI/4.0*sin(2*M_PI*elapsed/T);
+        joint_values[1] = -M_PI/2.0*(1.0/2.0)*(1-cos(2*M_PI*elapsed/T));
         
         std::cout << joint_values[0] << "\t" << joint_values[1] << std::endl;
 

@@ -122,7 +122,7 @@ HuboCan::error_result_t Commander::claim_joints(const IndexArray &joints)
 
     for(size_t i=0; i<joints.size(); ++i)
     {
-        result |= release_joint(joints[i]);
+        result |= claim_joint(joints[i]);
     }
 
     return result;
