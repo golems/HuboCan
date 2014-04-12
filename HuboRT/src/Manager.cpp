@@ -42,9 +42,11 @@ void Manager::_initialize()
     _create_channel(hubo_rt_mgr_reply_chan, 20, 2048);
     
     ach_status_t r = ach_open(&_msg_chan, hubo_rt_mgr_req_chan, NULL);
-    _rt.check(ACH_OK == r, "Could not open the Hubo Manager request channel (" + std::string(hubo_rt_mgr_req_chan) + ")", true);
+    _rt.check(ACH_OK == r, "Could not open the Hubo Manager request channel ("
+              + std::string(hubo_rt_mgr_req_chan) + ")", true);
     r = ach_open(&_reply_chan, hubo_rt_mgr_reply_chan, NULL);
-    _rt.check(ACH_OK == r, "Could not open the Hubo Manager reply channel (" + std::string(hubo_rt_mgr_reply_chan) + ")", true);
+    _rt.check(ACH_OK == r, "Could not open the Hubo Manager reply channel ("
+              + std::string(hubo_rt_mgr_reply_chan) + ")", true);
 }
 
 void Manager::_create_channel(const std::string &channel_name,
@@ -348,7 +350,7 @@ void Manager::kill_all_processes()
     _report_no_error(KILL_ALL_PROCS);
 }
 
-bool Manager::_create_ach_channel_raw(const std::string &name)
+std::string Manager::_create_ach_channel_raw(const std::string &name)
 {
     std::ifstream chan_file;
     chan_file.open( (_chan_roster+"/"+name).c_str() );
@@ -360,22 +362,22 @@ bool Manager::_create_ach_channel_raw(const std::string &name)
         std::string chan_desc;
         std::getline(chan_file, chan_desc);
         StringArray components;
-        if(_split_components(chan_desc, components) >= 3)
+        if(_split_components(chan_desc, components) >= 4)
         {
             chan_name = components[0];
             count = atoi(components[1].c_str());
             fs = atoi(components[2].c_str());
             _create_channel(chan_name, count, fs);
-            return true;
+            return components[0]+":"+components[3]+":";
         }
         else
         {
-            return false;
+            return "COMPONENT_COUNT_ERROR";
         }
     }
     else
     {
-        return false;
+        return "REGISTRATION_ERROR";
     }
 }
 
@@ -415,26 +417,22 @@ bool Manager::_close_ach_channel_raw(const std::string &name)
 
 void Manager::create_ach_chan(const std::string &name)
 {
-    if(_create_ach_channel_raw(name))
-    {
-        _report_no_error(CREATE_ACH_CHAN);
-    }
-    else
-    {
-        _report_no_existence(CREATE_ACH_CHAN);
-    }
+    StringArray achd_types;
+    achd_types.push_back(_create_ach_channel_raw(name));
+    _relay_string_array(CREATE_ACH_CHAN, achd_types);
 }
 
 void Manager::create_all_ach_chans()
 {
     StringArray chans = _grab_files_in_dir(_chan_roster);
+    StringArray achd_types;
     
     for( size_t i=0; i < chans.size(); ++i )
     {
-        _create_ach_channel_raw(chans[i]);
+        achd_types.push_back(_create_ach_channel_raw(chans[i]));
     }
     
-    _report_no_error(CREATE_ALL_ACH_CHANS);
+    _relay_string_array(CREATE_ALL_ACH_CHANS, achd_types);
 }
 
 void Manager::close_ach_chan(const std::string &name)

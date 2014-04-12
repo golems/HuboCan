@@ -29,23 +29,23 @@ void ManagerReq::_initialize()
     timeout = 2;
 }
 
-NameArray ManagerReq::list_registered_processes()
+StringArray ManagerReq::list_registered_processes()
 {
-    NameArray reply;
+    StringArray reply;
     _send_request(LIST_PROCS, reply);
     return reply;
 }
 
-NameArray ManagerReq::list_locked_processes()
+StringArray ManagerReq::list_locked_processes()
 {
-    NameArray reply;
+    StringArray reply;
     _send_request(LIST_LOCKED_PROCS, reply);
     return reply;
 }
 
-NameArray ManagerReq::list_channels()
+StringArray ManagerReq::list_channels()
 {
-    NameArray reply;
+    StringArray reply;
     _send_request(LIST_CHANS, reply);
     return reply;
 }
@@ -82,14 +82,14 @@ manager_err_t ManagerReq::kill_all_processes()
     return _send_request(KILL_ALL_PROCS);
 }
 
-manager_err_t ManagerReq::create_ach_channel(const std::string &name)
+manager_err_t ManagerReq::create_ach_channel(const std::string &name, StringArray& achd_type)
 {
-    return _send_request(CREATE_ACH_CHAN, name);
+    return _send_request(CREATE_ACH_CHAN, achd_type, name);
 }
 
-manager_err_t ManagerReq::create_all_ach_channels()
+manager_err_t ManagerReq::create_all_ach_channels(StringArray& achd_types)
 {
-    return _send_request(CREATE_ALL_ACH_CHANS);
+    return _send_request(CREATE_ALL_ACH_CHANS, achd_types);
 }
 
 manager_err_t ManagerReq::close_ach_channel(const std::string &name)
@@ -146,9 +146,9 @@ manager_err_t ManagerReq::reset_rosters()
     return _send_request(RESET_ROSTERS);
 }
 
-manager_err_t ManagerReq::start_up()
+manager_err_t ManagerReq::start_up(StringArray& achd_types)
 {
-    return _send_request(START_UP);
+    return _send_request(START_UP, achd_types);
 }
 
 manager_err_t ManagerReq::shut_down()
@@ -156,9 +156,9 @@ manager_err_t ManagerReq::shut_down()
     return _send_request(SHUT_DOWN);
 }
 
-NameArray ManagerReq::list_configs()
+StringArray ManagerReq::list_configs()
 {
-    NameArray reply;
+    StringArray reply;
     _send_request(LIST_CONFIGS, reply);
     return reply;
 }
@@ -175,11 +175,11 @@ manager_err_t ManagerReq::load_config(const std::string &config_name)
 
 manager_err_t ManagerReq::_send_request(manager_cmd_t cmd, const std::string &desc)
 {
-    NameArray empty;
+    StringArray empty;
     return _send_request(cmd, empty, desc);
 }
 
-manager_err_t ManagerReq::_send_request(manager_cmd_t cmd, NameArray &reply, const std::string &desc)
+manager_err_t ManagerReq::_send_request(manager_cmd_t cmd, StringArray &reply, const std::string &desc)
 {
     ach_flush(&_reply_chan);
     
@@ -240,4 +240,18 @@ manager_err_t ManagerReq::_send_request(manager_cmd_t cmd, NameArray &reply, con
     }
     
     return raw_reply.err;
+}
+
+size_t ManagerReq::_split_components(const std::string &name, StringArray &array)
+{
+    array.resize(0);
+    size_t pos = 0, last_pos=0, count=0;
+    while(std::string::npos != (pos = name.find(":", last_pos)))
+    {
+        ++count;
+        array.push_back(name.substr(last_pos, pos-last_pos));
+        last_pos = pos+1;
+    }
+    
+    return count;
 }

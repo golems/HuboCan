@@ -4,14 +4,14 @@
 #include <string>
 #include <vector>
 
+#include "HuboCan/InfoTypes.hpp"
+
 extern "C" {
 #include "manager_msg.h"
 #include "HuboCan/AchIncludes.h"
 }
 
 namespace HuboRT {
-
-typedef std::vector<std::string> NameArray;
 
 class ManagerReq
 {
@@ -33,7 +33,7 @@ public:
      * A timeout is given in case the manager is locked up (or not operating)
      * and cannot respond.
      */
-    NameArray list_registered_processes();
+    StringArray list_registered_processes();
     
     
     /*!
@@ -60,7 +60,7 @@ public:
      * of a process which did not quit gracefully) use either kill_process()
      * or kill_all_processes()
      */
-    NameArray list_locked_processes();
+    StringArray list_locked_processes();
     
     
     /*!
@@ -72,7 +72,7 @@ public:
      * The return is a NameArray where each entry contains the name of
      * an ach channel which is registered with the Manager.
      */
-    NameArray list_channels();
+    StringArray list_channels();
     
     // TODO:
 //    NameArray list_open_channels();
@@ -158,14 +158,14 @@ public:
      * The name of the channel must be one of the entries in list_channels().
      * To add a channel to the roster, use register_new_channel().
      */
-    manager_err_t create_ach_channel(const std::string& name);
+    manager_err_t create_ach_channel(const std::string& name, StringArray& achd_type);
     
     /*!
      * \fn create_all_ach_channels()
      * \brief Equivalent to running create_ach_channel() for each entry of list_channels()
      * \return 
      */
-    manager_err_t create_all_ach_channels();
+    manager_err_t create_all_ach_channels(StringArray& achd_types);
     
     /*!
      * \fn close_ach_channel()
@@ -256,7 +256,7 @@ public:
      * \brief Initializes the hardware interface and opens all channels and processes in the rosters
      * \return 
      */
-    manager_err_t start_up();
+    manager_err_t start_up(StringArray& achd_types);
     
     /*!
      * \fn shut_down()
@@ -270,7 +270,7 @@ public:
      * \brief Provides a list of the roster configurations which have been saved
      * \return 
      */
-    NameArray list_configs();
+    StringArray list_configs();
     
     /*!
      * \fn save_current_config()
@@ -293,11 +293,12 @@ protected:
     void _initialize();
     
     manager_err_t _send_request(manager_cmd_t cmd, const std::string& desc="");
-    manager_err_t _send_request(manager_cmd_t cmd, NameArray& reply, const std::string& desc = "");
+    manager_err_t _send_request(manager_cmd_t cmd, StringArray& reply, const std::string& desc = "");
     
     ach_channel_t _req_chan;
     ach_channel_t _reply_chan;
     
+    size_t _split_components(const std::string &name, StringArray &array);
 };
 
 } // namespace HuboRT

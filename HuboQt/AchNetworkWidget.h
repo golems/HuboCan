@@ -21,7 +21,7 @@ protected:
     Ui::AchNetworkWidget* _ui;
     
 protected Q_SLOTS:
-    void save_hostname();
+    void save_hostname(const QString& new_name);
     
 };
 

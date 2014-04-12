@@ -90,12 +90,11 @@ protected:
                                  size_t nominal_size);
     size_t _split_components(const std::string& name, StringArray& array);
     StringArray _grab_files_in_dir(const std::string& directory);
-    void _relay_string_array(manager_cmd_t original_req, const StringArray& array);
     bool _fork_process(const std::string& proc_name, const std::string& args);
     void _fork_process_raw(const std::string& proc_name, std::string args);
     void _stop_process_raw(const std::string &name);
     void _kill_process_raw(const std::string &name);
-    bool _create_ach_channel_raw(const std::string& name);
+    std::string _create_ach_channel_raw(const std::string& name);
     bool _close_ach_channel_raw(const std::string& name);
     bool _register(const std::string& directory, const std::string& description, size_t minimum_size);
     void _unregister(const std::string& directory, const std::string& name);
@@ -111,6 +110,7 @@ protected:
     void _report_error(manager_err_t error, const std::string& description);
     void _report_no_existence(manager_cmd_t original_req);
     void _report_no_error(manager_cmd_t original_req);
+    void _relay_string_array(manager_cmd_t original_req, const StringArray& array);
     // End: Report functions
     
     
