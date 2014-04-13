@@ -1,13 +1,13 @@
 
 #include "../HuboQtMainWindow.h"
-#include "../AchNetworkWidget.h"
+#include "../ManagerWidget.h"
 #include <QHBoxLayout>
 
 using namespace HuboQt;
 
 HuboQtMainWindow::HuboQtMainWindow()
 {
-    AchNetworkWidget* ach = new AchNetworkWidget;
+    ManagerWidget* ach = new ManagerWidget;
     
     setCentralWidget(ach);
 }

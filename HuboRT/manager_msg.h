@@ -82,6 +82,10 @@ typedef struct manager_reply {
     
 } manager_reply_t;
 
+const char ACHD_NOTHING_STRING[] = "NOTHING";
+const char ACHD_PULL_STRING[] = "PULL";
+const char ACHD_PUSH_STRING[] = "PUSH";
+
 typedef enum {
     
     ACHD_NOTHING,

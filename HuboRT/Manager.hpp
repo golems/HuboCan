@@ -10,6 +10,8 @@ extern "C" {
 #include "HuboCan/AchIncludes.h"
 }
 
+#include "HuboCan/InfoTypes.hpp"
+
 namespace HuboRT {
 
 const std::string opt_directory = "/opt";
@@ -18,8 +20,6 @@ const std::string manager_directory = "/opt/hubo/mgr";
 const std::string proc_roster_directory = "/opt/hubo/mgr/proc";
 const std::string chan_roster_directory = "/opt/hubo/mgr/chan";
 const std::string config_directory = "/opt/hubo/mgr/configs";
-
-typedef std::vector<std::string> StringArray;
 
 class MgrDaemon : public Daemonizer
 {
@@ -88,7 +88,7 @@ protected:
     virtual void _create_channel(const std::string& channel_name,
                                  size_t message_count,
                                  size_t nominal_size);
-    size_t _split_components(const std::string& name, StringArray& array);
+//    size_t _split_components(const std::string& name, StringArray& array);
     StringArray _grab_files_in_dir(const std::string& directory);
     bool _fork_process(const std::string& proc_name, const std::string& args);
     void _fork_process_raw(const std::string& proc_name, std::string args);

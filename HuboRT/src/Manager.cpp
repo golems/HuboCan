@@ -13,6 +13,8 @@ extern "C" {
 #include <dirent.h>
 #include <fstream>
 
+#include "../utils.hpp"
+
 using namespace HuboRT;
 
 Manager::Manager()
@@ -224,7 +226,7 @@ void Manager::list_channels()
 void Manager::run_process(const std::string &name)
 {
     StringArray components;
-    if(_split_components(name,components) == 2)
+    if(split_components(name,components) == 2)
     {
         if(_fork_process(components[0], components[1]))
             _report_no_error(RUN_PROC);
@@ -362,21 +364,23 @@ std::string Manager::_create_ach_channel_raw(const std::string &name)
         std::string chan_desc;
         std::getline(chan_file, chan_desc);
         StringArray components;
-        if(_split_components(chan_desc, components) >= 4)
+        if(split_components(chan_desc, components) >= 4)
         {
             chan_name = components[0];
             count = atoi(components[1].c_str());
             fs = atoi(components[2].c_str());
             _create_channel(chan_name, count, fs);
-            return components[0]+":"+components[3]+":";
+            return chan_desc;
         }
         else
         {
+            std::cerr << "Component count error for ach channel '" << name << "'" << std::endl;
             return "COMPONENT_COUNT_ERROR";
         }
     }
     else
     {
+        std::cerr << "Unregistered ach channel '" << name << "'" << std::endl;
         return "REGISTRATION_ERROR";
     }
 }
@@ -392,7 +396,7 @@ bool Manager::_close_ach_channel_raw(const std::string &name)
         std::string chan_desc;
         std::getline(chan_file, chan_desc);
         StringArray components;
-        if(_split_components(chan_desc, components) >= 3)
+        if(split_components(chan_desc, components) >= 3)
         {
             chan_name = components[0];
             
@@ -494,7 +498,7 @@ bool Manager::_register(const std::string &directory,
                         size_t minimum_size)
 {
     StringArray components;
-    if(_split_components(description, components) < minimum_size)
+    if(split_components(description, components) < minimum_size)
         return false;
     
     std::ofstream output;
@@ -649,7 +653,7 @@ bool Manager::_load_config_raw(const std::string &name)
         
         StringArray components;
         
-        if(_split_components(next_line, components) < 1)
+        if(split_components(next_line, components) < 1)
         {
             continue;
         }
@@ -689,19 +693,19 @@ void Manager::_clear_current_config()
     }
 }
 
-size_t Manager::_split_components(const std::string &name, StringArray &array)
-{
-    array.resize(0);
-    size_t pos = 0, last_pos=0, count=0;
-    while(std::string::npos != (pos = name.find(":", last_pos)))
-    {
-        ++count;
-        array.push_back(name.substr(last_pos, pos-last_pos));
-        last_pos = pos+1;
-    }
+//size_t Manager::_split_components(const std::string &name, StringArray &array)
+//{
+//    array.resize(0);
+//    size_t pos = 0, last_pos=0, count=0;
+//    while(std::string::npos != (pos = name.find(":", last_pos)))
+//    {
+//        ++count;
+//        array.push_back(name.substr(last_pos, pos-last_pos));
+//        last_pos = pos+1;
+//    }
     
-    return count;
-}
+//    return count;
+//}
 
 void Manager::_report_no_error(manager_cmd_t original_req)
 {
@@ -776,7 +780,7 @@ void Manager::_fork_process_raw(const std::string &proc_name, std::string args)
         std::string proc_desc;
         std::getline(proc_file, proc_desc);
         StringArray components;
-        if(_split_components(proc_desc, components) < 2)
+        if(split_components(proc_desc, components) < 2)
         {
             std::cerr << "Proc named " << proc_name
                       << " has incorrect number of parameters: " << components.size()
