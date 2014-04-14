@@ -1,7 +1,7 @@
 
 cmake_minimum_required(VERSION 2.6)
 
-message(STATUS " ------- Building HuboQt QWidgets! -------- ")
+message(STATUS "\n ------- Building HuboQt QWidgets! -------- ")
 
 find_package(Qt4 COMPONENTS QtCore QtGui Qt3Support REQUIRED)
 
