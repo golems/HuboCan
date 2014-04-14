@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>607</width>
-    <height>547</height>
+    <height>549</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -320,7 +320,11 @@ QGroupBox::title {
            </layout>
           </item>
           <item>
-           <widget class="QListWidget" name="listWidget"/>
+           <widget class="QListWidget" name="chan_list">
+            <property name="selectionMode">
+             <enum>QAbstractItemView::MultiSelection</enum>
+            </property>
+           </widget>
           </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -398,19 +402,45 @@ QGroupBox::title {
            </widget>
           </item>
           <item>
-           <widget class="QToolButton" name="refresh_proc">
-            <property name="toolTip">
-             <string>Refresh the list of registered processes</string>
+           <widget class="QRadioButton" name="refresh_registered_procs">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
             </property>
             <property name="text">
-             <string>Refresh</string>
+             <string>Registered</string>
             </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroup</string>
+            </attribute>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="refresh_locked_procs">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Locked</string>
+            </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroup</string>
+            </attribute>
            </widget>
           </item>
          </layout>
         </item>
         <item>
-         <widget class="QListWidget" name="listWidget_2"/>
+         <widget class="QListWidget" name="proc_list">
+          <property name="selectionMode">
+           <enum>QAbstractItemView::MultiSelection</enum>
+          </property>
+         </widget>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_8">
@@ -430,6 +460,9 @@ QGroupBox::title {
          <layout class="QHBoxLayout" name="horizontalLayout_9">
           <item>
            <widget class="QPushButton" name="launch_proc">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>Launch</string>
             </property>
@@ -437,6 +470,9 @@ QGroupBox::title {
           </item>
           <item>
            <widget class="QPushButton" name="stop_proc">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>Stop</string>
             </property>
@@ -449,8 +485,39 @@ QGroupBox::title {
      </item>
     </layout>
    </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_11">
+     <item>
+      <widget class="QLabel" name="label_5">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Manager Reply:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="reply_status">
+       <property name="text">
+        <string>&lt;Empty Status&gt;</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
   </layout>
  </widget>
  <resources/>
  <connections/>
+ <buttongroups>
+  <buttongroup name="buttonGroup">
+   <property name="exclusive">
+    <bool>false</bool>
+   </property>
+  </buttongroup>
+ </buttongroups>
 </ui>

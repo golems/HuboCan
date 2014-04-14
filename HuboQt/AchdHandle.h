@@ -18,6 +18,7 @@ public:
     QString robot_hostname;
     
     QString channel_description;
+    QString nickname;
     QString channel_name;
     int nominal_size;
     int message_count;

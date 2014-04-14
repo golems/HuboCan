@@ -37,7 +37,7 @@ public:
      * A timeout is given in case the manager is locked up (or not operating)
      * and cannot respond.
      */
-    StringArray list_registered_processes();
+    manager_err_t list_registered_processes(StringArray& reply);
     
     
     /*!
@@ -64,7 +64,7 @@ public:
      * of a process which did not quit gracefully) use either kill_process()
      * or kill_all_processes()
      */
-    StringArray list_locked_processes();
+    manager_err_t list_locked_processes(StringArray& reply);
     
     
     /*!
@@ -73,10 +73,10 @@ public:
      * \param timeout
      * \return 
      * 
-     * The return is a NameArray where each entry contains the name of
+     * The return is a StringArray where each entry contains the name of
      * an ach channel which is registered with the Manager.
      */
-    StringArray list_channels();
+    manager_err_t list_channels(StringArray& reply);
     
     // TODO:
 //    NameArray list_open_channels();

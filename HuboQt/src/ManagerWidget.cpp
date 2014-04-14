@@ -4,6 +4,7 @@
 #include <QTime>
 
 #include "../ManagerWidget.h"
+#include "HuboRT/utils.hpp"
 
 extern "C" {
 #include "HuboRT/Daemonizer_C.h"
@@ -15,7 +16,8 @@ const char* anw_save_directory = "/opt/hubo/qt/anw";
 const char* anw_save_hostname_file = "/opt/hubo/qt/anw/hostname.txt";
 
 ManagerWidget::ManagerWidget() :
-    _ui(new Ui::ManagerWidget)
+    _ui(new Ui::ManagerWidget),
+    _init(false)
 {
     _ui->setupUi(this);
     
@@ -24,12 +26,12 @@ ManagerWidget::ManagerWidget() :
     load_hostname();
     
     AchdHandle* handle = new AchdHandle;
-    handle->parse_description(QString(hubo_rt_mgr_req_chan)+":20:2048:PUSH:");
+    handle->parse_description("manager_request:"+QString(hubo_rt_mgr_req_chan)+":20:2048:PUSH:");
     connect(&(handle->achd_process), SIGNAL(finished(int)), this, SLOT(inform_disconnect(int)));
     _perm_achd_handles.push_back(handle);
     
     handle = new AchdHandle;
-    handle->parse_description(QString(hubo_rt_mgr_reply_chan)+":20:2048:PULL:");
+    handle->parse_description("manager_reply:"+QString(hubo_rt_mgr_reply_chan)+":20:2048:PULL:");
     connect(&(handle->achd_process), SIGNAL(finished(int)), this, SLOT(inform_disconnect(int)));
     _perm_achd_handles.push_back(handle);
     
@@ -53,6 +55,57 @@ ManagerWidget::ManagerWidget() :
     connect(_ui->startup, SIGNAL(clicked()), this, SLOT(startup_everything()));
     connect(_ui->shutdown, SIGNAL(clicked()), this, SLOT(shutdown_everything()));
     connect(_ui->homeall, SIGNAL(clicked()), this, SLOT(homeall()));
+    
+    connect(_ui->create_all, SIGNAL(clicked()), this, SLOT(create_all()));
+    connect(_ui->destroy_all, SIGNAL(clicked()), this, SLOT(destroy_all()));
+    connect(_ui->launch_all, SIGNAL(clicked()), this, SLOT(launch_all()));
+    connect(_ui->stop_all, SIGNAL(clicked()), this, SLOT(stop_all()));
+    
+    connect(_ui->refresh_chan, SIGNAL(clicked()), this, SLOT(refresh_chans()));
+    connect(_ui->refresh_registered_procs, SIGNAL(clicked()), this, SLOT(refresh_registered_procs()));
+    connect(_ui->refresh_locked_procs, SIGNAL(clicked()), this, SLOT(refresh_locked_procs()));
+    
+    
+}
+
+bool ManagerWidget::_double_check_init()
+{
+    if(!_init.ready())
+        _init.initialize();
+    
+    if(!_init.ready())
+    {
+        _ui->reply_status->setText("Could not use the Initializer "
+                                   "(check terminal output for details)");
+    }
+    
+    return _init.ready();
+}
+
+void ManagerWidget::_set_status(manager_err_t incoming_status, const QString &status_context)
+{
+    if(incoming_status != NO_ERROR)
+    {
+        std::cerr << "Error during '" << status_context.toStdString() << "': "
+                  << manager_err_to_string(incoming_status) << std::endl;
+    }
+    
+    _ui->reply_status->setText(QString::fromStdString(manager_err_to_string(incoming_status))
+                               + " (" + status_context + ")");
+}
+
+void ManagerWidget::disconnect_all_achds()
+{
+    _disconnect_achds(_perm_achd_handles);
+    _disconnect_achds(_more_achd_handles);
+}
+
+void ManagerWidget::_disconnect_achds(AchdPtrArray &achds)
+{
+    for(int i=0; i<achds.size(); ++i)
+    {
+        achds[i]->achd_process.kill();
+    }
 }
 
 void ManagerWidget::startup_everything()
@@ -60,14 +113,12 @@ void ManagerWidget::startup_everything()
     StringArray reply;
     manager_err_t result = _req->start_up(reply);
     
+    _set_status(result, "startup command");
+    
     if(NO_ERROR != result)
-    {
-        std::cerr << "Error after startup command: " << manager_err_to_string(result) << std::endl;
         return;
-    }
     
     _parse_channel_descriptions(reply);
-//    _start_achds(_more_achd_handles); // Automatically starting them when parsed
 }
 
 void ManagerWidget::_parse_channel_descriptions(const StringArray &descs)
@@ -90,35 +141,151 @@ void ManagerWidget::_parse_channel_descriptions(const StringArray &descs)
 
 void ManagerWidget::_display_channels()
 {
-    
+    _ui->chan_list->clear();
     for(int i=0; i<_more_achd_handles.size(); ++i)
     {
+        QListWidgetItem* new_chan = new QListWidgetItem;
+        new_chan->setText(_more_achd_handles[i]->nickname);
+        new_chan->setToolTip("Details: "
+                             +_more_achd_handles[i]->channel_name
+                             +", "+QString::number(_more_achd_handles[i]->message_count)
+                             +"x"+QString::number(_more_achd_handles[i]->nominal_size)
+                             +" bytes, "
+                             +QString::fromStdString(
+                                 achd_network_to_string(
+                                     _more_achd_handles[i]->push_or_pull)));
+    }
+}
+
+void ManagerWidget::_display_registered_processes(const StringArray &procs)
+{
+    _ui->proc_list->clear();
+    _displaying_registered = true;
+    _ui->stop_proc->setEnabled(false);
+    _ui->launch_proc->setEnabled(true);
+    _ui->refresh_locked_procs->setChecked(false);
+    for(size_t i=0; i<procs.size(); ++i)
+    {
+        StringArray components;
+        if(HuboRT::split_components(procs[i], components) < 2)
+        {
+            std::cerr << "Invalid process description: " << procs[i] << std::endl;
+            continue;
+        }
         
+        QListWidgetItem* new_proc = new QListWidgetItem;
+        new_proc->setText(QString::fromStdString(components[0]));
+        new_proc->setToolTip("args: "+QString::fromStdString(components[1]));
+    }
+}
+
+void ManagerWidget::_display_locked_processes(const StringArray &locks)
+{
+    _ui->proc_list->clear();
+    _displaying_registered = false;
+    _ui->stop_proc->setEnabled(true);
+    _ui->launch_proc->setEnabled(false);
+    _ui->refresh_registered_procs->setChecked(false);
+    for(size_t i=0; i<locks.size(); ++i)
+    {
+        StringArray components;
+        if(HuboRT::split_components(locks[i], components) < 2)
+        {
+            std::cerr << "Invalid process description: " << locks[i] << std::endl;
+            continue;
+        }
+        
+        QListWidgetItem* new_lock = new QListWidgetItem;
+        new_lock->setText(QString::fromStdString(components[0]));
+        new_lock->setToolTip("pid: "+QString::fromStdString(components[1]));
     }
 }
 
 void ManagerWidget::shutdown_everything()
 {
-    
+    manager_err_t result = _req->shut_down();
+    _set_status(result, "shutdown command");
 }
 
 void ManagerWidget::homeall()
 {
+    if(!_double_check_init())
+        return;
     
+    _init.home_all_joints();
 }
 
-void ManagerWidget::disconnect_all_achds()
+void ManagerWidget::create_all()
 {
-    _disconnect_achds(_perm_achd_handles);
-    _disconnect_achds(_more_achd_handles);
+    StringArray reply;
+    manager_err_t result = _req->create_all_ach_channels(reply);
+    
+    _set_status(result, "create all channels");
+    
+    if(NO_ERROR != result)
+        return;
+    
+    _parse_channel_descriptions(reply);
 }
 
-void ManagerWidget::_disconnect_achds(AchdPtrArray &achds)
+void ManagerWidget::destroy_all()
 {
-    for(int i=0; i<achds.size(); ++i)
+    _set_status(_req->close_all_ach_channels(), "destroy all channels");
+}
+
+void ManagerWidget::launch_all()
+{
+    _set_status(_req->run_all_processes(), "launch all processes");
+}
+
+void ManagerWidget::stop_all()
+{
+    _set_status(_req->stop_all_processes(), "stop all processes");
+}
+
+void ManagerWidget::refresh_chans()
+{
+    StringArray reply;
+    manager_err_t result = _req->list_channels(reply);
+    
+    _set_status(result, "refresh channels");
+    
+    if(NO_ERROR != result)
+        return;
+    
+    _parse_channel_descriptions(reply);
+}
+
+void ManagerWidget::refresh_registered_procs()
+{
+    StringArray reply;
+    manager_err_t result = _req->list_registered_processes(reply);
+    
+    _set_status(result, "refresh all processes");
+    
+    if(NO_ERROR != result)
     {
-        achds[i]->achd_process.kill();
+        _ui->refresh_registered_procs->setChecked(false);
+        return;
     }
+    
+    _display_registered_processes(reply);
+}
+
+void ManagerWidget::refresh_locked_procs()
+{
+    StringArray reply;
+    manager_err_t result = _req->list_locked_processes(reply);
+    
+    _set_status(result, "refresh locked processes");
+    
+    if(NO_ERROR != result)
+    {
+        _ui->refresh_locked_procs->setChecked(false);
+        return;
+    }
+    
+    _display_locked_processes(reply);
 }
 
 void ManagerWidget::inform_disconnect(int exit_code)
@@ -135,8 +302,9 @@ void ManagerWidget::_check_if_achds_running(AchdPtrArray &achds, int exit_code)
         if(achds[i]->achd_process.state() != QProcess::Running && achds[i]->started )
         {
             achds[i]->started = false;
-            std::cout << "Channel '" << achds[i]->channel_name.toStdString()
-                      << "' disconnected at "
+            std::cout << "Channel '" << achds[i]->nickname.toStdString() << "' ("
+                      << achds[i]->channel_name.toStdString() << ")"
+                      << " disconnected at "
                       << QTime::currentTime().toString().toStdString()
                       << " with exit code " << exit_code
                       << std::endl;

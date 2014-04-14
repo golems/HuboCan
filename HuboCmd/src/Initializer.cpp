@@ -4,20 +4,35 @@
 
 using namespace HuboCmd;
 
-Initializer::Initializer(double timeout_sec)
+Initializer::Initializer(bool initialize, double timeout_sec)
 {
     _channels_opened = false;
+    _clear_command();
+    
+    if(!initialize)
+        return;
+    
     receive_description(timeout_sec);
     open_channels();
-    _clear_command();
 }
 
 Initializer::Initializer(const HuboCan::HuboDescription& description)
 {
     _channels_opened = false;
+    _clear_command();
+    
     load_description(description);
     open_channels();
-    _clear_command();
+}
+
+bool Initializer::initialize(double timeout_sec)
+{
+    if(!_description_loaded)
+        receive_description(timeout_sec);
+    
+    open_channels();
+    
+    return ready();
 }
 
 bool Initializer::ready() { return _description_loaded && _channels_opened; }
@@ -34,8 +49,6 @@ void Initializer::load_description(const HuboCan::HuboDescription &description)
     _desc = description;
     _description_loaded = true;
 }
-
-
 
 bool Initializer::open_channels()
 {
@@ -72,6 +85,7 @@ bool Initializer::_send_command()
     ach_status_t result = ach_put(&_aux_cmd_chan, &_cmd, sizeof(_cmd));
     if( ACH_OK != result)
     {
+        _channels_opened = false;
         fprintf(stderr, "Error in sending auxiliary command: %s (%d)\n",
                 ach_result_to_string(result), (int)result);
         return false;

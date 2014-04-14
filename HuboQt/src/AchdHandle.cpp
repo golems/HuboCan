@@ -80,18 +80,19 @@ bool AchdHandle::parse_description(QString description)
     channel_description = description;
     
     StringArray components;
-    if(HuboRT::split_components(description.toStdString(), components) < 4)
+    if(HuboRT::split_components(description.toStdString(), components) < 5)
     {
         std::cerr << "Invalid ach channel description: " << description.toStdString() << std::endl;
         return false;
     }
     
-    channel_name = components[0].c_str();
-    message_count = atoi(components[1].c_str());
-    nominal_size = atoi(components[2].c_str());
+    nickname = components[0].c_str();
+    channel_name = components[1].c_str();
+    message_count = atoi(components[2].c_str());
+    nominal_size = atoi(components[3].c_str());
     
-    std::string achd_type = components[3];
-    if(ACHD_NOTHING_STRING == achd_type)
+    std::string achd_type = components[4];
+    if(ACHD_INTERNAL_STRING == achd_type)
     {
         push_or_pull = ACHD_NOTHING;
     }

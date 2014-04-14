@@ -21,3 +21,16 @@ std::string manager_err_to_string(manager_err_t error)
     
     return "IMPOSSIBLE_ERROR";
 }
+
+std::string achd_network_to_string(achd_network_t type)
+{
+    switch(type)
+    {
+        case ACHD_NOTHING:          return ACHD_INTERNAL_STRING;
+        case ACHD_PULL_FROM_ROBOT:  return ACHD_PULL_STRING;
+        case ACHD_PUSH_TO_ROBOT:    return ACHD_PUSH_STRING;
+        default:                    return "UNKNOWN_ACHD_TYPE";
+    }
+    
+    return "IMPOSSIBLE";
+}

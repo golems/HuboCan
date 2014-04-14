@@ -86,7 +86,7 @@ typedef struct manager_reply {
     
 } manager_reply_t;
 
-const char ACHD_NOTHING_STRING[] = "NOTHING";
+const char ACHD_INTERNAL_STRING[] = "INTERNAL";
 const char ACHD_PULL_STRING[] = "PULL";
 const char ACHD_PUSH_STRING[] = "PUSH";
 
@@ -97,5 +97,7 @@ typedef enum {
     ACHD_PUSH_TO_ROBOT,
     
 } achd_network_t;
+
+std::string achd_network_to_string(achd_network_t type);
 
 #endif // MANAGERMSGS_H

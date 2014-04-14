@@ -174,6 +174,30 @@ StringArray Manager::_grab_files_in_dir(const std::string &directory)
     return result;
 }
 
+void Manager::_relay_directory_contents(manager_cmd_t original_req, const std::string &directory)
+{
+    StringArray reply;
+    StringArray files = _grab_files_in_dir(directory);
+    for(size_t i=0; i<files.size(); ++i)
+    {
+        std::ifstream filestr;
+        filestr.open( (directory+"/"+files[i]).c_str() );
+        
+        if(!filestr.good())
+        {
+            std::cerr << "Failed to open " << (directory+"/"+files[i])
+                      << " to relay its contents" << std::endl;
+        }
+        
+        std::string contents;
+        std::getline(filestr, contents);
+        
+        reply.push_back(files[i]+":"+contents+":");
+    }
+    
+    _relay_string_array(original_req, reply);
+}
+
 void Manager::_relay_string_array(manager_cmd_t original_req, const StringArray &array)
 {
     if(array.size() == 0)
@@ -211,23 +235,23 @@ void Manager::_relay_string_array(manager_cmd_t original_req, const StringArray 
 
 void Manager::list_processes()
 {
-    _relay_string_array(LIST_PROCS, _grab_files_in_dir(_proc_roster));
+    _relay_directory_contents(LIST_PROCS, _proc_roster);
 }
 
 void Manager::list_locked_processes()
 {
-    _relay_string_array(LIST_LOCKED_PROCS, _grab_files_in_dir(_rt_lock_dir));
+    _relay_directory_contents(LIST_LOCKED_PROCS, _rt_lock_dir);
 }
 
 void Manager::list_channels()
 {
-    _relay_string_array(LIST_CHANS, _grab_files_in_dir(_chan_roster));
+    _relay_directory_contents(LIST_CHANS, _chan_roster);
 }
 
 void Manager::run_process(const std::string &name)
 {
     StringArray components;
-    if(split_components(name,components) == 2)
+    if(split_components(name,components) >= 2)
     {
         if(_fork_process(components[0], components[1]))
             _report_no_error(RUN_PROC);
@@ -235,7 +259,7 @@ void Manager::run_process(const std::string &name)
             _report_no_existence(RUN_PROC);
     }
     else
-        _report_malformed_error("Run process should have exactly two components");
+        _report_malformed_error("Run process should have at least two components");
 }
 
 void Manager::run_all_processes()
@@ -371,7 +395,7 @@ std::string Manager::_create_ach_channel_raw(const std::string &name)
             count = atoi(components[1].c_str());
             fs = atoi(components[2].c_str());
             _create_channel(chan_name, count, fs);
-            return chan_desc;
+            return name+":"+chan_desc;
         }
         else
         {

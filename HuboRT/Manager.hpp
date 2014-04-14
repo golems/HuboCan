@@ -91,6 +91,7 @@ protected:
                                  size_t nominal_size);
 //    size_t _split_components(const std::string& name, StringArray& array);
     StringArray _grab_files_in_dir(const std::string& directory);
+    void _relay_directory_contents(manager_cmd_t original_req, const std::string& directory);
     bool _fork_process(const std::string& proc_name, const std::string& args);
     void _fork_process_raw(const std::string& proc_name, std::string args);
     void _stop_process_raw(const std::string &name);

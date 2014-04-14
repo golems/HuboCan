@@ -9,12 +9,16 @@ extern "C" {
 
 namespace HuboCmd {
 
+// TODO: Come up with a better name for this class
+
 class Initializer
 {
 public:
-
-    Initializer(double timeout_sec=1);
+    
+    Initializer(bool initialize=true, double timeout_sec=1 );
     Initializer(const HuboCan::HuboDescription& description);
+    
+    bool initialize(double timeout_sec=1);
 
     bool receive_description(double timeout_sec=1);
     void load_description(const HuboCan::HuboDescription& description);

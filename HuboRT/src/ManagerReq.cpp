@@ -41,25 +41,19 @@ bool ManagerReq::is_initialized()
     return _initialized;
 }
 
-StringArray ManagerReq::list_registered_processes()
+manager_err_t ManagerReq::list_registered_processes(StringArray& reply)
 {
-    StringArray reply;
-    _send_request(LIST_PROCS, reply);
-    return reply;
+    return _send_request(LIST_PROCS, reply);
 }
 
-StringArray ManagerReq::list_locked_processes()
+manager_err_t ManagerReq::list_locked_processes(StringArray& reply)
 {
-    StringArray reply;
-    _send_request(LIST_LOCKED_PROCS, reply);
-    return reply;
+    return _send_request(LIST_LOCKED_PROCS, reply);
 }
 
-StringArray ManagerReq::list_channels()
+manager_err_t ManagerReq::list_channels(StringArray& reply)
 {
-    StringArray reply;
-    _send_request(LIST_CHANS, reply);
-    return reply;
+    return _send_request(LIST_CHANS, reply);
 }
 
 manager_err_t ManagerReq::run_process(const std::string &name, const std::string &args)
