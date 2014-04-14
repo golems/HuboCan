@@ -114,6 +114,17 @@ static int hubo_rt_make_directory_component(const char* subdirectory)
                     subdirectory, errno, strerror(errno) ); fflush(stdout);
             return -1;
         }
+
+        // We do a chmod after creating because POSIX seems to be obstinate
+        // about creating a directory with different permissions than its parent.
+        if(chmod(subdirectory, S_IRUSR | S_IXUSR | S_IWUSR |
+                               S_IRGRP | S_IXGRP | S_IWGRP |
+                               S_IROTH | S_IXOTH | S_IWOTH ) != 0)
+        {
+            fprintf( stdout, "Unable to set universal permissions for directory %s, "
+                     "code=%d (%s)\n", subdirectory, errno, strerror(errno)); fflush(stdout);
+            return -2;
+        }
     }
 
     return 0;

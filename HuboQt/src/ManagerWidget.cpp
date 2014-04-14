@@ -12,6 +12,7 @@ extern "C" {
 
 using namespace HuboQt;
 
+// anw = ach networking widget
 const char* anw_save_directory = "/opt/hubo/qt/anw";
 const char* anw_save_hostname_file = "/opt/hubo/qt/anw/hostname.txt";
 
@@ -364,7 +365,7 @@ void ManagerWidget::save_hostname(const QString& new_name)
     QFile hostname(anw_save_hostname_file);
     if(!hostname.open(QIODevice::WriteOnly | QIODevice::Text))
     {
-        std::cout << "Unable to save hostname file. Maybe a permissions issue?";
+        std::cout << "Unable to save hostname file. Maybe a permissions issue?" << std::endl;
         return;
     }
     
