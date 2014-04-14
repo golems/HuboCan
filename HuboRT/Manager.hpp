@@ -6,9 +6,10 @@
 #include "Daemonizer.hpp"
 
 extern "C" {
-#include "HuboRT/manager_msg.h"
 #include "HuboCan/AchIncludes.h"
 }
+
+#include "HuboRT/manager_msg.hpp"
 
 #include "HuboCan/InfoTypes.hpp"
 

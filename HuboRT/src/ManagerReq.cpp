@@ -7,16 +7,20 @@ using namespace HuboRT;
 
 ManagerReq::ManagerReq()
 {
-    _initialize();
+    _initialized = false;
+    timeout = 2;
+    initialize();
 }
 
-void ManagerReq::_initialize()
+bool ManagerReq::initialize()
 {
     ach_status_t r = ach_open(&_req_chan, hubo_rt_mgr_req_chan, NULL);
     if( ACH_OK != r )
     {
         std::cerr << "Error trying to open Manager Request Channel:\n"
                      << " -- (" << (int)r << ") " << ach_result_to_string(r) << std::endl;
+        _initialized = false;
+        return false;
     }
     
     r = ach_open(&_reply_chan, hubo_rt_mgr_reply_chan, NULL);
@@ -24,9 +28,17 @@ void ManagerReq::_initialize()
     {
         std::cerr << "Error trying to open Manager Reply Channel:\n"
                      << " -- (" << (int)r << ") " << ach_result_to_string(r) << std::endl;
+        _initialized = false;
+        return false;
     }
     
-    timeout = 2;
+    _initialized = true;
+    return true;
+}
+
+bool ManagerReq::is_initialized()
+{
+    return _initialized;
 }
 
 StringArray ManagerReq::list_registered_processes()

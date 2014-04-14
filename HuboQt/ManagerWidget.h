@@ -1,13 +1,15 @@
-#ifndef ACHNETWORKWIDGET_H
-#define ACHNETWORKWIDGET_H
+#ifndef HUBOQTMANAGERWIDGET_H
+#define HUBOQTMANAGERWIDGET_H
 
 #include <QWidget>
 
 #include <vector>
 #include <QVector>
 
-#include "ui_AchNetworkWidget.h"
+#include "ui_ManagerWidget.h"
 #include "AchdHandle.h"
+
+#include "HuboRT/ManagerReq.hpp"
 
 namespace HuboQt {
 
@@ -27,6 +29,8 @@ protected:
     
     Ui::ManagerWidget* _ui;
     
+    HuboRT::ManagerReq* _req;
+    
     AchdPtrArray _perm_achd_handles;    // This is for the Manager's channels which will
                                         // always be exactly the same
     
@@ -41,8 +45,15 @@ protected:
 protected Q_SLOTS:
     
     void save_hostname(const QString& new_name);
+    
     void start_all_achds();
     void disconnect_all_achds();
+    
+    void startup_everything();
+    void shutdown_everything();
+    void homeall();
+    
+    
     
     void inform_disconnect(int exit_code);
     
@@ -55,4 +66,4 @@ private:
 
 } // namespace HuboQt
 
-#endif // ACHNETWORKWIDGET_H
+#endif // HUBOQTMANAGERWIDGET_H

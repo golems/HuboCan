@@ -35,12 +35,45 @@ ManagerWidget::ManagerWidget() :
     
     _start_achds(_perm_achd_handles);
     
+    _req = new HuboRT::ManagerReq;
+    if(!_req->is_initialized())
+    {
+        std::cerr << "Insane unexplainable error!"
+                  << " The ManagerReq instance could not be initialized!!"
+                  << std::endl;
+    }
+    
     // ---- Connecting UI signals ----
     
     connect(_ui->hostname_edit, SIGNAL(textChanged(QString)), this, SLOT(save_hostname(QString)));
     
     connect(_ui->reconnect, SIGNAL(clicked()), this, SLOT(start_all_achds()));
     connect(_ui->disconnect, SIGNAL(clicked()), this, SLOT(disconnect_all_achds()));
+    
+    connect(_ui->startup, SIGNAL(clicked()), this, SLOT(startup_everything()));
+    connect(_ui->shutdown, SIGNAL(clicked()), this, SLOT(shutdown_everything()));
+    connect(_ui->homeall, SIGNAL(clicked()), this, SLOT(homeall()));
+}
+
+void ManagerWidget::startup_everything()
+{
+    StringArray reply;
+    manager_err_t result = _req->start_up(reply);
+    
+    if(NO_ERROR != result)
+    {
+        
+    }
+}
+
+void ManagerWidget::shutdown_everything()
+{
+    
+}
+
+void ManagerWidget::homeall()
+{
+    
 }
 
 void ManagerWidget::disconnect_all_achds()
@@ -106,6 +139,9 @@ ManagerWidget::~ManagerWidget()
     {
         delete _more_achd_handles[i];
     }
+    
+    delete _req;
+    delete _ui;
 }
 
 void ManagerWidget::load_hostname()

@@ -113,13 +113,3 @@ bool AchdHandle::parse_description(QString description)
 }
 
 
-
-
-
-
-
-
-
-
-
-

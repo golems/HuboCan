@@ -7,9 +7,10 @@
 #include "HuboCan/InfoTypes.hpp"
 
 extern "C" {
-#include "manager_msg.h"
 #include "HuboCan/AchIncludes.h"
 }
+
+#include "manager_msg.hpp"
 
 namespace HuboRT {
 
@@ -18,6 +19,9 @@ class ManagerReq
 public:
     
     ManagerReq();
+    
+    bool initialize();
+    bool is_initialized();
     
     double timeout;
     
@@ -290,7 +294,7 @@ public:
     
 protected:
     
-    void _initialize();
+    bool _initialized;
     
     manager_err_t _send_request(manager_cmd_t cmd, const std::string& desc="");
     manager_err_t _send_request(manager_cmd_t cmd, StringArray& reply, const std::string& desc = "");

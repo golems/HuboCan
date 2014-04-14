@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>591</width>
-    <height>490</height>
+    <width>607</width>
+    <height>547</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -67,6 +67,12 @@ QGroupBox::title {
           </item>
           <item>
            <widget class="QLabel" name="network_status">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="text">
              <string>Status</string>
             </property>
@@ -124,12 +130,12 @@ QGroupBox::title {
              <enum>Qt::Vertical</enum>
             </property>
             <property name="sizeType">
-             <enum>QSizePolicy::MinimumExpanding</enum>
+             <enum>QSizePolicy::Preferred</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
               <width>20</width>
-              <height>2</height>
+              <height>25</height>
              </size>
             </property>
            </spacer>
@@ -163,12 +169,12 @@ QGroupBox::title {
              <enum>Qt::Vertical</enum>
             </property>
             <property name="sizeType">
-             <enum>QSizePolicy::MinimumExpanding</enum>
+             <enum>QSizePolicy::Preferred</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
               <width>20</width>
-              <height>2</height>
+              <height>10</height>
              </size>
             </property>
            </spacer>
@@ -176,6 +182,71 @@ QGroupBox::title {
          </layout>
         </item>
        </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="styleSheet">
+      <string notr="true">QGroupBox {
+    border: 1px solid gray;
+    border-radius: 9px;
+    margin-top: 0.5em;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 10px;
+    padding: 0 3px 0 3px;
+}</string>
+     </property>
+     <property name="title">
+      <string>Standard Options</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_10">
+      <item>
+       <widget class="QPushButton" name="startup">
+        <property name="toolTip">
+         <string>Creates all channels and launches all processes</string>
+        </property>
+        <property name="text">
+         <string>Startup</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="shutdown">
+        <property name="toolTip">
+         <string>Stops all processes and destroys all channels</string>
+        </property>
+        <property name="text">
+         <string>Shutdown</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="homeall">
+        <property name="toolTip">
+         <string>Homes all joints</string>
+        </property>
+        <property name="text">
+         <string>Home All</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

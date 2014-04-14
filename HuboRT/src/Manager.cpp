@@ -1,10 +1,11 @@
 
 
 extern "C" {
-#include "HuboRT/manager_msg.h"
 #include "HuboRT/Daemonizer_C.h"
 #include "HuboCan/AchIncludes.h"
 }
+
+#include "HuboRT/manager_msg.hpp"
 
 #include "HuboRT/Manager.hpp"
 #include <sstream>

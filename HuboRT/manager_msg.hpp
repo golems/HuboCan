@@ -2,6 +2,8 @@
 #define MANAGERMSGS_H
 
 #include <stdint.h>
+#include <string>
+
 #include "HuboRT/HuboRtParams.h"
 
 const char hubo_rt_mgr_req_chan[] = "hubo_rt_mgr_cmd";
@@ -71,6 +73,8 @@ typedef enum manager_err {
     MGR_TIMEOUT             /*!< The manager failed to reply in the specified amount of time. This likely means that the manager is not running. */
     
 } manager_err_t;
+
+std::string manager_err_to_string(manager_err_t error);
 
 typedef struct manager_reply {
     

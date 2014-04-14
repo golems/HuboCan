@@ -4,9 +4,7 @@
 #include <QString>
 #include <QProcess>
 
-extern "C" {
-#include "HuboRT/manager_msg.h"
-} // extern "C"
+#include "HuboRT/manager_msg.hpp"
 
 namespace HuboQt {
 
