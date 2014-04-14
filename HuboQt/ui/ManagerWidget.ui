@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>607</width>
-    <height>549</height>
+    <height>571</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -322,7 +322,7 @@ QGroupBox::title {
           <item>
            <widget class="QListWidget" name="chan_list">
             <property name="selectionMode">
-             <enum>QAbstractItemView::MultiSelection</enum>
+             <enum>QAbstractItemView::ExtendedSelection</enum>
             </property>
            </widget>
           </item>
@@ -438,7 +438,7 @@ QGroupBox::title {
         <item>
          <widget class="QListWidget" name="proc_list">
           <property name="selectionMode">
-           <enum>QAbstractItemView::MultiSelection</enum>
+           <enum>QAbstractItemView::ExtendedSelection</enum>
           </property>
          </widget>
         </item>

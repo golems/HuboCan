@@ -33,7 +33,7 @@ bool AchdHandle::start(QString hostname)
                 || achd_process.state() == QProcess::Starting)
         {
             std::cout << "Killing the achd process for channel "
-                      << channel_description.toStdString()
+                      << nickname.toStdString()
                       << " in order to restart it." << std::endl;
             achd_process.kill();
         }
@@ -51,6 +51,7 @@ bool AchdHandle::start(QString hostname)
             return false;
         }
         
+//        std::cout << (start_type + hostname + " " + channel_name).toStdString() << std::endl;
         achd_process.start(start_type + hostname + " " + channel_name);
     }
     

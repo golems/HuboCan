@@ -28,12 +28,10 @@ ManagerWidget::ManagerWidget() :
     
     AchdHandle* handle = new AchdHandle;
     handle->parse_description("manager_request:"+QString(hubo_rt_mgr_req_chan)+":20:2048:PUSH:");
-    connect(&(handle->achd_process), SIGNAL(finished(int)), this, SLOT(inform_disconnect(int)));
     _perm_achd_handles.push_back(handle);
     
     handle = new AchdHandle;
     handle->parse_description("manager_reply:"+QString(hubo_rt_mgr_reply_chan)+":20:2048:PULL:");
-    connect(&(handle->achd_process), SIGNAL(finished(int)), this, SLOT(inform_disconnect(int)));
     _perm_achd_handles.push_back(handle);
     
     _start_achds(_perm_achd_handles);
@@ -66,7 +64,9 @@ ManagerWidget::ManagerWidget() :
     connect(_ui->refresh_registered_procs, SIGNAL(clicked()), this, SLOT(refresh_registered_procs()));
     connect(_ui->refresh_locked_procs, SIGNAL(clicked()), this, SLOT(refresh_locked_procs()));
     
-    
+
+//    _ui->refresh_chan->click();
+//    _ui->refresh_registered_procs->click();
 }
 
 bool ManagerWidget::_double_check_init()
@@ -85,7 +85,7 @@ bool ManagerWidget::_double_check_init()
 
 void ManagerWidget::_set_status(manager_err_t incoming_status, const QString &status_context)
 {
-    if(incoming_status != NO_ERROR)
+    if(incoming_status != NO_ERROR && incoming_status != EMPTY_LIST)
     {
         std::cerr << "Error during '" << status_context.toStdString() << "': "
                   << manager_err_to_string(incoming_status) << std::endl;
@@ -155,6 +155,8 @@ void ManagerWidget::_display_channels()
                              +QString::fromStdString(
                                  achd_network_to_string(
                                      _more_achd_handles[i]->push_or_pull)));
+
+        _ui->chan_list->addItem(new_chan);
     }
 }
 
@@ -168,7 +170,7 @@ void ManagerWidget::_display_registered_processes(const StringArray &procs)
     for(size_t i=0; i<procs.size(); ++i)
     {
         StringArray components;
-        if(HuboRT::split_components(procs[i], components) < 2)
+        if(HuboRT::split_components(procs[i], components) < 3)
         {
             std::cerr << "Invalid process description: " << procs[i] << std::endl;
             continue;
@@ -176,7 +178,10 @@ void ManagerWidget::_display_registered_processes(const StringArray &procs)
         
         QListWidgetItem* new_proc = new QListWidgetItem;
         new_proc->setText(QString::fromStdString(components[0]));
-        new_proc->setToolTip("args: "+QString::fromStdString(components[1]));
+        new_proc->setToolTip("bin: "+QString::fromStdString(components[1])
+                +", args: "+QString::fromStdString(components[2]));
+
+        _ui->proc_list->addItem(new_proc);
     }
 }
 
@@ -199,6 +204,8 @@ void ManagerWidget::_display_locked_processes(const StringArray &locks)
         QListWidgetItem* new_lock = new QListWidgetItem;
         new_lock->setText(QString::fromStdString(components[0]));
         new_lock->setToolTip("pid: "+QString::fromStdString(components[1]));
+
+        _ui->proc_list->addItem(new_lock);
     }
 }
 
@@ -251,7 +258,7 @@ void ManagerWidget::refresh_chans()
     
     _set_status(result, "refresh channels");
     
-    if(NO_ERROR != result)
+    if(NO_ERROR != result && EMPTY_LIST != result)
         return;
     
     _parse_channel_descriptions(reply);
@@ -264,7 +271,7 @@ void ManagerWidget::refresh_registered_procs()
     
     _set_status(result, "refresh all processes");
     
-    if(NO_ERROR != result)
+    if(NO_ERROR != result && EMPTY_LIST != result)
     {
         _ui->refresh_registered_procs->setChecked(false);
         return;
@@ -280,7 +287,7 @@ void ManagerWidget::refresh_locked_procs()
     
     _set_status(result, "refresh locked processes");
     
-    if(NO_ERROR != result)
+    if(NO_ERROR != result && EMPTY_LIST != result)
     {
         _ui->refresh_locked_procs->setChecked(false);
         return;
@@ -319,6 +326,9 @@ void ManagerWidget::_start_achds(AchdPtrArray &achds)
     for(int i=0; i<achds.size(); ++i)
     {
         achds[i]->start(_ui->hostname_edit->text());
+        connect(&(achds[i]->achd_process),
+                SIGNAL(finished(int)),
+                this, SLOT(inform_disconnect(int)));
     }
 }
 
