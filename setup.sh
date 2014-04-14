@@ -43,7 +43,7 @@ CopyDevices()
 
 RawRobotInstall()
 {
-    echo "Performing robot installation for $1"
+    echo "Performing robot installation for $2"
 
     # I hate bash scripts
     if [ -d "build" ]
@@ -55,14 +55,14 @@ RawRobotInstall()
     fi
 
     cd build
-    cmake .. -DBuildHuboQt=OFF
+    cmake .. -DBuildHuboQt=OFF -DCMAKE_INSTALL_PREFIX=/usr
     make
     sudo make install
 
     CreateOptHubo
-    CopyDevices()
+    CopyDevices
 
-    /usr/bin/hubocan_setup_default_config "$1"
+    /usr/bin/hubocan_setup_default_config "$2"
 }
 
 RobotInstall()
@@ -92,12 +92,12 @@ RemoteInstall()
     fi
 
     cd build
-    cmake .. -DBuildHuboQt=ON
+    cmake .. -DBuildHuboQt=ON -DCMAKE_INSTALL_PREFIX=/usr
     make
     sudo make install
 
     CreateOptHubo
-    CopyDevices()
+    CopyDevices
 }
 
 case "$1" in
