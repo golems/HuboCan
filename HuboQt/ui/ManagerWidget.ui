@@ -320,11 +320,7 @@ QGroupBox::title {
            </layout>
           </item>
           <item>
-           <widget class="QListView" name="chan_list">
-            <property name="toolTip">
-             <string>The list of channels currently registered in Hubo's Manager configuration</string>
-            </property>
-           </widget>
+           <widget class="QListWidget" name="listWidget"/>
           </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -414,7 +410,7 @@ QGroupBox::title {
          </layout>
         </item>
         <item>
-         <widget class="QListView" name="proc_list"/>
+         <widget class="QListWidget" name="listWidget_2"/>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_8">

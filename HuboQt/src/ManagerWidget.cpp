@@ -62,6 +62,37 @@ void ManagerWidget::startup_everything()
     
     if(NO_ERROR != result)
     {
+        std::cerr << "Error after startup command: " << manager_err_to_string(result) << std::endl;
+        return;
+    }
+    
+    _parse_channel_descriptions(reply);
+//    _start_achds(_more_achd_handles); // Automatically starting them when parsed
+}
+
+void ManagerWidget::_parse_channel_descriptions(const StringArray &descs)
+{
+    for(int i=0; i<_more_achd_handles.size(); ++i)
+    {
+        delete _more_achd_handles[i];
+    }
+    _more_achd_handles.resize(0);
+    
+    for(size_t i=0; i<descs.size(); ++i)
+    {
+        AchdHandle* handle = new AchdHandle;
+        handle->start(_ui->hostname_edit->text(), QString::fromStdString(descs[i]));
+        _more_achd_handles.push_back(handle);
+    }
+    
+    _display_channels();
+}
+
+void ManagerWidget::_display_channels()
+{
+    
+    for(int i=0; i<_more_achd_handles.size(); ++i)
+    {
         
     }
 }

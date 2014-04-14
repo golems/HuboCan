@@ -8,7 +8,7 @@ using namespace HuboRT;
 ManagerReq::ManagerReq()
 {
     _initialized = false;
-    timeout = 2;
+    timeout = 1;
     initialize();
 }
 
@@ -224,7 +224,7 @@ manager_err_t ManagerReq::_send_request(manager_cmd_t cmd, StringArray &reply, c
         
         if( ACH_TIMEOUT == r )
         {
-            std::cerr << "The reply time from the Manager timed out!" << std::endl;
+            std::cerr << "The reply from the Manager timed out! (" << timeout << " sec)" << std::endl;
             return MGR_TIMEOUT;
         }
         

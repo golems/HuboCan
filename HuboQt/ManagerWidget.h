@@ -37,6 +37,9 @@ protected:
     AchdPtrArray _more_achd_handles;    // This is for the rest of the channels which we
                                         // will depend on the Manager to inform us about
     
+    void _parse_channel_descriptions(const StringArray& descs);
+    void _display_channels();
+    
     void _start_achds(AchdPtrArray& achds);
     void _disconnect_achds(AchdPtrArray& achds);
     
