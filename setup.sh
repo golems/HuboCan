@@ -23,6 +23,24 @@ ShowUsage()
     echo " "
 }
 
+CreateOptHubo()
+{
+    if [ -d "/opt/hubo" ]
+    then
+        echo '/opt/hubo already exists'
+    else
+        echo 'Creating /opt/hubo'
+        sudo mkdir /opt/hubo
+        sudo chmod a+rwx /opt/hubo
+    fi
+}
+
+CopyDevices()
+{
+    echo 'Copying device files into /opt/hubo/devices'
+    cp -r ../HuboCan/devices /opt/hubo/
+}
+
 RawRobotInstall()
 {
     echo "Performing robot installation for $1"
@@ -41,9 +59,8 @@ RawRobotInstall()
     make
     sudo make install
 
-    sudo mkdir /opt/hubo
-    sudo chmod a+rwx /opt/hubo
-    cp -r ../HuboCan/devices /opt/hubo/
+    CreateOptHubo
+    CopyDevices()
 
     /usr/bin/hubocan_setup_default_config "$1"
 }
@@ -64,7 +81,7 @@ RobotInstall()
     esac
 }
 
-RemoteIntall()
+RemoteInstall()
 {
     if [ -d "build" ]
     then
@@ -79,9 +96,8 @@ RemoteIntall()
     make
     sudo make install
 
-    sudo mkdir /opt/hubo
-    sudo chmod a+rwx /opt/hubo
-    cp -r ../HuboCan/devices /opt/hubo/
+    CreateOptHubo
+    CopyDevices()
 }
 
 case "$1" in
