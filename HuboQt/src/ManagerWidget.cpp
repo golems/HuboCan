@@ -2,6 +2,8 @@
 #include <QFile>
 #include <iostream>
 #include <QTime>
+#include <QTimer>
+#include <QColor>
 
 #include "../ManagerWidget.h"
 #include "HuboRT/utils.hpp"
@@ -20,6 +22,10 @@ ManagerWidget::ManagerWidget() :
     _ui(new Ui::ManagerWidget),
     _init(false)
 {
+    QColor color(100, 230, 100);
+    selected_button_style = "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "
+            "stop: 0 #dadbde, stop: 1 " + color.name() + ")";
+
     _ui->setupUi(this);
     
     hubo_rt_safe_make_directory(anw_save_directory);
@@ -28,10 +34,16 @@ ManagerWidget::ManagerWidget() :
     
     AchdHandle* handle = new AchdHandle;
     handle->parse_description("manager_request:"+QString(hubo_rt_mgr_req_chan)+":20:2048:PUSH:");
+    connect(&(handle->achd_process),
+            SIGNAL(finished(int)),
+            this, SLOT(inform_disconnect(int)), Qt::UniqueConnection);
     _perm_achd_handles.push_back(handle);
     
     handle = new AchdHandle;
     handle->parse_description("manager_reply:"+QString(hubo_rt_mgr_reply_chan)+":20:2048:PULL:");
+    connect(&(handle->achd_process),
+            SIGNAL(finished(int)),
+            this, SLOT(inform_disconnect(int)), Qt::UniqueConnection);
     _perm_achd_handles.push_back(handle);
     
     _start_achds(_perm_achd_handles);
@@ -67,6 +79,13 @@ ManagerWidget::ManagerWidget() :
 
 //    _ui->refresh_chan->click();
 //    _ui->refresh_registered_procs->click();
+
+    if(_ui->hostname_edit->text().size() > 0)
+        QTimer::singleShot(2000, this, SLOT(refresh_startup()));
+
+    QTimer* refresh_locked_timer = new QTimer(this);
+    connect(refresh_locked_timer, SIGNAL(timeout()), this, SLOT(timer_refresh()));
+    refresh_locked_timer->start(1000);
 }
 
 bool ManagerWidget::_double_check_init()
@@ -138,6 +157,9 @@ void ManagerWidget::_parse_channel_descriptions(const StringArray &descs)
     for(size_t i=0; i<descs.size(); ++i)
     {
         AchdHandle* handle = new AchdHandle;
+        connect(&(handle->achd_process),
+                SIGNAL(finished(int)),
+                this, SLOT(inform_disconnect(int)), Qt::UniqueConnection);
         handle->start(_ui->hostname_edit->text(), QString::fromStdString(descs[i]));
         _main_achd_handles.push_back(handle);
     }
@@ -168,10 +190,8 @@ void ManagerWidget::_display_channels()
 void ManagerWidget::_display_registered_processes(const StringArray &procs)
 {
     _ui->proc_list->clear();
-    _displaying_registered = true;
     _ui->stop_proc->setEnabled(false);
     _ui->launch_proc->setEnabled(true);
-    _ui->refresh_locked_procs->setChecked(false);
     for(size_t i=0; i<procs.size(); ++i)
     {
         StringArray components;
@@ -193,10 +213,8 @@ void ManagerWidget::_display_registered_processes(const StringArray &procs)
 void ManagerWidget::_display_locked_processes(const StringArray &locks)
 {
     _ui->proc_list->clear();
-    _displaying_registered = false;
     _ui->stop_proc->setEnabled(true);
     _ui->launch_proc->setEnabled(false);
-    _ui->refresh_registered_procs->setChecked(false);
     for(size_t i=0; i<locks.size(); ++i)
     {
         StringArray components;
@@ -256,6 +274,12 @@ void ManagerWidget::stop_all()
     _set_status(_req->stop_all_processes(), "stop all processes");
 }
 
+void ManagerWidget::refresh_startup()
+{
+    refresh_chans();
+    set_displaying_locked_procs(true);
+}
+
 void ManagerWidget::refresh_chans()
 {
     StringArray reply;
@@ -269,7 +293,29 @@ void ManagerWidget::refresh_chans()
     _parse_channel_descriptions(reply);
 }
 
+void ManagerWidget::set_displaying_locked_procs(bool displaying_locked_procs)
+{
+    _displaying_locked_procs = displaying_locked_procs;
+    if(displaying_locked_procs)
+    {
+        _ui->refresh_locked_procs->setStyleSheet(selected_button_style);
+        _ui->refresh_registered_procs->setStyleSheet("");
+        refresh_locked_procs_raw();
+    }
+    else
+    {
+        _ui->refresh_registered_procs->setStyleSheet(selected_button_style);
+        _ui->refresh_locked_procs->setStyleSheet("");
+        refresh_registered_procs_raw();
+    }
+}
+
 void ManagerWidget::refresh_registered_procs()
+{
+    set_displaying_locked_procs(false);
+}
+
+void ManagerWidget::refresh_registered_procs_raw()
 {
     StringArray reply;
     manager_err_t result = _req->list_registered_processes(reply);
@@ -287,6 +333,11 @@ void ManagerWidget::refresh_registered_procs()
 
 void ManagerWidget::refresh_locked_procs()
 {
+    set_displaying_locked_procs(true);
+}
+
+void ManagerWidget::refresh_locked_procs_raw()
+{
     StringArray reply;
     manager_err_t result = _req->list_locked_processes(reply);
     
@@ -301,9 +352,14 @@ void ManagerWidget::refresh_locked_procs()
     _display_locked_processes(reply);
 }
 
+void ManagerWidget::timer_refresh()
+{
+    if(_displaying_locked_procs)
+        refresh_locked_procs_raw();
+}
+
 void ManagerWidget::inform_disconnect(int exit_code)
 {
-    _ui->network_status->setText("Disconnected!");
     _check_if_achds_running(_perm_achd_handles, exit_code);
     _check_if_achds_running(_main_achd_handles, exit_code);
 }
@@ -312,8 +368,9 @@ void ManagerWidget::_check_if_achds_running(AchdPtrArray &achds, int exit_code)
 {
     for(int i=0; i<achds.size(); ++i)
     {
-        if(achds[i]->achd_process.state() != QProcess::Running && achds[i]->started )
+        if( (achds[i]->achd_process.state() == QProcess::NotRunning) && achds[i]->started )
         {
+            _ui->network_status->setText("Disconnected!");
             achds[i]->started = false;
             std::cout << "Channel '" << achds[i]->nickname.toStdString() << "' ("
                       << achds[i]->channel_name.toStdString() << ")"
@@ -331,9 +388,6 @@ void ManagerWidget::_start_achds(AchdPtrArray &achds)
     for(int i=0; i<achds.size(); ++i)
     {
         achds[i]->start(_ui->hostname_edit->text());
-        connect(&(achds[i]->achd_process),
-                SIGNAL(finished(int)),
-                this, SLOT(inform_disconnect(int)));
     }
 }
 

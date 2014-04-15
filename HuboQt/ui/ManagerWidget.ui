@@ -402,35 +402,17 @@ QGroupBox::title {
            </widget>
           </item>
           <item>
-           <widget class="QRadioButton" name="refresh_registered_procs">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
+           <widget class="QPushButton" name="refresh_registered_procs">
             <property name="text">
              <string>Registered</string>
             </property>
-            <attribute name="buttonGroup">
-             <string notr="true">buttonGroup</string>
-            </attribute>
            </widget>
           </item>
           <item>
-           <widget class="QRadioButton" name="refresh_locked_procs">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
+           <widget class="QPushButton" name="refresh_locked_procs">
             <property name="text">
              <string>Locked</string>
             </property>
-            <attribute name="buttonGroup">
-             <string notr="true">buttonGroup</string>
-            </attribute>
            </widget>
           </item>
          </layout>

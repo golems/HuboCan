@@ -5,9 +5,9 @@ extern "C" {
 #include "HuboCan/AchIncludes.h"
 }
 
-#include "HuboRT/manager_msg.hpp"
+#include "../manager_msg.hpp"
 
-#include "HuboRT/Manager.hpp"
+#include "../Manager.hpp"
 #include <sstream>
 #include <stdlib.h>
 #include <iostream>
@@ -262,14 +262,16 @@ void Manager::run_process(const std::string &name)
         _report_malformed_error("Run process should have at least two components");
 }
 
-void Manager::run_all_processes()
+void Manager::run_all_processes(bool report)
 {
     StringArray procs = _grab_files_in_dir(_proc_roster);
     for(size_t i=0; i < procs.size(); ++i)
     {
         _fork_process_raw(procs[i], "");
     }
-    _report_no_error(RUN_ALL_PROCS);
+
+    if(report)
+        _report_no_error(RUN_ALL_PROCS);
 }
 
 void Manager::_stop_process_raw(const std::string &name)
@@ -426,7 +428,7 @@ bool Manager::_close_ach_channel_raw(const std::string &name)
             chan_name = components[0];
             
             int exit_code = system( ("ach rm "+chan_name).c_str());
-            if(exit_code != 0)
+            if(exit_code != 0 && exit_code != 256)
             {
                 std::cout << "Unexpected exit code from 'ach rm': " << exit_code << std::endl;
             }
@@ -451,7 +453,7 @@ void Manager::create_ach_chan(const std::string &name)
     _relay_string_array(CREATE_ACH_CHAN, achd_types);
 }
 
-void Manager::create_all_ach_chans()
+StringArray Manager::create_all_ach_chans(bool report)
 {
     StringArray chans = _grab_files_in_dir(_chan_roster);
     StringArray achd_types;
@@ -461,7 +463,9 @@ void Manager::create_all_ach_chans()
         achd_types.push_back(_create_ach_channel_raw(chans[i]));
     }
     
-    _relay_string_array(CREATE_ALL_ACH_CHANS, achd_types);
+    if(report)
+        _relay_string_array(CREATE_ALL_ACH_CHANS, achd_types);
+    return achd_types;
 }
 
 void Manager::close_ach_chan(const std::string &name)
@@ -476,7 +480,7 @@ void Manager::close_ach_chan(const std::string &name)
     }
 }
 
-void Manager::close_all_ach_chans()
+void Manager::close_all_ach_chans(bool report)
 {
     StringArray chans = _grab_files_in_dir(_chan_roster);
     
@@ -485,7 +489,8 @@ void Manager::close_all_ach_chans()
         _close_ach_channel_raw(chans[i]);
     }
     
-    _report_no_error(CLOSE_ALL_ACH_CHANS);
+    if(report)
+        _report_no_error(CLOSE_ALL_ACH_CHANS);
 }
 
 void Manager::register_new_proc(const std::string &name)
@@ -573,9 +578,11 @@ void Manager::reset_rosters()
 void Manager::start_up()
 {
     // TODO: Hardware-related things
-    
-    create_all_ach_chans();
+
+    StringArray reply = create_all_ach_chans(false);
     run_all_processes();
+
+
 }
 
 void Manager::shut_down()
@@ -717,20 +724,6 @@ void Manager::_clear_current_config()
         remove( (_chan_roster+"/"+procs[i]).c_str() );
     }
 }
-
-//size_t Manager::_split_components(const std::string &name, StringArray &array)
-//{
-//    array.resize(0);
-//    size_t pos = 0, last_pos=0, count=0;
-//    while(std::string::npos != (pos = name.find(":", last_pos)))
-//    {
-//        ++count;
-//        array.push_back(name.substr(last_pos, pos-last_pos));
-//        last_pos = pos+1;
-//    }
-    
-//    return count;
-//}
 
 void Manager::_report_no_error(manager_cmd_t original_req)
 {

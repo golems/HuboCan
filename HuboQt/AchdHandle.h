@@ -8,7 +8,7 @@
 
 namespace HuboQt {
 
-class AchdHandle 
+class AchdHandle
 {
 public:
     

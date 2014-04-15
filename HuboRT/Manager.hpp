@@ -49,7 +49,7 @@ public:
 //    void list_open_channels();
     
     void run_process(const std::string& name);
-    void run_all_processes();
+    void run_all_processes(bool report=true);
     
     void stop_process(const std::string& name);
     void stop_all_processes();
@@ -58,10 +58,10 @@ public:
     void kill_all_processes();
     
     void create_ach_chan(const std::string& name);
-    void create_all_ach_chans();
+    StringArray create_all_ach_chans(bool report=true);
     
     void close_ach_chan(const std::string& name);
-    void close_all_ach_chans();
+    void close_all_ach_chans(bool report=true);
     
     void register_new_proc(const std::string& name);
     void unregister_old_proc(const std::string& name);

@@ -10,6 +10,16 @@ using namespace HuboQt;
 AchdHandle::AchdHandle()
 {
     started = false;
+    achd_process.start("ach mk " + channel_name + " -1 "
+                       + "-m " + QString::number(message_count)
+                       + " -n " + QString::number(nominal_size)
+                       + " -o 666", QIODevice::ReadWrite);
+
+    if(!achd_process.waitForFinished(5000))
+    {
+        std::cout << "QProcess is hung up on attempting to create ach channel '"
+                     << channel_name.toStdString() << "'!" << std::endl;
+    }
 }
 
 bool AchdHandle::start(QString hostname)
@@ -28,29 +38,16 @@ bool AchdHandle::start(QString hostname)
     
     if(start_type.size() > 0)
     {
-        started = true;
         if(achd_process.state() == QProcess::Running
                 || achd_process.state() == QProcess::Starting)
         {
             std::cout << "Killing the achd process for channel "
                       << nickname.toStdString()
                       << " in order to restart it." << std::endl;
-            achd_process.kill();
+            stop();
         }
-        
-        achd_process.start("ach mk " + channel_name + " -1 "
-                           + "-m " + QString::number(message_count)
-                           + " -n " + QString::number(nominal_size)
-                           + " -o 666", QIODevice::ReadWrite);
-        
-        achd_process.waitForFinished(5000);
-        if(achd_process.state() != QProcess::NotRunning)
-        {
-            std::cout << "QProcess is hung up on attempting to create ach channel '"
-                         << channel_name.toStdString() << "'!" << std::endl;
-            return false;
-        }
-        
+
+        started = true;
         achd_process.start(start_type + hostname + " " + channel_name);
     }
     
@@ -67,7 +64,15 @@ bool AchdHandle::start(QString hostname, QString description)
 
 void AchdHandle::stop()
 {
-    achd_process.kill();
+    started = false;
+    if(achd_process.state() != QProcess::NotRunning)
+    {
+        achd_process.kill();
+        if(!achd_process.waitForFinished(5000))
+        {
+            std::cout << "Achd is hung up on quitting for '" << nickname.toStdString() << "'!" << std::endl;
+        }
+    }
 }
 
 AchdHandle::~AchdHandle()

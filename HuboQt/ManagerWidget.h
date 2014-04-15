@@ -25,10 +25,13 @@ public:
     ~ManagerWidget();
     
     void load_hostname();
+
+    void set_displaying_locked_procs(bool displaying_locked_procs);
+    QString selected_button_style;
     
 protected:
     
-    bool _displaying_registered;
+    bool _displaying_locked_procs;
     
     Ui::ManagerWidget* _ui;
     
@@ -73,9 +76,13 @@ protected Q_SLOTS:
     void launch_all();
     void stop_all();
     
+    void refresh_startup();
     void refresh_chans();
     void refresh_registered_procs();
+    void refresh_registered_procs_raw();
     void refresh_locked_procs();
+    void refresh_locked_procs_raw();
+    void timer_refresh();
     
     void inform_disconnect(int exit_code);
     
