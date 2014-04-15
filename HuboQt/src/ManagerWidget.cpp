@@ -22,6 +22,7 @@ ManagerWidget::ManagerWidget() :
     _ui(new Ui::ManagerWidget),
     _init(false)
 {
+    _connected = false;
     QColor color(100, 230, 100);
     selected_button_style = "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "
             "stop: 0 #dadbde, stop: 1 " + color.name() + ")";
@@ -83,9 +84,10 @@ ManagerWidget::ManagerWidget() :
     if(_ui->hostname_edit->text().size() > 0)
         QTimer::singleShot(2000, this, SLOT(refresh_startup()));
 
-    QTimer* refresh_locked_timer = new QTimer(this);
-    connect(refresh_locked_timer, SIGNAL(timeout()), this, SLOT(timer_refresh()));
-    refresh_locked_timer->start(1000);
+    // TODO: Figure out a better way to update on locked processes
+//    QTimer* refresh_locked_timer = new QTimer(this);
+//    connect(refresh_locked_timer, SIGNAL(timeout()), this, SLOT(timer_refresh()));
+//    refresh_locked_timer->start(5000);
 }
 
 bool ManagerWidget::_double_check_init()
@@ -354,7 +356,7 @@ void ManagerWidget::refresh_locked_procs_raw()
 
 void ManagerWidget::timer_refresh()
 {
-    if(_displaying_locked_procs)
+    if(_displaying_locked_procs && _connected)
         refresh_locked_procs_raw();
 }
 
@@ -371,6 +373,7 @@ void ManagerWidget::_check_if_achds_running(AchdPtrArray &achds, int exit_code)
         if( (achds[i]->achd_process.state() == QProcess::NotRunning) && achds[i]->started )
         {
             _ui->network_status->setText("Disconnected!");
+            _connected = false;
             achds[i]->started = false;
             std::cout << "Channel '" << achds[i]->nickname.toStdString() << "' ("
                       << achds[i]->channel_name.toStdString() << ")"
@@ -385,6 +388,7 @@ void ManagerWidget::_check_if_achds_running(AchdPtrArray &achds, int exit_code)
 void ManagerWidget::_start_achds(AchdPtrArray &achds)
 {
     _ui->network_status->setText("Connected");
+    _connected = true;
     for(int i=0; i<achds.size(); ++i)
     {
         achds[i]->start(_ui->hostname_edit->text());

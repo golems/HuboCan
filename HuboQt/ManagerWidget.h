@@ -32,6 +32,7 @@ public:
 protected:
     
     bool _displaying_locked_procs;
+    bool _connected;
     
     Ui::ManagerWidget* _ui;
     
