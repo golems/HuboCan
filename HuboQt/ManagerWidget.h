@@ -38,11 +38,12 @@ protected:
     AchdPtrArray _perm_achd_handles;    // This is for the Manager's channels which will
                                         // always be exactly the same
     
-    AchdPtrArray _more_achd_handles;    // This is for the rest of the channels which we
+    AchdPtrArray _main_achd_handles;    // This is for the rest of the channels which we
                                         // will depend on the Manager to inform us about
     
     bool _double_check_init();
     
+    void _clear_achd_handles(AchdPtrArray& achds);
     void _parse_channel_descriptions(const StringArray& descs);
     void _display_channels();
     

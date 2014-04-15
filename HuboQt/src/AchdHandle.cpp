@@ -51,7 +51,6 @@ bool AchdHandle::start(QString hostname)
             return false;
         }
         
-//        std::cout << (start_type + hostname + " " + channel_name).toStdString() << std::endl;
         achd_process.start(start_type + hostname + " " + channel_name);
     }
     

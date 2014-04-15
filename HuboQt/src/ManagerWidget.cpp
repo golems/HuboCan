@@ -98,7 +98,7 @@ void ManagerWidget::_set_status(manager_err_t incoming_status, const QString &st
 void ManagerWidget::disconnect_all_achds()
 {
     _disconnect_achds(_perm_achd_handles);
-    _disconnect_achds(_more_achd_handles);
+    _disconnect_achds(_main_achd_handles);
 }
 
 void ManagerWidget::_disconnect_achds(AchdPtrArray &achds)
@@ -122,19 +122,24 @@ void ManagerWidget::startup_everything()
     _parse_channel_descriptions(reply);
 }
 
+void ManagerWidget::_clear_achd_handles(AchdPtrArray &achds)
+{
+    AchdPtrArray backup = achds;
+    achds.clear();
+    for(int i=0; i<backup.size(); ++i)
+    {
+        delete backup[i];
+    }
+}
+
 void ManagerWidget::_parse_channel_descriptions(const StringArray &descs)
 {
-    for(int i=0; i<_more_achd_handles.size(); ++i)
-    {
-        delete _more_achd_handles[i];
-    }
-    _more_achd_handles.resize(0);
-    
+    _clear_achd_handles(_main_achd_handles);
     for(size_t i=0; i<descs.size(); ++i)
     {
         AchdHandle* handle = new AchdHandle;
         handle->start(_ui->hostname_edit->text(), QString::fromStdString(descs[i]));
-        _more_achd_handles.push_back(handle);
+        _main_achd_handles.push_back(handle);
     }
     
     _display_channels();
@@ -143,18 +148,18 @@ void ManagerWidget::_parse_channel_descriptions(const StringArray &descs)
 void ManagerWidget::_display_channels()
 {
     _ui->chan_list->clear();
-    for(int i=0; i<_more_achd_handles.size(); ++i)
+    for(int i=0; i<_main_achd_handles.size(); ++i)
     {
         QListWidgetItem* new_chan = new QListWidgetItem;
-        new_chan->setText(_more_achd_handles[i]->nickname);
+        new_chan->setText(_main_achd_handles[i]->nickname);
         new_chan->setToolTip("Details: "
-                             +_more_achd_handles[i]->channel_name
-                             +", "+QString::number(_more_achd_handles[i]->message_count)
-                             +"x"+QString::number(_more_achd_handles[i]->nominal_size)
+                             +_main_achd_handles[i]->channel_name
+                             +", "+QString::number(_main_achd_handles[i]->message_count)
+                             +"x"+QString::number(_main_achd_handles[i]->nominal_size)
                              +" bytes, "
                              +QString::fromStdString(
                                  achd_network_to_string(
-                                     _more_achd_handles[i]->push_or_pull)));
+                                     _main_achd_handles[i]->push_or_pull)));
 
         _ui->chan_list->addItem(new_chan);
     }
@@ -300,7 +305,7 @@ void ManagerWidget::inform_disconnect(int exit_code)
 {
     _ui->network_status->setText("Disconnected!");
     _check_if_achds_running(_perm_achd_handles, exit_code);
-    _check_if_achds_running(_more_achd_handles, exit_code);
+    _check_if_achds_running(_main_achd_handles, exit_code);
 }
 
 void ManagerWidget::_check_if_achds_running(AchdPtrArray &achds, int exit_code)
@@ -335,20 +340,13 @@ void ManagerWidget::_start_achds(AchdPtrArray &achds)
 void ManagerWidget::start_all_achds()
 {
     _start_achds(_perm_achd_handles);
-    _start_achds(_more_achd_handles);
+    _start_achds(_main_achd_handles);
 }
 
 ManagerWidget::~ManagerWidget()
 {
-    for(int i=0; i<_perm_achd_handles.size(); ++i)
-    {
-        delete _perm_achd_handles[i];
-    }
-    
-    for(int i=0; i<_more_achd_handles.size(); ++i)
-    {
-        delete _more_achd_handles[i];
-    }
+    _clear_achd_handles(_perm_achd_handles);
+    _clear_achd_handles(_main_achd_handles);
     
     delete _req;
     delete _ui;
