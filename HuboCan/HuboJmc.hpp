@@ -119,6 +119,8 @@ public:
 
 protected:
 
+    void _send_reference_commands();
+
 };
 
 class Hubo2Plus5chJmc : public Hubo2PlusBasicJmc
