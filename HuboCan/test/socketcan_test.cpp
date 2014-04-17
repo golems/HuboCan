@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
                 {
                     std::cout << desc.joints[i]->info.name << ":"
                               << desc.joints[i]->dropped_count
-                              << "(" << (double)(desc.joints[i]->dropped_count)/(double)(count)*200;
+                              << "(" << (double)(desc.joints[i]->dropped_count)/(double)(count)*200
                               << ")" << "\t";
                     missed_one = true;
                 }
