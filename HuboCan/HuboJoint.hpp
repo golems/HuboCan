@@ -29,6 +29,8 @@ public:
 
     bool updated;
     int dropped_count; // Counter for how many times this joint's encoder data has failed to update
+    int expected_replies;
+    int received_replies;
 
 protected:
 

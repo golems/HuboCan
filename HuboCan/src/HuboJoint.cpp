@@ -1,5 +1,5 @@
 
-#include "HuboCan/HuboJoint.hpp"
+#include "../HuboJoint.hpp"
 #include <math.h>
 #include <string.h>
 
@@ -10,6 +10,9 @@ HuboJoint::HuboJoint()
     memset(&info, 0, sizeof(info));
     updated = true;
     dropped_count = 0;
+
+    expected_replies = 0;
+    received_replies = 0;
 }
 
 double HuboJoint::encoder2radian(int encoder)

@@ -65,6 +65,7 @@ void Hubo2PlusBasicJmc::_request_encoder_readings()
     for(size_t i=0; i<joints.size(); ++i)
     {
         joints[i]->updated = false;
+        ++joints[i]->expected_replies;
     }
 
     _pump->add_frame(_frame, info.can_channel, 1);
@@ -160,6 +161,7 @@ bool Hubo2PlusBasicJmc::_decode_encoder_reading(const can_frame_t& frame)
             // TODO: Decide if velocity should be computed here
 
             joints[i]->updated = true;
+            ++joints[i]->received_replies;
         }
         return true;
     }

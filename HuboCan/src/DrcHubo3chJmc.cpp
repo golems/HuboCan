@@ -31,6 +31,7 @@ bool DrcHubo3chJmc::_decode_encoder_reading(const can_frame_t& frame)
                     joints[i]->encoder2radian(encoder);
 
         joints[i]->updated = true;
+        ++joints[i]->received_replies;
     }
 
     return true;
