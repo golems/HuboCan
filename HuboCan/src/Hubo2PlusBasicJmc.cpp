@@ -71,18 +71,57 @@ void Hubo2PlusBasicJmc::_request_encoder_readings()
 
 void Hubo2PlusBasicJmc::_send_reference_commands()
 {
-
     for(size_t i=0; i<joints.size(); ++i)
     {
         hubo_joint_cmd_t& cmd = _agg->joint(joints[i]->info.software_index);
-        if(cmd.mode != HUBO_CMD_IGNORE)
+        if(cmd.mode == HUBO_CMD_RIGID)
         {
-            std::cout << joints[i]->info.name << ":" << cmd.position << "  ";
+            _handle_rigid_reference_cmd();
+            break;  // All joints reference commands get sent out with a single CAN frame
+                    // so we quit as soon as a frame has been sent out
         }
     }
 }
 
-bool Hubo2PlusBasicJmc::decode(const can_frame_t &frame, size_t channel)
+void Hubo2PlusBasicJmc::_handle_rigid_reference_cmd()
+{
+    if(joints.size() > 2)
+    {
+        std::cout << "Hubo2PlusBasicJmc named '" << info.name
+                  << "' expected at most two joints, but instead has "
+                  << joints.size() << std::endl;
+        _pump->report_error();
+        return;
+    }
+
+    can_frame_t frame; memset(&frame, 0, sizeof(frame));
+    frame.can_id = REFERENCE_CMD + info.hardware_index;
+
+    for(size_t i=0; i<joints.size(); ++i)
+    {
+        hubo_joint_cmd_t& cmd = _agg->joint(joints[i]->info.software_index);
+        unsigned long reference = sign_convention_converter(
+                    joints[i]->radian2encoder(cmd.position));
+
+        for(size_t j=0; j<3; ++j)
+        {
+            frame.data[j + 3*i] = long_to_bytes(reference, j);
+        }
+    }
+    frame.can_dlc = 6;
+
+    _pump->add_frame(frame, info.can_channel);
+}
+
+unsigned long Hubo2PlusBasicJmc::sign_convention_converter(int encoder_value)
+{
+    if(encoder_value < 0)
+        return (unsigned long)( ((-encoder_value)&0x7FFFFF) | (1<<23) );
+
+    return (unsigned long)encoder_value;
+}
+
+bool Hubo2PlusBasicJmc::decode(const can_frame_t& frame, size_t channel)
 {
     if( channel != info.can_channel )
         return false;

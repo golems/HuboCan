@@ -81,6 +81,8 @@ public:
     virtual void update();
     virtual bool decode(const can_frame_t &frame, size_t channel);
 
+    virtual unsigned long sign_convention_converter(int encoder_value);
+
 protected:
 
     bool _startup;
@@ -95,6 +97,9 @@ protected:
     virtual void _handle_auxiliary_command(const hubo_aux_cmd_t& cmd);
     virtual void _handle_home_joint(const hubo_aux_cmd_t& cmd);
     virtual void _handle_home_all_joints();
+
+    virtual void _handle_rigid_reference_cmd();
+
 
 };
 

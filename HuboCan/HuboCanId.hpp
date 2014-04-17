@@ -5,7 +5,8 @@ namespace HuboCan {
 
 typedef enum {
     
-    CMD_BYTE = 0x01,
+    CMD_BYTE        = 0x01,
+    REFERENCE_CMD   = 0x10
     
 } can_base_id_t;
 
@@ -69,6 +70,11 @@ typedef enum {
     STATUS_REPORT       = 0x150
     
 } can_reply_id_t;
+
+inline uint8_t long_to_bytes(unsigned long value, size_t index)
+{
+    return (uint8_t)( (value >> ((index-1)*8) ) & 0xFF );
+}
 
 } // namespace HuboCan
 

@@ -63,6 +63,9 @@ bool Aggregator::open_channels()
         return false;
     }
 
+    ach_flush(&_cmd_chan);
+    ach_flush(&_agg_chan);
+
     return true;
 }
 

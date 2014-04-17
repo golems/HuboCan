@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
     StringArray joint_names;
     ValueArray joint_values;
     joint_names.push_back("RSP");
-    joint_names.push_back("REP");
+//    joint_names.push_back("REP");
     joint_values.resize(joint_names.size());
 
     IndexArray indices = cmd.get_indices(joint_names);
@@ -43,9 +43,11 @@ int main(int argc, char* argv[])
     while(elapsed <= T)
     {
         joint_values[0] = M_PI/4.0*sin(2*M_PI*elapsed/T);
-        joint_values[1] = -M_PI/2.0*(1.0/2.0)*(1-cos(2*M_PI*elapsed/T));
+//        joint_values[1] = -M_PI/2.0*(1.0/2.0)*(1-cos(2*M_PI*elapsed/T));
         
-        std::cout << joint_values[0] << "\t" << joint_values[1] << std::endl;
+        std::cout << joint_values[0]
+//                  << "\t" << joint_values[1]
+                  << std::endl;
 
         cmd.set_positions(indices, joint_values);
 

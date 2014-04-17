@@ -69,6 +69,7 @@ public:
     double period_threshold;
     
     inline bool error() { return _can_error; }
+    inline void report_error() { _can_error = true; }
     
     int channel_count() { return _channels.size(); }
     
