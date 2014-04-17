@@ -122,11 +122,6 @@ bool CanPump::pump()
     
     _increment_clock(_deadline, _timestep);
     
-    for(size_t i=0; i<_devices.size(); ++i)
-    {
-        _devices[i]->update();
-    }
-    
     timespec_t time;
     clock_gettime(CLOCK_MONOTONIC, &time);
     double diff = _clock_diff(_deadline, time);
@@ -142,6 +137,17 @@ bool CanPump::pump()
         std::cout << "WARNING: Expected size of CAN frame transfer (" << expectation*can_frame_bit_size
                   << ") exceeds the bitrate setting (" << _bitrate * diff << ")\n"
                   << " -- This may result in frames being dropped!" << std::endl;
+
+        if( diff < 0 )
+        {
+            std::cout << "Skipping this cycle" << std::endl;
+            return true;
+        }
+    }
+
+    for(size_t i=0; i<_devices.size(); ++i)
+    {
+        _devices[i]->update();
     }
     
     if(_get_max_frame_count() > 0)
