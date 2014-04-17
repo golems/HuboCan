@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
         }
     }
     
-    SocketCanPump can(200, 1e6, 2, virtual_can);
+    SocketCanPump can(200, 1e6, 2, 1000, virtual_can);
 
     HuboDescription desc;
     if(!desc.parseFile("../HuboCan/devices/DrcHubo.dd"))
@@ -54,7 +54,6 @@ int main(int argc, char* argv[])
     size_t iter=0, count=1;
     while(can.pump())
     {
-//        std::cout << std::endl;
         state.publish();
         aux.update();
         agg.update();
@@ -77,18 +76,6 @@ int main(int argc, char* argv[])
                 std::cout << std::endl;
             iter = 0;
         }
-//        bool missed_one = false;
-//        for(size_t i=0; i<desc.joints.size(); ++i)
-//        {
-//            if(!desc.joints[i]->updated)
-//            {
-//                std::cout << "Dropped " << desc.joints[i]->info.name << ":"
-//                          << desc.joints[i]->dropped_count << "\t";
-//                missed_one = true;
-//            }
-//        }
-//        if(missed_one)
-//            std::cout << std::endl;
 
         ++iter;
         ++count;

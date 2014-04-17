@@ -52,7 +52,8 @@ class CanPump
 {
 public:
     
-    CanPump(double nominal_frequency, double bitrate, size_t channels);
+    CanPump(double nominal_frequency, double bitrate, size_t channels,
+            size_t nominal_pump_size);
 
     void load_description(HuboDescription& desc);
     

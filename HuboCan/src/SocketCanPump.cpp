@@ -25,8 +25,8 @@ const char* virtual_can_names[] = { "vcan0", "vcan1", "vcan2", "vcan3" };
 
 SocketCanPump::SocketCanPump(double nominal_frequency,
                              double bitrate, size_t channels,
-                             bool virtual_can) :
-    CanPump(nominal_frequency, bitrate, channels)
+                             size_t nominal_pump_size, bool virtual_can) :
+    CanPump(nominal_frequency, bitrate, channels, nominal_pump_size)
 {
     initialize_devices(virtual_can);
 }

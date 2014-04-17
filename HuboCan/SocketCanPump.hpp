@@ -9,7 +9,7 @@ class SocketCanPump : public CanPump
 {
 public:
     SocketCanPump(double nominal_frequency, double bitrate, size_t channels,
-                  bool virtual_can=false);
+                  size_t nominal_pump_size=1000, bool virtual_can=false);
     
     ~SocketCanPump();
     

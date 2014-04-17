@@ -9,7 +9,7 @@
 
 using namespace HuboCan;
 
-CanPump::CanPump(double nominal_frequency, double bitrate, size_t channels)
+CanPump::CanPump(double nominal_frequency, double bitrate, size_t channels, size_t nominal_pump_size)
 {
     _timestep = 1.0/nominal_frequency;
     _can_initialized = false;
@@ -22,7 +22,11 @@ CanPump::CanPump(double nominal_frequency, double bitrate, size_t channels)
     period_threshold = 3E-3;
     
     _channels.resize(channels);
-    
+    for(size_t i=0; i<_channels.size(); ++i)
+    {
+        _channels[i].request_frames.reserve(nominal_pump_size);
+        _channels[i].command_frames.reserve(nominal_pump_size);
+    }
 }
 
 void CanPump::load_description(HuboDescription& desc)
