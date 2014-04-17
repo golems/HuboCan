@@ -28,6 +28,7 @@ void Hubo2PlusBasicJmc::update()
 
     if(_aux_commands.size() > 0)
     {
+        std::cout << "AUX COMMAND" << std::endl;
         _process_auxiliary_commands();
         // If there are auxiliary commands that need to be handled, we put off requesting
         // encoder readings and sending position commands in order to reduce the load on
@@ -76,6 +77,7 @@ void Hubo2PlusBasicJmc::_send_reference_commands()
         hubo_joint_cmd_t& cmd = _agg->joint(joints[i]->info.software_index);
         if(cmd.mode == HUBO_CMD_RIGID)
         {
+            std::cout << "IFJAFOIJAOIWJEROIJWEIOFJOWEIJF" << std::endl;
             _handle_rigid_reference_cmd();
             break;  // All joints reference commands get sent out with a single CAN frame
                     // so we quit as soon as a frame has been sent out
@@ -167,6 +169,10 @@ bool Hubo2PlusBasicJmc::_decode_encoder_reading(const can_frame_t& frame)
 bool Hubo2PlusBasicJmc::_decode_status_reading(const can_frame_t& frame)
 {
     // TODO: Check can_dlc?
+
+    std::cout << " ______________ RECEIVED STATUS UPDATE FOR " << info.name << " ________________ " << std::endl;
+
+
     for(size_t i=0; i<joints.size(); ++i)
     {
         size_t jnt = joints[i]->info.software_index;

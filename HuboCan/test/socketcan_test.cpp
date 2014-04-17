@@ -18,7 +18,8 @@ int main(int argc, char* argv[])
         }
     }
     
-    SocketCanPump can(200, 1e6, 2, 1000, virtual_can);
+    double frequency = 200;
+    SocketCanPump can(frequency, 1e6, 2, 1000, virtual_can);
 
     HuboDescription desc;
     if(!desc.parseFile("../HuboCan/devices/DrcHubo.dd"))
@@ -57,7 +58,7 @@ int main(int argc, char* argv[])
         state.publish();
         aux.update();
         agg.update();
-        if(iter > 2000)
+        if(iter > frequency*10)
         {
             bool missed_one = false;
             std::cout << " ----------------------------------- " << std::endl;
