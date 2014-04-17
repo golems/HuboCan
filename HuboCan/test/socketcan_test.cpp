@@ -60,14 +60,14 @@ int main(int argc, char* argv[])
         if(iter > 3000)
         {
             bool missed_one = false;
+            std::cout << " ----------------------------------- " << std::endl;
             for(size_t i=0; i<desc.joints.size(); ++i)
             {
-                std::cout << " ----------------------------------- " << std::endl;
                 if(desc.joints[i]->dropped_count > 0 && !virtual_can)
                 {
                     std::cout << desc.joints[i]->info.name << ":"
                               << desc.joints[i]->dropped_count
-                              << "(" << desc.joints[i]->dropped_count/count
+                              << "(" << (double)(desc.joints[i]->dropped_count)/(double)(count)*200;
                               << ")" << "\t";
                     missed_one = true;
                 }
