@@ -58,15 +58,18 @@ int main(int argc, char* argv[])
         state.publish();
         aux.update();
         agg.update();
-        if(iter > 600)
+        if(iter > 3000)
         {
             bool missed_one = false;
             for(size_t i=0; i<desc.joints.size(); ++i)
             {
+                std::cout << " ----------------------------------- " << std::endl;
                 if(desc.joints[i]->dropped_count > 0 && !virtual_can)
                 {
-                    std::cout << "Dropped " << desc.joints[i]->info.name << ":"
-                              << desc.joints[i]->dropped_count << "\t";
+                    std::cout << desc.joints[i]->info.name << ":"
+                              << desc.joints[i]->dropped_count
+                              << "(" << desc.joints[i]->dropped_count/count
+                              << ")" << "\t";
                     missed_one = true;
                 }
             }
