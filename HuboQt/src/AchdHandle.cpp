@@ -10,16 +10,7 @@ using namespace HuboQt;
 AchdHandle::AchdHandle()
 {
     started = false;
-    achd_process.start("ach mk " + channel_name + " -1 "
-                       + "-m " + QString::number(message_count)
-                       + " -n " + QString::number(nominal_size)
-                       + " -o 666", QIODevice::ReadWrite);
 
-    if(!achd_process.waitForFinished(5000))
-    {
-        std::cout << "QProcess is hung up on attempting to create ach channel '"
-                     << channel_name.toStdString() << "'!" << std::endl;
-    }
 }
 
 bool AchdHandle::start(QString hostname)
@@ -114,8 +105,20 @@ bool AchdHandle::parse_description(QString description)
         std::cerr << "Invalid achd networking type: " << achd_type << std::endl;
         return false;
     }
+
+    QProcess ach_make;
+    ach_make.start("ach mk " + channel_name + " -1 "
+                       + "-m " + QString::number(message_count)
+                       + " -n " + QString::number(nominal_size)
+                       + " -o 666", QIODevice::ReadWrite);
+
+    if(!ach_make.waitForFinished(5000))
+    {
+        std::cout << "QProcess is hung up on attempting to create ach channel '"
+                     << channel_name.toStdString() << "'!" << std::endl;
+    }
     
-    return false;
+    return true;
 }
 
 
