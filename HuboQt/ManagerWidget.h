@@ -84,6 +84,11 @@ protected Q_SLOTS:
     void refresh_locked_procs();
     void refresh_locked_procs_raw();
     void timer_refresh();
+
+    void create_chan();
+    void destroy_chan();
+    void launch_proc();
+    void stop_proc();
     
     void inform_disconnect(int exit_code);
     

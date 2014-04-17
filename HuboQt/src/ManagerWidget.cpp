@@ -77,14 +77,18 @@ ManagerWidget::ManagerWidget() :
     connect(_ui->refresh_registered_procs, SIGNAL(clicked()), this, SLOT(refresh_registered_procs()));
     connect(_ui->refresh_locked_procs, SIGNAL(clicked()), this, SLOT(refresh_locked_procs()));
     
+    connect(_ui->create_chan, SIGNAL(clicked()), this, SLOT(create_chan()));
+    connect(_ui->destroy_chan, SIGNAL(clicked()), this, SLOT(destroy_chan()));
+    connect(_ui->launch_proc, SIGNAL(clicked()), this, SLOT(launch_proc()));
+    connect(_ui->stop_proc, SIGNAL(clicked()), this, SLOT(stop_proc()));
 
-//    _ui->refresh_chan->click();
-//    _ui->refresh_registered_procs->click();
+
+
 
     if(_ui->hostname_edit->text().size() > 0)
         QTimer::singleShot(2000, this, SLOT(refresh_startup()));
 
-    // TODO: Figure out a better way to update on locked processes
+    // TODO: Figure out a better way to periodically update the locked processes
 //    QTimer* refresh_locked_timer = new QTimer(this);
 //    connect(refresh_locked_timer, SIGNAL(timeout()), this, SLOT(timer_refresh()));
 //    refresh_locked_timer->start(5000);
@@ -263,6 +267,7 @@ void ManagerWidget::create_all()
 
 void ManagerWidget::destroy_all()
 {
+    _disconnect_achds(_main_achd_handles);
     _set_status(_req->close_all_ach_channels(), "destroy all channels");
 }
 
@@ -358,6 +363,47 @@ void ManagerWidget::timer_refresh()
 {
     if(_displaying_locked_procs && _connected)
         refresh_locked_procs_raw();
+}
+
+void ManagerWidget::create_chan()
+{
+    QList<QListWidgetItem*> items = _ui->chan_list->selectedItems();
+
+    StringArray reply;
+    for(int i=0; i<items.size(); ++i)
+    {
+        _set_status(_req->create_ach_channel(items[i]->text().toStdString(), reply), "create ach channel");
+    }
+}
+
+void ManagerWidget::destroy_chan()
+{
+    QList<QListWidgetItem*> items = _ui->chan_list->selectedItems();
+
+    for(int i=0; i<items.size(); ++i)
+    {
+        _set_status(_req->close_ach_channel(items[i]->text().toStdString()), "destroy ach channel");
+    }
+}
+
+void ManagerWidget::launch_proc()
+{
+    QList<QListWidgetItem*> items = _ui->proc_list->selectedItems();
+
+    for(int i=0; i<items.size(); ++i)
+    {
+        _set_status(_req->run_process(items[i]->text().toStdString()), "launch process");
+    }
+}
+
+void ManagerWidget::stop_proc()
+{
+    QList<QListWidgetItem*> items = _ui->proc_list->selectedItems();
+
+    for(int i=0; i<items.size(); ++i)
+    {
+        _set_status(_req->stop_process(items[i]->text().toStdString()), "stop process");
+    }
 }
 
 void ManagerWidget::inform_disconnect(int exit_code)

@@ -13,6 +13,7 @@ using namespace HuboCan;
 
 HuboDescription::HuboDescription()
 {
+    _okay = false;
     _data = NULL;
 }
 
@@ -74,6 +75,7 @@ HuboDescription::~HuboDescription()
 
 error_result_t HuboDescription::receiveInfo(double timeout_sec)
 {
+    _okay = false;
     free(_data);
     _data = hubo_info_receive_data(timeout_sec);
 
@@ -106,6 +108,8 @@ error_result_t HuboDescription::receiveInfo(double timeout_sec)
 
     free(_data);
     _data = NULL;
+
+    _okay = true;
 
     return OKAY;
 }
@@ -174,6 +178,7 @@ std::string HuboDescription::getJmcTable()
 
 bool HuboDescription::parseFile(const std::string &filename)
 {
+    _okay = false;
     if(!_parser.load_file(filename))
         return false;
 
@@ -507,6 +512,7 @@ bool HuboDescription::_postParseProcessing()
     }
 
     _tempJointMap.clear();
+    _okay = true;
     return true;
 }
 

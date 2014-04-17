@@ -110,6 +110,8 @@ class Hubo2PlusNckJmc : public Hubo2PlusBasicJmc
 {
 public:
 
+    // TODO: The neck has a different protocol than the rest of the joints
+
 protected:
 
 };
@@ -131,6 +133,8 @@ protected:
 class DrcHubo2chJmc : public Hubo2Plus2chJmc
 {
 public:
+
+    // TODO: Handle compliance control
 
 protected:
 

@@ -71,7 +71,7 @@ void Hubo2PlusBasicJmc::_request_encoder_readings()
 
 void Hubo2PlusBasicJmc::_send_reference_commands()
 {
-    // TODO
+
     for(size_t i=0; i<joints.size(); ++i)
     {
         hubo_joint_cmd_t& cmd = _agg->joint(joints[i]->info.software_index);
@@ -236,9 +236,6 @@ void Hubo2PlusBasicJmc::_handle_home_all_joints()
     _frame.data[0]  = info.hardware_index;
     _frame.data[1]  = GOTO_HOME;
     _frame.data[2]  = ( 0x0F << 4 ) | ( 0x01 << 1 );
-
-    // TODO: According to the CAN documentation 0x0F will instruct all joints to home,
-    // but this has never been tested by us Linux users.
 
     // ( 0x01 << 1 ) is used to specify that we want the joint to home according to
     // the settings which are stored in the firmware and to ignore all remaining bytes

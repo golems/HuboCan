@@ -123,7 +123,11 @@ public:
     HuboDescription& operator=(const HuboDescription& desc);
     HuboDescription(const HuboDescription& desc);
 
+    inline bool okay() const { return _okay; }
+
 protected:
+
+    bool _okay;
 
     HuboJointPtrMap _tempJointMap;
 
