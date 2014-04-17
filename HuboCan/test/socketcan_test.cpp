@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
         state.publish();
         aux.update();
         agg.update();
-        if(iter > 3000)
+        if(iter > 2000)
         {
             bool missed_one = false;
             std::cout << " ----------------------------------- " << std::endl;
