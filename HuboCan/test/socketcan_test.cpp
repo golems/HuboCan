@@ -24,6 +24,7 @@ int main(int argc, char* argv[])
 
     HuboRT::Daemonizer rt;
     rt.redirect_signals();
+    rt.prioritize(45);
 
     HuboDescription desc;
     if(!desc.parseFile("../HuboCan/devices/DrcHubo.dd"))

@@ -24,14 +24,19 @@ int main(int argc, char* argv[])
 
     cmd.update();
 
+    std::cout << "Claiming joint" << std::endl;
     cmd.claim_joint(joint_index);
     cmd.send_commands();
 
     cmd.update();
 
+    std::cout << "Setting mode" << std::endl;
     cmd.set_mode(joint_index, HUBO_CMD_RIGID);
+    std::cout << "Setting position" << std::endl;
     cmd.set_position(joint_index, joint_value);
     cmd.send_commands();
+
+    cmd.update();
 
     return 0;
 }
