@@ -30,10 +30,11 @@ int main(int argc, char* argv[])
 
     for(size_t i=0; i<indices.size(); ++i)
     {
-        if(cmd.joints[indices[i]].position != 0)
+        if(fabs(cmd.joints[indices[i]].position) > 1e-3)
         {
             std::cout << "Joint " << cmd.description().joints[indices[i]]->info.name
-                      << " is not at 0, so we will not execute this test" << std::endl;
+                      << " is at " << cmd.joints[indices[i]].position
+                      << ", so we will not execute this test" << std::endl;
             return 1;
         }
     }
