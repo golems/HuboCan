@@ -114,6 +114,13 @@ void Hubo2PlusBasicJmc::_handle_rigid_reference_cmd()
     }
     frame.can_dlc = 6;
 
+    std::cout << "ID:" << frame.can_id << " Data: ";
+    for(size_t k=0; k<8; ++k)
+    {
+        std::cout << (int)frame.data[k] << " ";
+    }
+    std::cout << " DLC:" << (int)frame.can_dlc << std::endl;
+
     _pump->add_frame(frame, info.can_channel);
 }
 

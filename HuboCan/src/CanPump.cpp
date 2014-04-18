@@ -232,7 +232,7 @@ void CanPump::_decode_frame(const can_frame_t& frame, size_t channel)
                   << /*std::hex <<*/ frame.can_id << " Data: ";
         for(size_t i=0; i<8; ++i)
         {
-            std::cout << /*std::hex <<*/ (int)frame.data[i] << " ";
+            std::cout << (int)frame.data[i] << " ";
         }
         std::cout << " DLC:" << /*std::dec <<*/ (int)frame.can_dlc << std::endl;
     }
