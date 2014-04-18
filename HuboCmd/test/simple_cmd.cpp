@@ -2,10 +2,14 @@
 #include "../Commander.hpp"
 #include "math.h"
 #include <iostream>
+#include <HuboRT/Daemonizer.hpp>
 
 int main(int argc, char* argv[])
 {
     HuboCmd::Commander cmd;
+    HuboRT::Daemonizer rt;
+    rt.redirect_signals();
+
     if(!cmd.initialized())
     {
         std::cout << "Commander was not initialized successfully!" << std::endl;
@@ -36,7 +40,23 @@ int main(int argc, char* argv[])
     cmd.set_position(joint_index, joint_value);
     cmd.send_commands();
 
-    cmd.update();
+
+//    while( fabs(cmd.joints[joint_index].position - joint_value) > 1e-3 )
+//    {
+//        cmd.update();
+//    }
+
+    int counter = 0;
+    while(rt.good())
+    {
+        cmd.update();
+        if(counter > 200)
+        {
+            std::cout << cmd.joints[joint_index] << std::endl;
+            counter = 0;
+        }
+        ++counter;
+    }
 
     return 0;
 }
