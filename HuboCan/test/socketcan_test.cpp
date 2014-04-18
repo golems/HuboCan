@@ -60,23 +60,23 @@ int main(int argc, char* argv[])
         agg.update();
         if(iter > frequency*10)
         {
-//            bool missed_one = false;
-//            std::cout << " ----------------------------------- " << std::endl;
-//            for(size_t i=0; i<desc.joints.size(); ++i)
-//            {
-//                if(desc.joints[i]->dropped_count > 0 && !virtual_can)
-//                {
-//                    std::cout << desc.joints[i]->info.name << ":"
-//                              << desc.joints[i]->dropped_count
-////                              << "(" << (double)(desc.joints[i]->dropped_count)/(double)(count)*100
-//                              << "(" << desc.joints[i]->expected_replies - desc.joints[i]->received_replies
-//                              << ")" << "\t";
-//                    missed_one = true;
-//                }
-//            }
-//            if(missed_one)
-//                std::cout << std::endl;
-//            iter = 0;
+            bool missed_one = false;
+            std::cout << " ----------------------------------- " << std::endl;
+            for(size_t i=0; i<desc.joints.size(); ++i)
+            {
+                if(desc.joints[i]->dropped_count > 0 && !virtual_can)
+                {
+                    std::cout << desc.joints[i]->info.name << ":"
+                              << desc.joints[i]->dropped_count
+//                              << "(" << (double)(desc.joints[i]->dropped_count)/(double)(count)*100
+                              << "(" << desc.joints[i]->expected_replies - desc.joints[i]->received_replies
+                              << ")" << "\t";
+                    missed_one = true;
+                }
+            }
+            if(missed_one)
+                std::cout << std::endl;
+            iter = 0;
         }
 
         ++iter;
