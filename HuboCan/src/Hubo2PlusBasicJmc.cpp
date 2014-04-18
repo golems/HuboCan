@@ -109,6 +109,7 @@ void Hubo2PlusBasicJmc::_handle_rigid_reference_cmd()
         {
             frame.data[j + 3*i] = long_to_bytes(reference, j);
         }
+        std::cout << joints[i]->info.name << ": " << cmd.position << " -> " << reference << std::endl;
     }
     frame.can_dlc = 6;
 

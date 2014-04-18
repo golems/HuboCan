@@ -80,7 +80,7 @@ bool SocketCanPump::initialize_devices(bool virtual_can)
                                   +pcan_device_names[i]).c_str());
             if(result != 0)
             {
-                perror("setting pcan to 1Mb/s");
+                perror("setting pcan to 1Mb/s"); fflush(stderr);
             }
 
             if(!_initialize_device(can_device_names[i], i))
