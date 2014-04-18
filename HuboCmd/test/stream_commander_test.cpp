@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
 
     for(size_t i=0; i<indices.size(); ++i)
     {
-        if(fabs(cmd.joints[indices[i]].position) > 1e-3)
+        if(fabs(cmd.joints[indices[i]].position) > 5e-3)
         {
             std::cout << "Joint " << cmd.description().joints[indices[i]]->info.name
                       << " is at " << cmd.joints[indices[i]].position
@@ -62,7 +62,10 @@ int main(int argc, char* argv[])
         }
         elapsed = cmd.get_time() - start;
     }
-
+    joint_values[0] = 0;
+    joint_values[1] = 0;
+    cmd.set_positions(indices, joint_values);
+    cmd.send_commands();
 
 
 
