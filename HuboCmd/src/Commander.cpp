@@ -399,7 +399,7 @@ HuboCan::error_result_t Commander::send_commands()
 {
     if(!_has_been_updated)
     {
-        fprintf(stderr, "Your Commander has not been updated since the last time you sent a command!");
+        fprintf(stderr, "Your Commander has not been updated since the last time you sent a command!\n");
         // TODO: Decide if I should terminate here or allow the command to proceed anyway
     }
 
