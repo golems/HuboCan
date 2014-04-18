@@ -76,6 +76,7 @@ protected Q_SLOTS:
     void destroy_all();
     void launch_all();
     void stop_all();
+    void kill_all();
     
     void refresh_startup();
     void refresh_chans();
@@ -89,6 +90,7 @@ protected Q_SLOTS:
     void destroy_chan();
     void launch_proc();
     void stop_proc();
+    void kill_proc();
     
     void inform_disconnect(int exit_code);
     

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>607</width>
-    <height>571</height>
+    <height>573</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -390,6 +390,13 @@ QGroupBox::title {
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QPushButton" name="kill_all">
+            <property name="text">
+             <string>Kill All</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
         <item>
@@ -460,6 +467,16 @@ QGroupBox::title {
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QPushButton" name="kill_proc">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Kill</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
        </layout>
@@ -495,11 +512,4 @@ QGroupBox::title {
  </widget>
  <resources/>
  <connections/>
- <buttongroups>
-  <buttongroup name="buttonGroup">
-   <property name="exclusive">
-    <bool>false</bool>
-   </property>
-  </buttongroup>
- </buttongroups>
 </ui>

@@ -140,3 +140,8 @@ void Daemonizer::close()
 {
     hubo_rt_daemon_close(_daemon_name.c_str(), _lock_directory.c_str());
 }
+
+void Daemonizer::redirect_signals()
+{
+    hubo_rt_redirect_signals();
+}

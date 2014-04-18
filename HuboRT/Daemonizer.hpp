@@ -166,6 +166,12 @@ public:
      */
     void close();
 
+    /*!
+     * \fn redirect_signals();
+     * \brief Reroutes incoming signals so that safe shutdown can be performed
+     */
+    void redirect_signals();
+
     // TODO: Document this function
     int daemonization_status() const;
 

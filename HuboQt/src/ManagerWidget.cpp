@@ -72,6 +72,7 @@ ManagerWidget::ManagerWidget() :
     connect(_ui->destroy_all, SIGNAL(clicked()), this, SLOT(destroy_all()));
     connect(_ui->launch_all, SIGNAL(clicked()), this, SLOT(launch_all()));
     connect(_ui->stop_all, SIGNAL(clicked()), this, SLOT(stop_all()));
+    connect(_ui->kill_all, SIGNAL(clicked()), this, SLOT(kill_all()));
     
     connect(_ui->refresh_chan, SIGNAL(clicked()), this, SLOT(refresh_chans()));
     connect(_ui->refresh_registered_procs, SIGNAL(clicked()), this, SLOT(refresh_registered_procs()));
@@ -81,8 +82,7 @@ ManagerWidget::ManagerWidget() :
     connect(_ui->destroy_chan, SIGNAL(clicked()), this, SLOT(destroy_chan()));
     connect(_ui->launch_proc, SIGNAL(clicked()), this, SLOT(launch_proc()));
     connect(_ui->stop_proc, SIGNAL(clicked()), this, SLOT(stop_proc()));
-
-
+    connect(_ui->kill_proc, SIGNAL(clicked()), this, SLOT(kill_proc()));
 
 
     if(_ui->hostname_edit->text().size() > 0)
@@ -197,6 +197,7 @@ void ManagerWidget::_display_registered_processes(const StringArray &procs)
 {
     _ui->proc_list->clear();
     _ui->stop_proc->setEnabled(false);
+    _ui->kill_proc->setEnabled(false);
     _ui->launch_proc->setEnabled(true);
     for(size_t i=0; i<procs.size(); ++i)
     {
@@ -220,6 +221,7 @@ void ManagerWidget::_display_locked_processes(const StringArray &locks)
 {
     _ui->proc_list->clear();
     _ui->stop_proc->setEnabled(true);
+    _ui->kill_proc->setEnabled(true);
     _ui->launch_proc->setEnabled(false);
     for(size_t i=0; i<locks.size(); ++i)
     {
@@ -279,6 +281,11 @@ void ManagerWidget::launch_all()
 void ManagerWidget::stop_all()
 {
     _set_status(_req->stop_all_processes(), "stop all processes");
+}
+
+void ManagerWidget::kill_all()
+{
+    _set_status(_req->kill_all_processes(), "kill all processes");
 }
 
 void ManagerWidget::refresh_startup()
@@ -403,6 +410,16 @@ void ManagerWidget::stop_proc()
     for(int i=0; i<items.size(); ++i)
     {
         _set_status(_req->stop_process(items[i]->text().toStdString()), "stop process");
+    }
+}
+
+void ManagerWidget::kill_proc()
+{
+    QList<QListWidgetItem*> items = _ui->proc_list->selectedItems();
+
+    for(int i=0; i<items.size(); ++i)
+    {
+        _set_status(_req->kill_process(items[i]->text().toStdString()), "kill process");
     }
 }
 

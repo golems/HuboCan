@@ -4,6 +4,7 @@
 #include "HuboState/State.hpp"
 #include "HuboCmd/Aggregator.hpp"
 #include "HuboCmd/AuxReceiver.hpp"
+#include "HuboRT/Daemonizer.hpp"
 
 using namespace HuboCan;
 
@@ -20,6 +21,9 @@ int main(int argc, char* argv[])
     
     double frequency = 200;
     SocketCanPump can(frequency, 1e6, 2, 1000, virtual_can);
+
+    HuboRT::Daemonizer rt;
+    rt.redirect_signals();
 
     HuboDescription desc;
     if(!desc.parseFile("../HuboCan/devices/DrcHubo.dd"))
@@ -53,7 +57,7 @@ int main(int argc, char* argv[])
     agg.run();
 
     size_t iter=0, count=1;
-    while(can.pump())
+    while(can.pump() && rt.good())
     {
         state.publish();
         aux.update();
