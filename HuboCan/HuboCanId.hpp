@@ -73,7 +73,7 @@ typedef enum {
 
 inline uint8_t long_to_bytes(unsigned long value, size_t index)
 {
-    return (uint8_t)( (value >> ((index-1)*8) ) & 0xFF );
+    return (uint8_t)( (value >> (index*8) ) & 0xFF );
 }
 
 } // namespace HuboCan
