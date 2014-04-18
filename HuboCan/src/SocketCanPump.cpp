@@ -21,6 +21,7 @@
 using namespace HuboCan;
 
 const char* can_device_names[] = { "can0", "can1", "can2", "can3" };
+const char* pcan_device_names[] = { "/dev/pcan0", "/dev/pcan1", "/dev/pcan2", "/dev/pcan3" };
 const char* virtual_can_names[] = { "vcan0", "vcan1", "vcan2", "vcan3" };
 
 SocketCanPump::SocketCanPump(double nominal_frequency,
@@ -74,6 +75,14 @@ bool SocketCanPump::initialize_devices(bool virtual_can)
         }
         else
         {
+            // Instruct the pcan device to operate at 1Mb/s
+            int result = system( (std::string("echo \"i 0x0014 e\" > ")
+                                  +pcan_device_names[i]).c_str());
+            if(result != 0)
+            {
+                perror("setting pcan to 1Mb/s");
+            }
+
             if(!_initialize_device(can_device_names[i], i))
                 return false;
         }

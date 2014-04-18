@@ -172,7 +172,7 @@ bool Hubo2PlusBasicJmc::_decode_status_reading(const can_frame_t& frame)
 {
     // TODO: Check can_dlc?
 
-    std::cout << " ______________ RECEIVED STATUS UPDATE FOR " << info.name << " ________________ " << std::endl;
+//    std::cout << " ______________ RECEIVED STATUS UPDATE FOR " << info.name << " ________________ " << std::endl;
 
 
     for(size_t i=0; i<joints.size(); ++i)
