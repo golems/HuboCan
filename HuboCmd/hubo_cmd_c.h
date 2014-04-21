@@ -9,7 +9,7 @@
 
 #define HUBO_CMD_CHANNEL "hubo_cmd"
 
-/*                            123456789012345                        */
+//                            123456789012345
 #define HUBO_CMD_HEADER_CODE "CMDHEADER_V0.01"
 #define HUBO_CMD_HEADER_CODE_SIZE 16 // including null-terminator \0
 

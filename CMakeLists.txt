@@ -8,6 +8,11 @@ endif(NOT CMAKE_BUILD_TYPE)
 
 option(BuildHuboQt "Build the HuboCan QWidgets" ON)
 
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+find_package(Eigen REQUIRED)
+include_directories(${EIGEN_INCLUDE_DIRS})
+add_definitions(${EIGEN_DEFINITIONS})
+
 add_definitions("-Wall")
 
 set(LIBRARY_INSTALL_PATH ${CMAKE_INSTALL_PREFIX}/lib)
@@ -29,6 +34,7 @@ add_subdirectory(HuboState)
 add_subdirectory(HuboCan)
 add_subdirectory(HuboCmd)
 add_subdirectory(HuboRT)
+add_subdirectory(HuboPath)
 
 add_library(${library_name} SHARED ${lib_source})
 target_link_libraries(${library_name} ach)
