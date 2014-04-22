@@ -18,11 +18,12 @@ enum error_flag {
     INDEX_OUT_OF_BOUNDS = 1 << 5,
     SYNCH_ERROR         = 1 << 6,
     TIMEOUT             = 1 << 7,
-    UNINITIALIZED       = 1 << 8
+    UNINITIALIZED       = 1 << 8,
+    INTERRUPTED         = 1 << 9
 
 };
+const size_t max_error_flag_bit_location = 9;
 
-const size_t max_error_flag_bit_location = 7;
 
 //typedef int error_result_t;
 class error_result_t

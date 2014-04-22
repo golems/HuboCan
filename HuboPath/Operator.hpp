@@ -3,18 +3,12 @@
 
 #include "HuboState/State.hpp"
 
-extern "C" {
-#include "hubo_path_c.h"
-}
-
-#include <Eigen/Core>
-#include <Eigen/Geometry>
+#include "hubo_path.hpp"
 
 #include <list>
 
 namespace HuboPath {
 
-typedef std::vector<Eigen::VectorXd> Path;
 
 class Operator : public HuboState::State 
 {
@@ -37,7 +31,7 @@ public:
      * The string version allows you to pass in a std::vector of joint names.
      */
     HuboCan::error_result_t setJointIndices(const StringArray& joint_names);
-    
+
     /*!
      * \fn setJointIndices(const IndexArray& joint_names)
      * \brief Sets the mapping of incoming joint indices

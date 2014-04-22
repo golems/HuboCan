@@ -6,7 +6,7 @@
 
 find_path(Eigen_INCLUDE_DIR
     NAMES Eigen/Core
-    PATHS "${CMAKE_INSTALL_PREFIX}/include"
+    PATHS "${CMAKE_INSTALL_PREFIX}/include" "/usr/local/include" "/usr/include"
     PATH_SUFFIXES eigen3 eigen)
 
 set(Eigen_INCLUDE_DIRS ${Eigen_INCLUDE_DIR})

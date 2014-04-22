@@ -10,8 +10,7 @@ option(BuildHuboQt "Build the HuboCan QWidgets" ON)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 find_package(Eigen REQUIRED)
-include_directories(${EIGEN_INCLUDE_DIRS})
-add_definitions(${EIGEN_DEFINITIONS})
+include_directories(${Eigen_INCLUDE_DIRS})
 
 add_definitions("-Wall")
 

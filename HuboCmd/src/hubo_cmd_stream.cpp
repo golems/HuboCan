@@ -5,14 +5,13 @@ const char* hubo_cmd_mode_to_string(hubo_cmd_mode_t mode)
 {
     switch(mode)
     {
-    case HUBO_CMD_IGNORE:       return "HUBO_CMD_IGNORE";   break;
-    case HUBO_CMD_RIGID:        return "HUBO_CMD_RIGID";    break;
-    case HUBO_CMD_COMPLIANT:    return "HUBO_CMD_COMPLIANT";break;
-    case HUBO_CMD_HYBRID:       return "HUBO_CMD_HYBRID";   break;
-
-    case HUBO_CMD_CLAIM:        return "HUBO_CMD_CLAIM";    break;
-    case HUBO_CMD_RELEASE:      return "HUBO_CMD_RELEASE";  break;
-    default:                    return "HUBO_CMD_UNKNOWN";  break;
+        case HUBO_CMD_IGNORE:       return "HUBO_CMD_IGNORE";   break;
+        case HUBO_CMD_RIGID:        return "HUBO_CMD_RIGID";    break;
+        case HUBO_CMD_COMPLIANT:    return "HUBO_CMD_COMPLIANT";break;
+        case HUBO_CMD_HYBRID:       return "HUBO_CMD_HYBRID";   break;
+        case HUBO_CMD_CLAIM:        return "HUBO_CMD_CLAIM";    break;
+        case HUBO_CMD_RELEASE:      return "HUBO_CMD_RELEASE";  break;
+        default:                    return "HUBO_CMD_UNKNOWN";  break;
     }
 
     return "HUBO_CMD_IMPOSSIBLE";
@@ -28,14 +27,14 @@ const char* hubo_data_error_to_string(hubo_data_error_t error)
 {
     switch(error)
     {
-    case HUBO_DATA_OKAY:                return "HUBO_DATA_OKAY";                break;
-    case HUBO_DATA_NULL:                return "HUBO_DATA_NULL";                break;
-    case HUBO_DATA_OUT_OF_BOUNDS:       return "HUBO_DATA_OUT_OF_BOUNDS";       break;
-    case HUBO_DATA_READ_ONLY:           return "HUBO_DATA_READ_ONLY";           break;
-    case HUBO_DATA_UNAVAILABLE_INDEX:   return "HUBO_DATA_UNAVAILABLE_INDEX";   break;
-    case HUBO_DATA_MALFORMED_HEADER:    return "HUBO_DATA_MALFORMED_HEADER";    break;
-    case HUBO_DATA_IMPOSSIBLE:          return "HUBO_DATA_IMPOSSIBLE";          break;
-    default:                            return "HUBO_DATA_UNKNOWN";             break;
+        case HUBO_DATA_OKAY:                return "HUBO_DATA_OKAY";                break;
+        case HUBO_DATA_NULL:                return "HUBO_DATA_NULL";                break;
+        case HUBO_DATA_OUT_OF_BOUNDS:       return "HUBO_DATA_OUT_OF_BOUNDS";       break;
+        case HUBO_DATA_READ_ONLY:           return "HUBO_DATA_READ_ONLY";           break;
+        case HUBO_DATA_UNAVAILABLE_INDEX:   return "HUBO_DATA_UNAVAILABLE_INDEX";   break;
+        case HUBO_DATA_MALFORMED_HEADER:    return "HUBO_DATA_MALFORMED_HEADER";    break;
+        case HUBO_DATA_IMPOSSIBLE:          return "HUBO_DATA_IMPOSSIBLE";          break;
+        default:                            return "HUBO_DATA_UNKNOWN";             break;
     }
 
     return "HUBO_DATA_IMPOSSIBLE";

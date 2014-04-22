@@ -38,17 +38,18 @@ std::string HuboCan::error_result_to_string(error_result_t error)
             
             switch(i)
             {
-                case 0: stream << "UNDEFINED_ERROR"; break;
-                case 1: stream << "ARRAY_MISMATCH"; break;
-                case 2: stream << "ACH_ERROR"; break;
-                case 3: stream << "READ_ONLY"; break;
-                case 4: stream << "INCOMPATIBLE_JOINT"; break;
-                case 5: stream << "INDEX_OUT_OF_BOUNDS"; break;
-                case 6: stream << "SYNCH_ERROR"; break;
-                case 7: stream << "TIMEOUT"; break;
-                case 8: stream << "UNINITIALIZED"; break;
-                default:
-                    stream << "UNKNOWN"; break;
+                case 0: stream << "UNDEFINED_ERROR";        break;
+                case 1: stream << "ARRAY_MISMATCH";         break;
+                case 2: stream << "ACH_ERROR";              break;
+                case 3: stream << "READ_ONLY";              break;
+                case 4: stream << "INCOMPATIBLE_JOINT";     break;
+                case 5: stream << "INDEX_OUT_OF_BOUNDS";    break;
+                case 6: stream << "SYNCH_ERROR";            break;
+                case 7: stream << "TIMEOUT";                break;
+                case 8: stream << "UNINITIALIZED";          break;
+                case 9: stream << "INTERRUPTED";            break;
+
+                default:stream << "UNKNOWN";                break;
             }
         }
     }

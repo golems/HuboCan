@@ -25,7 +25,7 @@
 
 // Maximum number of waypoints transmitted in each message over Ach.
 // This value could be adjusted if 100 turns out to not be optimal.
-#define HUBO_PATH_CHUNK_SIZE 100
+#define HUBO_PATH_CHUNK_MAX_SIZE 100
 
 // A stream of const-sized messages are being used for paths, unlike the
 // single-shoot variable-sized messages for state and command data. This
@@ -58,7 +58,7 @@ typedef enum hubo_path_instruction {
                             pause at the first timestep                                             */
     HUBO_PATH_REVERSE,  /*! Run backwards through the current trajectory. If the trajectory runner
                             is not currently in a trajectory, it will behave the same as pause      */
-    HUBO_PATH_LOAD,     /*! Quit the current trajectory and attempt to load a new one. Then run.    */
+    HUBO_PATH_LOAD,     /*! Quit the current trajectory and attempt to load a new one. Then pause.  */
     
     
 } hubo_path_instruction_t;
@@ -70,13 +70,13 @@ typedef struct hubo_path_timestep {
     // TODO: Add controller-related parameters in here
     
     
-}__attribute__((packed)) hubo_path_timestep_t;
+}__attribute__((packed)) hubo_path_element_t;
 
 typedef struct hubo_path_header {
     
     char code[HUBO_PATH_HEADER_CODE_SIZE];
     double frequency;       /*! Used for HUBO_PATH_DENSIFY */
-    
+
     // TODO: Add any useful meta-data in here, e.g. the model
     // of hubo that the trajectory is meant for
     
@@ -86,7 +86,7 @@ typedef struct hubo_path_chunk {
 
     hubo_path_header_t header;
     
-    hubo_path_timestep_t steps[HUBO_PATH_CHUNK_SIZE];
+    hubo_path_element_t elements[HUBO_PATH_CHUNK_MAX_SIZE];
     
     uint32_t chunk_size;    /*! Number of relevant steps in this chunk      */
     uint32_t chunk_id;      /*! ID of this chunk                            */
@@ -96,24 +96,24 @@ typedef struct hubo_path_chunk {
 
 typedef enum {
     
-    PATH_REC_IGNORING = 0,  /*! There is no point in sending any path chunks right now  */
-    PATH_REC_READ_READY,    /*! Ready to start reading a series of path chunks          */
-    PATH_REC_LISTENING,     /*! Currently reading a series of path chunks               */
-    PATH_REC_TIMEOUT,       /*! Timed out while waiting for the next chunk  -- quitting!*/
-    PATH_REC_DISCONTINUITY, /*! Received a discontinuous chunk              -- quitting!*/
-    PATH_REC_ACH_ERROR,     /*! Ran into an ach error                       -- quitting!*/
-    PATH_REC_FINISHED,      /*! Finished receiving the incoming path chunks             */
-    PATH_REC_CANCELED       /*! The user has canceled the chunk sending     -- quitting!*/
+    PATH_RX_IGNORING = 0,   /*! There is no point in sending any path chunks right now  */
+    PATH_RX_READ_READY,     /*! Ready to start reading a series of path chunks          */
+    PATH_RX_LISTENING,      /*! Currently reading a series of path chunks               */
+    PATH_RX_TIMEOUT,        /*! Timed out while waiting for the next chunk  -- quitting!*/
+    PATH_RX_DISCONTINUITY,  /*! Received a discontinuous chunk              -- quitting!*/
+    PATH_RX_ACH_ERROR,      /*! Ran into an ach error                       -- quitting!*/
+    PATH_RX_FINISHED,       /*! Finished receiving the incoming path chunks -- good quit*/
+    PATH_RX_CANCELED        /*! The user has canceled the chunk sending     -- quitting!*/
     
-} path_reception_state_t;
+} hubo_path_rx_state_t;
 
 typedef struct path_reception {
     
-    path_reception_state_t state;
+    hubo_path_rx_state_t state;
     
     uint32_t chunk_id;
     uint32_t expected_size;
     
-}__attribute__((packed)) path_reception_t;
+}__attribute__((packed)) hubo_path_rx_t;
 
 #endif // HUBO_PATH_C_H
