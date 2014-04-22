@@ -10,6 +10,7 @@ extern "C" {
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+#include <list>
 
 namespace HuboPath {
 
@@ -18,6 +19,9 @@ typedef std::vector<Eigen::VectorXd> Path;
 class Operator : public HuboState::State 
 {
 public:
+    
+    Operator(double timeout=1);
+    Operator(const HuboCan::HuboDescription& description);
     
     /*!
      * \fn setJointIndices(const IndexArray& joint_names)
@@ -71,6 +75,22 @@ public:
     HuboCan::error_result_t addWaypoint(const Eigen::VectorXd& waypoint);
     
     /*!
+     * \fn addWaypoints()
+     * \brief Add a vector of waypoints onto the currently added ones
+     * \param waypoints
+     * \return 
+     */
+    HuboCan::error_result_t addWaypoints(const std::vector<Eigen::VectorXd>& waypoints);
+    
+    /*!
+     * \fn addWaypoints()
+     * \brief Add a list of waypoints onto the currently added ones
+     * \param waypoints
+     * \return 
+     */
+    HuboCan::error_result_t addWaypoints(const std::list<Eigen::VectorXd>& waypoints);
+    
+    /*!
      * \fn pop_back()
      * \brief Removes the last waypoint that was added to the list
      * \return 
@@ -82,7 +102,7 @@ public:
      * \brief Clears all currently existing waypoints
      * \return 
      */
-    HuboCan::error_result_t clearWaypoints();
+    void clearWaypoints();
     
     /*!
      * \fn getWaypoints()
@@ -98,10 +118,16 @@ public:
      * index map, and that waypoints are not being entered without the
      * joint index map being set.
      */
-    inline const Path& getWaypoints() { return _input_path; }
+    inline const Path& getWaypoints() const { return _input_path; }
+    
+    
     
 protected:
     
+    bool _check_mapping_set(std::string calling_function);
+    bool _mapping_set;
+    IndexArray _index_map;
+    void _initialize_operator();
     Path _input_path;
     
 };

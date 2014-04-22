@@ -35,12 +35,12 @@
 
 typedef enum hubo_path_interp {
     
-    HUBO_PATH_RAW,      /*! Use the waypoints exactly as they are given                     */
-    HUBO_PATH_DENSIFY,  /*! Add points based on input frequency                             */
     HUBO_PATH_SPLINE,   /*! Go from waypoint to waypoint based on a series of splines,
                             coming to a stop at each waypoint                               */
-    HUBO_PATH_OPTIMIZE  /*! Minimize the time spent travelling through waypoints without
+    HUBO_PATH_OPTIMIZE, /*! Minimize the time spent travelling along the path, but without
                             violating the joints' nominal speed and acceleration settings   */
+    HUBO_PATH_DENSIFY,  /*! Add points based on input frequency                             */
+    HUBO_PATH_RAW       /*! Use the waypoints exactly as they are given                     */
     
 } hubo_path_interp_t;
 // Note: No matter which option is chosen, paths will be rejected if they violate maximum

@@ -17,7 +17,8 @@ enum error_flag {
     INCOMPATIBLE_JOINT  = 1 << 4,
     INDEX_OUT_OF_BOUNDS = 1 << 5,
     SYNCH_ERROR         = 1 << 6,
-    TIMEOUT             = 1 << 7
+    TIMEOUT             = 1 << 7,
+    UNINITIALIZED       = 1 << 8
 
 };
 
