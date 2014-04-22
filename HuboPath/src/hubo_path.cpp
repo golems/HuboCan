@@ -7,6 +7,8 @@ HuboCan::error_result_t HuboPath::send_trajectory(ach_channel_t &output_channel,
                                             const Trajectory& trajectory,
                                             int max_wait_time)
 {
+    std::cout << "Attempted to send trajectory... " << std::endl;
+    
     hubo_path_rx_t feedback;
     memset(&feedback, 0, sizeof(feedback));
 
@@ -44,12 +46,63 @@ HuboCan::error_result_t HuboPath::send_trajectory(ach_channel_t &output_channel,
     size_t counter = 0;
     for(uint32_t i=0; i<total_chunks; ++i)
     {
-
-        // TODO: The rest of the sending procedure
+        memset(&chunk, 0, sizeof(chunk));
+        chunk.chunk_id = i;
+        chunk.total_chunks = total_chunks;
+        
+        size_t c = 0;
+        while( c < HUBO_PATH_CHUNK_MAX_SIZE && counter < trajectory.size() )
+        {
+            chunk.elements[c] = trajectory[counter];
+            ++c; ++counter;
+        }
+        chunk.chunk_size = c;
+        
+        ach_put(&output_channel, &chunk, sizeof(chunk));
+        
+        clock_gettime( ACH_DEFAULT_CLOCK, &t );
+        t.tv_sec += max_wait_time;
+        result = ach_get( &feedback_channel, &feedback, sizeof(feedback), &fs,
+                          &t, ACH_O_WAIT | ACH_O_LAST );
+        
+        if( ACH_TIMEOUT == result )
+        {
+            std::cout << "We did not receive acknowledgment from the listener at chunk "
+                      << i << " of the trajectory\n"
+                      << " -- Last received acknowledgment: " << feedback << "\n"
+                      << " -- We will STOP sending off the trajectory!" << std::endl;
+            return HuboCan::TIMEOUT;
+        }
+        
+        if( feedback.chunk_id != i )
+        {
+            std::cout << "Inconsistent Chunk ID in acknowledgment from listener!\n"
+                      << " -- Received:" << feedback.chunk_id << ", Expected:" << i << "\n"
+                      << " -- Status: " << feedback << std::endl;
+            return HuboCan::SYNCH_ERROR;
+        }
+        
+        if( PATH_RX_FINISHED == feedback.state && feedback.chunk_id == total_chunks-1 )
+        {
+            std::cout << "Finished sending trajectory!" << std::endl;
+            return HuboCan::OKAY;
+        }
+        else if( PATH_RX_FINISHED == feedback.state && feedback.chunk_id != total_chunks-1 )
+        {
+            std::cout << "Received inappropriate report of being finished!\n"
+                      << " -- Current chunk:" << i << ", Final chunk:" << total_chunks-1 << "\n"
+                      << " -- Status: " << feedback << std::endl;
+            return HuboCan::SYNCH_ERROR;
+        }
+        
+        if( PATH_RX_LISTENING != feedback.state )
+        {
+            std::cout << "Error reported by trajectory receiver: " << feedback << std::endl;
+            return HuboCan::INTERRUPTED;
+        }
     }
 
-
-    return HuboCan::OKAY;
+    return HuboCan::UNDEFINED_ERROR;
 }
 
 HuboCan::error_result_t HuboPath::receive_trajectory(ach_channel_t &input_channel,
@@ -57,8 +110,86 @@ HuboCan::error_result_t HuboPath::receive_trajectory(ach_channel_t &input_channe
                                                Trajectory &new_trajectory,
                                                int max_wait_time)
 {
-
-
+    std::cout << "Attempting to receive trajectory... " << std::endl;
+    
+    new_trajectory.clear();
+    
+    hubo_path_rx_t feedback;
+    memset(&feedback, 0, sizeof(feedback));
+    feedback.state = PATH_RX_READ_READY;
+    ach_put(&feedback_channel, &feedback, sizeof(feedback));
+    
+    hubo_path_chunk_t chunk;
+    int chunk_id=-1, total_chunks=1;
+    struct timespec t;
+    size_t fs;
+    ach_status_t result;
+    
+    while(chunk_id < total_chunks-1)
+    {
+        clock_gettime(ACH_DEFAULT_CLOCK, &t);
+        t.tv_sec += max_wait_time;
+        result = ach_get(&input_channel, &chunk, sizeof(chunk), &fs, &t, ACH_O_WAIT);
+        
+        feedback.chunk_id = chunk.chunk_id;
+        feedback.expected_size = chunk.total_chunks;
+        
+        if( ACH_TIMEOUT == result )
+        {
+            std::cout << "Did not receive next chunk from the sender in "
+                      << max_wait_time << "seconds\n"
+                      << " -- We are giving up on this trajectory!" << std::endl;
+            feedback.state = PATH_RX_TIMEOUT;
+            ach_put(&feedback_channel, &feedback, sizeof(feedback));
+            return HuboCan::TIMEOUT;
+        }
+        else if( ACH_OK != result )
+        {
+            std::cout << "Unexpected Ach result: " << ach_result_to_string(result)
+                      << " -- We are giving up on this trajectory!" << std::endl;
+            feedback.state = PATH_RX_ACH_ERROR;
+            ach_put(&feedback_channel, &feedback, sizeof(feedback));
+            return HuboCan::ACH_ERROR;
+        }
+        
+        if( chunk.chunk_id == PATH_TX_CANCEL )
+        {
+            std::cout << "Received a request to cancel the trajectory transfer\n"
+                      << " -- We are giving up on this trajectory!" << std::endl;
+            feedback.state = PATH_RX_CANCELED;
+            ach_put(&feedback_channel, &feedback, sizeof(feedback));
+            return HuboCan::INTERRUPTED;
+        }
+        
+        if(chunk.chunk_id == chunk_id+1)
+        {
+            for(uint32_t i=0; i<chunk.chunk_size; ++i)
+            {
+                new_trajectory.push_back(chunk.elements[i]);
+            }
+        }
+        else
+        {
+            std::cout << "Received discontinuous Chunk ID: "
+                      << chunk_id << " -> " << chunk.chunk_id
+                      << " -- We are giving up on this trajectory!" << std::endl;
+            feedback.state = PATH_RX_DISCONTINUITY;
+            ach_put(&feedback_channel, &feedback, sizeof(feedback));
+            return HuboCan::SYNCH_ERROR;
+        }
+        
+        chunk_id = chunk.chunk_id;
+        total_chunks = chunk.total_chunks;
+        
+        if(chunk_id < total_chunks-1)
+            feedback.state = PATH_RX_LISTENING;
+        else if(chunk_id == total_chunks-1)
+            feedback.state = PATH_RX_FINISHED;
+        
+        ach_put(&feedback_channel, &feedback, sizeof(feedback));
+    }
+    
+    std::cout << "Finished receiving trajectory!" << std::endl;
     return HuboCan::OKAY;
 }
 

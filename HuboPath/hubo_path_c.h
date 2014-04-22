@@ -89,10 +89,14 @@ typedef struct hubo_path_chunk {
     hubo_path_element_t elements[HUBO_PATH_CHUNK_MAX_SIZE];
     
     uint32_t chunk_size;    /*! Number of relevant steps in this chunk      */
-    uint32_t chunk_id;      /*! ID of this chunk                            */
+    int32_t chunk_id;       /*! ID of this chunk                            */
     uint32_t total_chunks;  /*! Total number of chunks to be streamed in    */
     
 }__attribute__((packed)) hubo_path_chunk_t;
+
+enum {
+    PATH_TX_CANCEL = -2
+};
 
 typedef enum {
     

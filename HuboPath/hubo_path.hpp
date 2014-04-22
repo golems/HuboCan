@@ -23,12 +23,13 @@ typedef std::vector<hubo_path_element_t> Trajectory;
 HuboCan::error_result_t send_trajectory(ach_channel_t& output_channel,
                                         ach_channel_t& feedback_channel,
                                         const Trajectory& trajectory,
-                                        int max_wait_time = 1);
+                                        int max_wait_time = 5);
 
 HuboCan::error_result_t receive_trajectory(ach_channel_t& input_channel,
                                             ach_channel_t& feedback_channel,
                                             Trajectory& new_trajectory,
-                                            int max_wait_time = 1);
+                                            int max_wait_time = 5);
+
 
 
 } // namespace HuboPath

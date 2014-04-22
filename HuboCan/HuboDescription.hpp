@@ -14,7 +14,7 @@ class HuboDescription
 public:
 
     HuboDescription();
-    ~HuboDescription();
+    virtual ~HuboDescription();
 
     /*!
      * \fn parseFile(const std::string& filename)
