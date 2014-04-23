@@ -25,6 +25,11 @@ public:
     
     hubo_path_params_t params;
     std::vector<hubo_path_element_t> elements;
+
+    inline Trajectory()
+    {
+        memset(&params, 0, sizeof(params));
+    }
     
     inline size_t size() const
     {
@@ -50,6 +55,19 @@ public:
     {
         elements.clear();
         memset(&params, 0, sizeof(params));
+    }
+
+    inline void claim_joint(size_t joint_index)
+    {
+        params.bitmap = params.bitmap | ( 0x01 << joint_index );
+    }
+
+    inline void claim_joints(const IndexArray& joint_indices)
+    {
+        for(size_t i=0; i<joint_indices.size(); ++i)
+        {
+            claim_joint(joint_indices[i]);
+        }
     }
 };
 

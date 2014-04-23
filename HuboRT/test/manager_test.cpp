@@ -13,7 +13,20 @@ int main(int argc, char* argv[])
 {
     HuboRT::Manager mgr;
 
-    mgr.run();
+    std::string command = "";
+    for(int i=1; i<argc; ++i)
+    {
+        command = argv[i];
+    }
+
+    if(command == "create")
+    {
+        mgr.create_all_ach_chans();
+    }
+    else
+    {
+        mgr.run();
+    }
 
 //    mgr.create_all_ach_chans();
 //    mgr.stop_all_processes();

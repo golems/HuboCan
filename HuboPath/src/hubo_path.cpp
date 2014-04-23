@@ -267,19 +267,25 @@ std::ostream& operator<<(std::ostream& stream, const hubo_path_rx_state_t& state
 
 std::ostream& operator<<(std::ostream& stream, const hubo_path_params_t& params)
 {
-    stream << "Frequency:" << params.frequency
-           << ", Interpolation Mode:" << params.interp
-           << ", Bitmap:";
+    stream << "Frequency: " << params.frequency
+           << " | Interpolation Mode: " << params.interp
+           << " | Bitmap:";
     
+    size_t zero_count = 0;
     for(size_t i=0; i<HUBO_PATH_JOINT_MAX_SIZE; ++i)
     {
         if( ((params.bitmap >> i) & 0x01) == 1 )
         {
+            for(size_t z=0; z<zero_count; ++z)
+            {
+                stream << 0;
+            }
             stream << 1;
+            zero_count = 0;
         }
         else
         {
-            stream << 0;
+            ++zero_count;
         }
     }
     
@@ -288,7 +294,7 @@ std::ostream& operator<<(std::ostream& stream, const hubo_path_params_t& params)
 
 std::ostream& operator<<(std::ostream& stream, const HuboPath::Trajectory& traj)
 {
-    stream << "Parameters | " << traj.params;
+    stream << "Parameters .:. " << traj.params;
     
     size_t index_width = (size_t)ceil(log10(traj.size()));
     
