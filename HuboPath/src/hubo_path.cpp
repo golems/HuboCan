@@ -46,9 +46,10 @@ HuboCan::error_result_t HuboPath::send_trajectory(ach_channel_t &output_channel,
     size_t counter = 0;
     for(uint32_t i=0; i<total_chunks; ++i)
     {
-        memset(&chunk, 0, sizeof(chunk));
+        clear_hubo_path_chunk(&chunk);
         chunk.chunk_id = i;
         chunk.total_chunks = total_chunks;
+        chunk.params = trajectory.params;
         
         size_t c = 0;
         while( c < HUBO_PATH_CHUNK_MAX_SIZE && counter < trajectory.size() )
@@ -152,6 +153,13 @@ HuboCan::error_result_t HuboPath::receive_trajectory(ach_channel_t &input_channe
             return HuboCan::ACH_ERROR;
         }
         
+        if( check_hubo_path_chunk(&chunk) != 0 )
+        {
+            std::cout << "Invalid header code in received chunk: " << chunk.header.code << "\n"
+                      << " -- We are giving up on this trajectory!" << std::endl;
+            
+        }
+        
         if( chunk.chunk_id == PATH_TX_CANCEL )
         {
             std::cout << "Received a request to cancel the trajectory transfer\n"
@@ -167,6 +175,8 @@ HuboCan::error_result_t HuboPath::receive_trajectory(ach_channel_t &input_channe
             {
                 new_trajectory.push_back(chunk.elements[i]);
             }
+            
+            new_trajectory.params = chunk.params;
         }
         else
         {
@@ -193,7 +203,7 @@ HuboCan::error_result_t HuboPath::receive_trajectory(ach_channel_t &input_channe
     return HuboCan::OKAY;
 }
 
-const char* hubo_path_interp_to_string(hubo_path_interp_t type)
+const char* hubo_path_interp_to_string(const hubo_path_interp_t& type)
 {
     switch(type)
     {
@@ -212,7 +222,7 @@ std::ostream& operator<<(std::ostream& stream, const hubo_path_interp_t& type)
     return (stream << hubo_path_interp_to_string(type));
 }
 
-const char* hubo_path_instruction_to_string(hubo_path_instruction_t type)
+const char* hubo_path_instruction_to_string(const hubo_path_instruction_t& type)
 {
     switch(type)
     {
@@ -232,7 +242,7 @@ std::ostream& operator<<(std::ostream& stream, const hubo_path_instruction_t& ty
     return (stream << hubo_path_instruction_to_string(type));
 }
 
-const char* hubo_path_rx_state_to_string(hubo_path_rx_state_t state)
+const char* hubo_path_rx_state_to_string(const hubo_path_rx_state_t& state)
 {
     switch(state)
     {
@@ -255,7 +265,86 @@ std::ostream& operator<<(std::ostream& stream, const hubo_path_rx_state_t& state
     return (stream << hubo_path_rx_state_to_string(state));
 }
 
-const char* hubo_path_rx_to_string(hubo_path_rx_t rx)
+std::ostream& operator<<(std::ostream& stream, const hubo_path_params_t& params)
+{
+    stream << "Frequency:" << params.frequency
+           << ", Interpolation Mode:" << params.interp
+           << ", Bitmap:";
+    
+    for(size_t i=0; i<HUBO_PATH_JOINT_MAX_SIZE; ++i)
+    {
+        if( ((params.bitmap >> i) & 0x01) == 1 )
+        {
+            stream << 1;
+        }
+        else
+        {
+            stream << 0;
+        }
+    }
+    
+    return stream;
+}
+
+std::ostream& operator<<(std::ostream& stream, const HuboPath::Trajectory& traj)
+{
+    stream << "Parameters | " << traj.params;
+    
+    size_t index_width = (size_t)ceil(log10(traj.size()));
+    
+    stream << std::fixed;
+    
+    for(size_t i=0; i<traj.elements.size(); ++i)
+    {
+        // Print a header with every 25 lines
+        if(i%25 == 0)
+        {
+            stream.width(0);
+            stream << "\n";
+            
+            for(size_t j=0; j<index_width+10; ++j)
+                stream << " ";
+            
+            for(size_t j=0; j<HUBO_PATH_JOINT_MAX_SIZE; ++j)
+            {
+                if( ((traj.params.bitmap >> j) & 0x01) == 1 )
+                {
+                    stream << "(";
+                    stream.width(2);
+                    stream << j;
+                    stream.width(0);
+                    stream << "): ";
+                }
+            }
+            stream << "\n";
+        }
+        
+        stream << "(Index ";
+        stream.width(index_width);
+        stream << i;
+        stream.width(0);
+        stream << "): ";
+        
+        stream.precision(2);
+        stream << std::fixed;
+        
+        for(size_t j=0; j<HUBO_PATH_JOINT_MAX_SIZE; ++j)
+        {
+            if( ((traj.params.bitmap >> j) & 0x01) == 1 )
+            {
+                stream.width(5);
+                stream << traj.elements[i].references[j];
+                stream.width(0);
+                stream << " ";
+            }
+        }
+        stream << "\n";
+    }
+    
+    return stream;
+}
+
+const char* hubo_path_rx_to_string(const hubo_path_rx_t& rx)
 {
     std::stringstream sstream;
     sstream << "Status:" << rx.state << ", Chunk ID:" << rx.chunk_id

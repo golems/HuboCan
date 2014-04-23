@@ -7,6 +7,7 @@
 
 extern "C"{
 #include "HuboState/hubo_sensor_c.h"
+#include "HuboPath/hubo_path_c.h"
 }
 
 // Note: This is really only meant for testing the format
@@ -32,6 +33,11 @@ int main(int argc, char* argv[])
                           +":10:4096:"+ACHD_PULL_STRING+":");
     mgr.register_new_chan(std::string("ft_state:")+HUBO_FT_SENSOR_CHANNEL
                           +":10:4096:"+ACHD_PULL_STRING+":");
+    
+    mgr.register_new_chan(std::string("trajectory:")+HUBO_PATH_CHANNEL
+                          +":3:65536:"+ACHD_PUSH_STRING+":");
+    mgr.register_new_chan(std::string("traj_rx_feedback:")+HUBO_PATH_FEEDBACK_CHANNEL
+                          +":5:64:"+ACHD_PULL_STRING+":");
 
     return 0;
 }

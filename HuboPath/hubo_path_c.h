@@ -18,7 +18,7 @@
 // Note: Theoretically, this may need to be increased if Hubo
 // (or another robot using this codebase) has more than 50
 // joints, but this seems unlikely.
-#define HUBO_PATH_JOINT_MAX_SIZE 50
+#define HUBO_PATH_JOINT_MAX_SIZE 64
 // TODO: ^^^ Consider using variable-sized data structures for this based
 // on the HuboDescription. For right now, this is more involved than I think
 // it's worth. Also, this fixed-size format makes it easier to dump into files.
@@ -63,36 +63,49 @@ typedef enum hubo_path_instruction {
     
 } hubo_path_instruction_t;
 
-typedef struct hubo_path_timestep {
+typedef struct hubo_path_element {
     
     double references[HUBO_PATH_JOINT_MAX_SIZE];
     
     // TODO: Add controller-related parameters in here
     
     
-}__attribute__((packed)) hubo_path_element_t;
+}__attribute__((packed)) hubo_path_element_t; // Size estimate: 400 bytes
 
 typedef struct hubo_path_header {
     
     char code[HUBO_PATH_HEADER_CODE_SIZE];
-    double frequency;       /*! Used for HUBO_PATH_DENSIFY */
 
     // TODO: Add any useful meta-data in here, e.g. the model
     // of hubo that the trajectory is meant for
     
-}__attribute__((packed)) hubo_path_header_t;
+}__attribute__((packed)) hubo_path_header_t; // Size estimate: 16 bytes
+
+typedef struct hubo_path_params {
+    
+    double frequency;
+    hubo_path_interp_t interp;
+    uint64_t bitmap;
+    
+    // TODO: Add any parameters which apply to all elements in the path
+    
+}__attribute__((packed)) hubo_path_params_t; // Size estimate: ~24 bytes
 
 typedef struct hubo_path_chunk {
 
-    hubo_path_header_t header;
+    hubo_path_header_t header; // Size estimate: 16 bytes
     
-    hubo_path_element_t elements[HUBO_PATH_CHUNK_MAX_SIZE];
+    hubo_path_params_t params; // Size estimate: 24 bytes
+    hubo_path_element_t elements[HUBO_PATH_CHUNK_MAX_SIZE]; // Size estimate: 40000 bytes
     
     uint32_t chunk_size;    /*! Number of relevant steps in this chunk      */
     int32_t chunk_id;       /*! ID of this chunk                            */
     uint32_t total_chunks;  /*! Total number of chunks to be streamed in    */
     
-}__attribute__((packed)) hubo_path_chunk_t;
+}__attribute__((packed)) hubo_path_chunk_t; // Size estimate: ~40000 bytes
+
+void clear_hubo_path_chunk(hubo_path_chunk_t* chunk);
+int  check_hubo_path_chunk(const hubo_path_chunk_t* chunk);
 
 enum {
     PATH_TX_CANCEL = -2

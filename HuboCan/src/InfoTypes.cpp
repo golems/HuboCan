@@ -48,6 +48,7 @@ std::string HuboCan::error_result_to_string(error_result_t error)
                 case 7: stream << "TIMEOUT";                break;
                 case 8: stream << "UNINITIALIZED";          break;
                 case 9: stream << "INTERRUPTED";            break;
+                case 10:stream << "MALFORMED_HEADER";       break;
 
                 default:stream << "UNKNOWN";                break;
             }

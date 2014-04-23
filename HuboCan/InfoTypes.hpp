@@ -10,19 +10,20 @@ namespace HuboCan {
 enum error_flag {
 
     OKAY                = 0,
-    UNDEFINED_ERROR     = 1 << 0,
-    ARRAY_MISMATCH      = 1 << 1,
-    ACH_ERROR           = 1 << 2,
-    READ_ONLY           = 1 << 3,
-    INCOMPATIBLE_JOINT  = 1 << 4,
-    INDEX_OUT_OF_BOUNDS = 1 << 5,
-    SYNCH_ERROR         = 1 << 6,
-    TIMEOUT             = 1 << 7,
-    UNINITIALIZED       = 1 << 8,
-    INTERRUPTED         = 1 << 9
+    UNDEFINED_ERROR     = 1 <<  0,
+    ARRAY_MISMATCH      = 1 <<  1,
+    ACH_ERROR           = 1 <<  2,
+    READ_ONLY           = 1 <<  3,
+    INCOMPATIBLE_JOINT  = 1 <<  4,
+    INDEX_OUT_OF_BOUNDS = 1 <<  5,
+    SYNCH_ERROR         = 1 <<  6,
+    TIMEOUT             = 1 <<  7,
+    UNINITIALIZED       = 1 <<  8,
+    INTERRUPTED         = 1 <<  9,
+    MALFORMED_HEADER    = 1 << 10
 
 };
-const size_t max_error_flag_bit_location = 9;
+const size_t max_error_flag_bit_location = 10;
 
 
 //typedef int error_result_t;
@@ -33,7 +34,7 @@ public:
     error_result_t();
     error_result_t(error_flag flag);
     
-    int result;
+    unsigned int result;
     
     bool operator==(const error_flag& flag);
     bool operator!=(const error_flag& flag);
