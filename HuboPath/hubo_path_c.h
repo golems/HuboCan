@@ -7,7 +7,8 @@
 
 #include "HuboCan/AchIncludes.h"
 
-#define HUBO_PATH_CHANNEL "hubo_path"
+#define HUBO_PATH_INSTRUCTION_CHANNEL "hubo_path_instruction"
+#define HUBO_PATH_INPUT_CHANNEL "hubo_path_input"
 #define HUBO_PATH_FEEDBACK_CHANNEL "hubo_path_feedback"
 
 //                             123456789012345
@@ -62,6 +63,15 @@ typedef enum hubo_path_instruction {
     
     
 } hubo_path_instruction_t;
+
+typedef struct hubo_path_command {
+
+    hubo_path_instruction_t instruction;
+
+    // TODO: Add in flags for parameters that we might want to change during
+    // trajectory execution. For example, overriding the control scheme
+
+}__attribute__((packed)) hubo_path_command_t;
 
 typedef struct hubo_path_element {
     

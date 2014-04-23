@@ -28,7 +28,7 @@ public:
 
     inline Trajectory()
     {
-        memset(&params, 0, sizeof(params));
+        clear();
     }
     
     inline size_t size() const

@@ -22,6 +22,7 @@ bool ManagerReq::initialize()
         _initialized = false;
         return false;
     }
+    ach_flush(&_req_chan);
     
     r = ach_open(&_reply_chan, hubo_rt_mgr_reply_chan, NULL);
     if( ACH_OK != r )
@@ -31,6 +32,7 @@ bool ManagerReq::initialize()
         _initialized = false;
         return false;
     }
+    ach_flush(&_reply_chan);
     
     _initialized = true;
     return true;

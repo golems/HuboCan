@@ -47,9 +47,11 @@ void Manager::_initialize()
     ach_status_t r = ach_open(&_msg_chan, hubo_rt_mgr_req_chan, NULL);
     _rt.check(ACH_OK == r, "Could not open the Hubo Manager request channel ("
               + std::string(hubo_rt_mgr_req_chan) + ")", true);
+    ach_flush(&_msg_chan);
     r = ach_open(&_reply_chan, hubo_rt_mgr_reply_chan, NULL);
     _rt.check(ACH_OK == r, "Could not open the Hubo Manager reply channel ("
               + std::string(hubo_rt_mgr_reply_chan) + ")", true);
+    ach_flush(&_reply_chan);
 }
 
 void Manager::_create_channel(const std::string &channel_name,

@@ -3,7 +3,7 @@
 #include "HuboCmd/Commander.hpp"
 #include "HuboCmd/Aggregator.hpp"
 #include "HuboState/State.hpp"
-
+#include "HuboPath/hubo_path.hpp"
 
 #include <iostream>
 
@@ -29,6 +29,13 @@ int main(int argc, char* argv[])
                           +":10:4096:"+ACHD_PULL_STRING+":");
     mgr.register_new_chan(std::string("ft_state:")+HUBO_FT_SENSOR_CHANNEL
                           +":10:4096:"+ACHD_PULL_STRING+":");
+
+    mgr.register_new_chan(std::string("instruction:")+HUBO_PATH_INSTRUCTION_CHANNEL
+                          +":5:64:"+ACHD_PUSH_STRING+":");
+    mgr.register_new_chan(std::string("trajectory:")+HUBO_PATH_INPUT_CHANNEL
+                          +":3:65536:"+ACHD_PUSH_STRING+":");
+    mgr.register_new_chan(std::string("traj_rx_feedback:")+HUBO_PATH_FEEDBACK_CHANNEL
+                          +":5:64:"+ACHD_PULL_STRING+":");
 
     std::string robot_type = "Hubo2Plus";
     for(int i=1; i<argc; ++i)

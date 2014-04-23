@@ -34,7 +34,9 @@ int main(int argc, char* argv[])
     mgr.register_new_chan(std::string("ft_state:")+HUBO_FT_SENSOR_CHANNEL
                           +":10:4096:"+ACHD_PULL_STRING+":");
     
-    mgr.register_new_chan(std::string("trajectory:")+HUBO_PATH_CHANNEL
+    mgr.register_new_chan(std::string("instruction:")+HUBO_PATH_INSTRUCTION_CHANNEL
+                          +":5:64:"+ACHD_PUSH_STRING+":");
+    mgr.register_new_chan(std::string("trajectory:")+HUBO_PATH_INPUT_CHANNEL
                           +":3:65536:"+ACHD_PUSH_STRING+":");
     mgr.register_new_chan(std::string("traj_rx_feedback:")+HUBO_PATH_FEEDBACK_CHANNEL
                           +":5:64:"+ACHD_PULL_STRING+":");

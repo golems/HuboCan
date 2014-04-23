@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
     std::cout << traj << std::endl;
 
     ach_channel_t output_chan;
-    ach_status_t result = ach_open(&output_chan, HUBO_PATH_CHANNEL, NULL);
+    ach_status_t result = ach_open(&output_chan, HUBO_PATH_INPUT_CHANNEL, NULL);
     if( ACH_OK != result )
     {
         std::cout << "Ach error: " << ach_result_to_string(result) << std::endl;
@@ -38,6 +38,7 @@ int main(int argc, char* argv[])
         std::cout << "Feedback channel Ach error: " << ach_result_to_string(result) << std::endl;
         return 2;
     }
+    ach_flush(&feedback_chan);
 
     HuboCan::error_result_t sent = HuboPath::send_trajectory(output_chan,
                                                              feedback_chan,

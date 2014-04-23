@@ -53,7 +53,7 @@ public:
 
     Commander(double timeout=1);
     Commander(const HuboCan::HuboDescription& description);
-    ~Commander();
+    virtual ~Commander();
 
     HuboCan::error_result_t set_mode(size_t joint_index, hubo_cmd_mode_t mode);
     HuboCan::error_result_t set_modes(const IndexArray& joints, const ModeArray& modes);

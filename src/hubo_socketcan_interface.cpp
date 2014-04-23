@@ -39,7 +39,11 @@ int main(int argc, char* argv[])
     SocketCanPump can(200, 1e6, 2, virtual_can);
 
     HuboDescription desc;
-    desc.parseFile("/opt/hubo/devices/"+robot_name+".dd");
+    if(!desc.parseFile("/opt/hubo/devices/"+robot_name+".dd"))
+    {
+        std::cout << "Description could not be correctly parsed! Quitting!" << std::endl;
+        return 2;
+    }
     desc.broadcastInfo();
 
     can.load_description(desc);
@@ -58,7 +62,7 @@ int main(int argc, char* argv[])
         std::cout << "State was not initialized correctly, so we are quitting.\n"
                   << " -- Either your ach channels are not open"
                   << " or your HuboDescription was not valid!\n" << std::endl;
-        return 2;
+        return 3;
     }
 
     agg.run();

@@ -64,6 +64,7 @@ bool Initializer::open_channels()
                 ach_result_to_string(result), (int)result);
         _channels_opened = false;
     }
+    ach_flush(&_aux_cmd_chan);
 
     return _channels_opened;
 }

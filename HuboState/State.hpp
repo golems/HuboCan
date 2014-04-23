@@ -46,7 +46,7 @@ public:
      * special cases where you do not want to use the broadcasted description for some reason.
      */
     State(const HuboCan::HuboDescription& description);
-    ~State();
+    virtual ~State();
 
     /*!
      * \fn receive_description
