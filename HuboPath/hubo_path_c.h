@@ -10,6 +10,7 @@
 #define HUBO_PATH_INSTRUCTION_CHANNEL "hubo_path_instruction"
 #define HUBO_PATH_INPUT_CHANNEL "hubo_path_input"
 #define HUBO_PATH_FEEDBACK_CHANNEL "hubo_path_feedback"
+#define HUBO_PATH_PLAYER_STATE_CHANNEL "hubo_path_player_state"
 
 //                             123456789012345
 #define HUBO_PATH_HEADER_CODE "PATHHEADERv0.01"
@@ -60,6 +61,7 @@ typedef enum hubo_path_instruction {
     HUBO_PATH_REVERSE,  /*! Run backwards through the current trajectory. If the trajectory runner
                             is not currently in a trajectory, it will behave the same as pause      */
     HUBO_PATH_LOAD,     /*! Quit the current trajectory and attempt to load a new one. Then pause.  */
+    HUBO_PATH_LOAD_N_GO /*! Quit the current trajectory and attempt to load a new one. Then run.    */
     
     
 } hubo_path_instruction_t;
@@ -72,6 +74,14 @@ typedef struct hubo_path_command {
     // trajectory execution. For example, overriding the control scheme
 
 }__attribute__((packed)) hubo_path_command_t;
+
+typedef struct hubo_player_state {
+
+    hubo_path_instruction_t current_instruction;
+    uint64_t current_index;
+    uint64_t trajectory_size;
+
+}__attribute__((packed)) hubo_player_state_t;
 
 typedef struct hubo_path_element {
     

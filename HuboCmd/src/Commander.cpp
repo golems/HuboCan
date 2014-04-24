@@ -11,18 +11,20 @@ Commander::Commander(double timeout) :
     HuboState::State(timeout)
 {
     _initialize();
-    receive_description(timeout);
+    _create_memory();
 }
 
 Commander::Commander(const HuboCan::HuboDescription& description) :
     HuboState::State(description)
 {
     _initialize();
-    load_description(description);
+    _create_memory();
 }
 
 void Commander::_initialize()
 {
+    _construction = true;
+
     cmd_data = NULL;
     _compressed_data = NULL;
 
@@ -30,8 +32,6 @@ void Commander::_initialize()
     open_channels();
 
     _has_been_updated = false;
-
-    HuboState::State::_initialize();
 }
 
 bool Commander::open_channels()
@@ -67,10 +67,21 @@ void Commander::_create_memory()
         cmd_data = NULL;
         _compressed_data = NULL;
     }
+
+    if(_construction)
+    {
+        _construction = false;
+    }
+    else
+    {
+        HuboState::State::_create_memory();
+    }
 }
 
 Commander::~Commander()
 {
+    update(0);
+
     release_joints();
     send_commands();
 

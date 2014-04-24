@@ -12,6 +12,10 @@ encoder     4000
 hardware_index  0
 jmc_name        JMC4
 
+min_max_positions       -1.92   1.92
+nominal_and_max_speeds  0.8     7
+nominal_and_max_accels  0.6     15
+
 end     Joint
 
 ###########################
@@ -28,6 +32,10 @@ encoder     4000
 
 hardware_index  1
 jmc_name        JMC4
+
+min_max_positions       -0.52   0.52
+nominal_and_max_speeds  0.8     7
+nominal_and_max_accels  0.6     15
 
 end     Joint
 
@@ -46,6 +54,10 @@ encoder     4000
 hardware_index  0
 jmc_name        JMC5
 
+min_max_positions       -1.57   1.57
+nominal_and_max_speeds  0.8     7
+nominal_and_max_accels  0.6     15
+
 end     Joint
 
 ###########################
@@ -62,6 +74,10 @@ encoder     4000
 
 hardware_index  0
 jmc_name        JMC6
+
+min_max_positions       0       2.609
+nominal_and_max_speeds  0.4     7
+nominal_and_max_accels  0.6     15
 
 end     Joint
 
@@ -80,6 +96,10 @@ encoder     4000
 hardware_index  0
 jmc_name        JMC7
 
+min_max_positions       -1.70   1.70
+nominal_and_max_speeds  0.8     7
+nominal_and_max_accels  0.6     15
+
 end     Joint
 
 ###########################
@@ -96,5 +116,9 @@ encoder     4000
 
 hardware_index  1
 jmc_name        JMC7
+
+min_max_positions       -1.57   1.57
+nominal_and_max_speeds  0.8     7
+nominal_and_max_accels  0.6     15
 
 end     Joint

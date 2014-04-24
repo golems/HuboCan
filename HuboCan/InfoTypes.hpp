@@ -22,6 +22,7 @@ enum error_flag {
     INTERRUPTED         = 1 <<  9,
     MALFORMED_HEADER    = 1 << 10
 
+    // make one for INVALID_COMMAND?
 };
 const size_t max_error_flag_bit_location = 10;
 

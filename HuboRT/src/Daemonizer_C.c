@@ -179,8 +179,8 @@ static pid_t hubo_rt_daemon_fork()
     return child;
 }
 
-int hubo_rt_daemonize(const char *daemon_name, const char *lock_directory,
-                      const char *log_directory)
+int hubo_rt_daemonize(const char* daemon_name, const char* lock_directory,
+                      const char* log_directory)
 {
     syslog(LOG_NOTICE, "Starting daemonization for '%s'", daemon_name);
 

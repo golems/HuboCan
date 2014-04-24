@@ -3,16 +3,16 @@
 
 using namespace HuboPath;
 
-Player::Player(double timeout)
+Player::Player(double timeout) :
+    HuboCmd::Commander(timeout)
 {
     _initialize_player();
-    receive_description(timeout);
 }
 
-Player::Player(const HuboCan::HuboDescription &description)
+Player::Player(const HuboCan::HuboDescription &description) :
+    HuboCmd::Commander(description)
 {
     _initialize_player();
-    load_description(description);
 }
 
 void Player::_initialize_player()
@@ -27,6 +27,23 @@ void Player::_initialize_player()
     memset(&_last_elem, 0, sizeof(_last_elem));
     _current_index = 0;
     open_channels();
+}
+
+bool Player::receive_description(double timeout_sec)
+{
+    bool success = HuboState::State::receive_description(timeout_sec);
+
+    if(success)
+        _trajectory.desc = _desc;
+
+    return success;
+}
+
+void Player::load_description(const HuboCan::HuboDescription &description)
+{
+    HuboState::State::load_description(description);
+
+    _trajectory.desc = _desc;
 }
 
 bool Player::open_channels()
@@ -63,9 +80,27 @@ bool Player::open_channels()
     }
     ach_flush(&_feedback_chan);
 
+    result = ach_open(&_state_chan, HUBO_PATH_PLAYER_STATE_CHANNEL, NULL);
+    if( ACH_OK != result )
+    {
+        std::cout << "Error opening player state channel: "
+                  << ach_result_to_string(result) << std::endl;
+        _channels_opened = false;
+    }
+    ach_flush(&_state_chan);
+
     _channels_opened = _channels_opened && HuboCmd::Commander::open_channels();
 
     return _channels_opened;
+}
+
+void Player::_report_state()
+{
+    hubo_player_state_t state;
+    state.current_index = _current_index;
+    state.current_instruction = _current_cmd.instruction;
+    state.trajectory_size = _trajectory.size();
+    ach_put(&_state_chan, &state, sizeof(state));
 }
 
 void Player::_check_for_instructions()
@@ -91,8 +126,9 @@ void Player::_check_for_instructions()
 
 bool Player::_receive_incoming_trajectory()
 {
+    ach_flush(&_input_chan);
     HuboCan::error_result_t result = receive_trajectory(_input_chan, _feedback_chan,
-                                                        _current_traj, 10);
+                                                        _trajectory, 10);
     if(result != HuboCan::OKAY)
     {
         return false;
@@ -100,23 +136,24 @@ bool Player::_receive_incoming_trajectory()
 
     // TODO: Should the trajectory be passed through the controller before evaluating the refs?
     // Almost certainly.
-    bool all_valid = true;
+//    bool all_valid = true;
+    std::vector<bool> invalid_joints;
     for(size_t i=0; i<HUBO_PATH_JOINT_MAX_SIZE; ++i)
     {
-        if( ((_current_traj.params.bitmap >> i) & 0x01) == 0x01 )
+        if( ((_trajectory.params.bitmap >> i) & 0x01) == 0x01 )
         {
-            if(_current_traj.elements[0].references[i] != joints[i].reference)
+            if(_trajectory.elements[0].references[i] != joints[i].reference)
             {
-                all_valid = false;
+                invalid_joints.push_back(i);
             }
         }
     }
 
-    if(all_valid)
+    if(invalid_joints.size() == 0)
     {
         for(size_t i=0; i<HUBO_PATH_JOINT_MAX_SIZE; ++i)
         {
-            if( ((_current_traj.params.bitmap >> i) & 0x01) == 0x01 )
+            if( ((_trajectory.params.bitmap >> i) & 0x01) == 0x01 )
             {
                 claim_joint(i);
             }
@@ -124,6 +161,15 @@ bool Player::_receive_incoming_trajectory()
     }
     else
     {
+        std::cout << "Error! The following joints had invalid starting values: ";
+        for(size_t i=0; i<invalid_joints.size(); ++i)
+        {
+            std::cout << _desc.getJointName(i) << " ("
+                      << _trajectory.elements[0].references[i] << ")";
+            if(i+1 < invalid_joints.size())
+                std::cout << ", ";
+        }
+        std::cout << std::endl;
         return false;
     }
 
@@ -141,6 +187,7 @@ bool Player::step()
     if(update_result != HuboCan::OKAY)
     {
         std::cout << "Player failed to update its states: " << update_result << std::endl;
+        _report_state();
         return false;
     }
 
@@ -153,6 +200,7 @@ bool Player::step()
     double dt = get_time() - _last_time;
     if( dt <= 0 )
     {
+        _report_state();
         return true;
     }
 
@@ -160,6 +208,35 @@ bool Player::step()
     if(_new_instruction)
     {
         std::cout << "Received new instruction: " << _incoming_cmd.instruction << std::endl;
+    }
+
+    if( HUBO_PATH_LOAD == _incoming_cmd.instruction
+            || HUBO_PATH_LOAD_N_GO == _incoming_cmd.instruction )
+    {
+        if( _new_instruction )
+        {
+            if(_receive_incoming_trajectory())
+            {
+                if(HUBO_PATH_LOAD_N_GO == _incoming_cmd.instruction)
+                {
+                    _current_cmd.instruction = HUBO_PATH_RUN;
+                    _incoming_cmd.instruction = HUBO_PATH_RUN;
+                }
+                else
+                {
+                    _current_cmd.instruction = HUBO_PATH_PAUSE;
+                    _incoming_cmd.instruction = HUBO_PATH_PAUSE;
+                }
+            }
+            else
+            {
+                _trajectory.clear();
+                _current_cmd.instruction = HUBO_PATH_QUIT;
+                _incoming_cmd.instruction = HUBO_PATH_QUIT;
+            }
+        }
+        _report_state();
+        return true;
     }
 
     if( HUBO_PATH_QUIT == _current_cmd.instruction )
@@ -172,7 +249,7 @@ bool Player::step()
             }
             else
             {
-                _current_traj.clear();
+                _trajectory.clear();
             }
         }
         else if( _new_instruction )
@@ -180,39 +257,22 @@ bool Player::step()
             std::cout << "Quit command received -- but we do not have an active trajectory anyway!"
                       << std::endl;
         }
+        _report_state();
         return true;
     }
 
     _current_cmd = _incoming_cmd;
 
-    if( HUBO_PATH_LOAD == _current_cmd.instruction )
+    if(_trajectory.size() == 0)
     {
-        if( _new_instruction )
-        {
-            if(_receive_incoming_trajectory())
-            {
-                _current_cmd.instruction = HUBO_PATH_PAUSE;
-                _incoming_cmd.instruction = HUBO_PATH_PAUSE;
-            }
-            else
-            {
-                _current_traj.clear();
-                _current_cmd.instruction = HUBO_PATH_QUIT;
-                _incoming_cmd.instruction = HUBO_PATH_QUIT;
-            }
-        }
-        return true;
-    }
-
-    if(_current_traj.size() == 0)
-    {
+        _report_state();
         return true;
     }
 
     if(_new_trajectory)
     {
-        _last_elem = _current_traj[0];
-        _current_elem = _current_traj[0];
+        _last_elem = _trajectory[0];
+        _current_elem = _trajectory[0];
         _current_index = 0;
         _new_trajectory = false;
     }
@@ -220,8 +280,8 @@ bool Player::step()
     if( HUBO_PATH_RUN == _current_cmd.instruction )
     {
         ++_current_index;
-        if(_current_index >= _current_traj.size())
-            _current_index = _current_traj.size()-1;
+        if(_current_index >= _trajectory.size())
+            _current_index = _trajectory.size()-1;
     }
     else if( HUBO_PATH_PAUSE == _current_cmd.instruction )
     {
@@ -234,24 +294,34 @@ bool Player::step()
             _current_index = 0;
     }
 
-    _current_elem = _current_traj[_current_index];
+    _current_elem = _trajectory[_current_index];
 
     // TODO: Write a controller skeleton and use a controller class instance here
 
     _send_element_commands(_current_elem);
 
     _last_elem = _current_elem;
+    _report_state();
     return true;
 }
 
-void Player::_send_element_commands(const hubo_path_element_t &elem)
+void Player::_send_element_commands(const hubo_path_element_t& elem)
 {
     for(size_t i=0; i<HUBO_PATH_JOINT_MAX_SIZE; ++i)
     {
-        if( ((_current_traj.params.bitmap >> i) & 0x01) == 0x01 )
+        if( ((_trajectory.params.bitmap >> i) & 0x01) == 0x01 )
         {
+            // TODO: Use different command modes based on the element's control parameters
+            // (which do not exist yet)
+            set_mode(i, HUBO_CMD_RIGID);
+
             set_position(i, elem.references[i]);
         }
     }
     send_commands();
+}
+
+const hubo_path_element_t& Player::current_element()
+{
+    return _current_elem;
 }

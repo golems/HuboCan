@@ -86,7 +86,7 @@ ManagerWidget::ManagerWidget() :
 
 
     if(_ui->hostname_edit->text().size() > 0)
-        QTimer::singleShot(2000, this, SLOT(refresh_startup()));
+        QTimer::singleShot(2000, this, SLOT(create_all()));
 
     // TODO: Figure out a better way to periodically update the locked processes
 //    QTimer* refresh_locked_timer = new QTimer(this);

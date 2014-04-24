@@ -140,6 +140,8 @@ protected:
 
     virtual bool _postParseProcessing();
 
+    void _clear_memory();
+
     DdParser _parser;
 
     hubo_info_data* _data;

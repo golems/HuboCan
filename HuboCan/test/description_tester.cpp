@@ -5,8 +5,8 @@
 int main(int argc, char* argv[])
 {
     HuboCan::HuboDescription desc;
-//    desc.parseFile("../HuboCan/misc/Hubo2Plus.dd");
-    desc.parseFile("../HuboCan/misc/DrcHubo.dd");
+    desc.parseFile("../HuboCan/devices/Hubo2Plus.dd");
+//    desc.parseFile("../HuboCan/devices/DrcHubo.dd");
     desc.broadcastInfo();
 
 //    desc.receiveInfo();

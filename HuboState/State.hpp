@@ -64,7 +64,7 @@ public:
      * the event that the description has been changed (but this is not recommended behavior, since
      * your physical Hubo should not be able to change spontaneously during runtime).
      */
-    bool receive_description(double timeout_sec=2);
+    virtual bool receive_description(double timeout_sec=2);
 
     /*!
      * \fn load_description
@@ -82,7 +82,7 @@ public:
      * behavior, since your physical Hubo should not be able to change spontaneously during
      * runtime).
      */
-    void load_description(const HuboCan::HuboDescription& description);
+    virtual void load_description(const HuboCan::HuboDescription& description);
 
     /*!
      * \fn update
@@ -132,7 +132,7 @@ public:
 protected:
 
     bool _initialized;
-    bool _channels_opened;
+//    bool _channels_opened;
 
     virtual void _initialize();
     virtual void _create_memory();

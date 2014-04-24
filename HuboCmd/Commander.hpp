@@ -113,6 +113,8 @@ public:
 protected:
 
     bool _has_been_updated;
+    bool _channels_opened;
+    bool _construction;
 
     virtual void _initialize();
     virtual void _create_memory();

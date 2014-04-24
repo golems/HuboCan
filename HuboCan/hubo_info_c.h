@@ -44,6 +44,15 @@ typedef struct hubo_joint_info {
     uint16_t hardware_index;
     char jmc_name[HUBO_COMPONENT_NAME_MAX_LENGTH];
 
+    float min_position;
+    float max_position;
+
+    float nominal_speed;
+    float max_speed;
+
+    float nominal_accel;
+    float max_accel;
+
 }__attribute__((packed)) hubo_joint_info_t;
 
 typedef struct hubo_jmc_info {

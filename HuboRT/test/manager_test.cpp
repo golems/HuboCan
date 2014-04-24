@@ -23,6 +23,10 @@ int main(int argc, char* argv[])
     {
         mgr.create_all_ach_chans();
     }
+    else if(command == "kill")
+    {
+        mgr.stop_all_processes();
+    }
     else
     {
         mgr.run();

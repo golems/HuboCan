@@ -7,7 +7,7 @@ HuboCan::error_result_t HuboPath::send_trajectory(ach_channel_t &output_channel,
                                             const Trajectory& trajectory,
                                             int max_wait_time)
 {
-    std::cout << "Attempted to send trajectory... " << std::endl;
+    std::cout << "Attempting to send trajectory... " << std::endl;
     
     hubo_path_rx_t feedback;
     memset(&feedback, 0, sizeof(feedback));
@@ -138,7 +138,7 @@ HuboCan::error_result_t HuboPath::receive_trajectory(ach_channel_t &input_channe
         if( ACH_TIMEOUT == result )
         {
             std::cout << "Did not receive next chunk from the sender in "
-                      << max_wait_time << "seconds\n"
+                      << max_wait_time << " seconds\n"
                       << " -- We are giving up on this trajectory!" << std::endl;
             feedback.state = PATH_RX_TIMEOUT;
             ach_put(&feedback_channel, &feedback, sizeof(feedback));
@@ -226,12 +226,13 @@ const char* hubo_path_instruction_to_string(const hubo_path_instruction_t& type)
 {
     switch(type)
     {
-        case HUBO_PATH_QUIT:        return "HUBO_PATH_QUIT";    break;
-        case HUBO_PATH_RUN:         return "HUBO_PATH_RUN";     break;
-        case HUBO_PATH_PAUSE:       return "HUBO_PATH_PAUSE";   break;
-        case HUBO_PATH_REVERSE:     return "HUBO_PATH_REVERSE"; break;
-        case HUBO_PATH_LOAD:        return "HUBO_PATH_LOAD";    break;
-        default:                    return "HUBO_PATH_UNKNOWN"; break;
+        case HUBO_PATH_QUIT:        return "HUBO_PATH_QUIT";        break;
+        case HUBO_PATH_RUN:         return "HUBO_PATH_RUN";         break;
+        case HUBO_PATH_PAUSE:       return "HUBO_PATH_PAUSE";       break;
+        case HUBO_PATH_REVERSE:     return "HUBO_PATH_REVERSE";     break;
+        case HUBO_PATH_LOAD:        return "HUBO_PATH_LOAD";        break;
+        case HUBO_PATH_LOAD_N_GO:   return "HUBO_PATH_LOAD_N_GO";   break;
+        default:                    return "HUBO_PATH_UNKNOWN";     break;
     }
 
     return "HUBO_PATH_IMPOSSIBLE";
@@ -294,7 +295,7 @@ std::ostream& operator<<(std::ostream& stream, const hubo_path_params_t& params)
 
 std::ostream& operator<<(std::ostream& stream, const HuboPath::Trajectory& traj)
 {
-    stream << "Parameters .:. " << traj.params;
+    stream << "Parameters .:. " << traj.params << " .:.";
     
     size_t index_width = (size_t)ceil(log10(traj.size()));
     
@@ -315,11 +316,19 @@ std::ostream& operator<<(std::ostream& stream, const HuboPath::Trajectory& traj)
             {
                 if( ((traj.params.bitmap >> j) & 0x01) == 1 )
                 {
-                    stream << "(";
-                    stream.width(2);
-                    stream << j;
-                    stream.width(0);
-                    stream << "): ";
+                    if( traj.desc.okay() )
+                    {
+                        stream.width(0);
+                        stream << " " << traj.desc.joints[j]->info.name << ": ";
+                    }
+                    else
+                    {
+                        stream << "(";
+                        stream.width(2);
+                        stream << j;
+                        stream.width(0);
+                        stream << "): ";
+                    }
                 }
             }
             stream << "\n";

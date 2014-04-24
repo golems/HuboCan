@@ -16,4 +16,8 @@ default_max_pwm 0
 hardware_index  0
 jmc_name        EJMC3
 
+min_max_positions       -3.14   3.14
+nominal_and_max_speeds  1       6
+nominal_and_max_accels  0.8     15
+
 end     Joint

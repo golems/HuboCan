@@ -32,6 +32,8 @@ HuboDescription& HuboDescription::operator=(const HuboDescription& desc)
 
 void HuboDescription::_copy_description(const HuboDescription &desc)
 {
+    _clear_memory();
+
     for(size_t i=0; i<desc.joints.size(); ++i)
     {
         HuboJoint* newJoint = new HuboJoint(*desc.joints[i]);
@@ -50,6 +52,8 @@ void HuboDescription::_copy_description(const HuboDescription &desc)
         sensors.push_back(newSensor);
     }
 
+    _okay = true;
+
     _data = NULL;
 }
 
@@ -57,20 +61,28 @@ HuboDescription::~HuboDescription()
 {
     free(_data);
 
+    _clear_memory();
+}
+
+void HuboDescription::_clear_memory()
+{
     for(size_t i=0; i<joints.size(); ++i)
     {
         delete joints[i];
     }
+    joints.clear();
 
     for(size_t i=0; i<jmcs.size(); ++i)
     {
         delete jmcs[i];
     }
+    jmcs.clear();
 
     for(size_t i=0; i<sensors.size(); ++i)
     {
         delete sensors[i];
     }
+    sensors.clear();
 }
 
 error_result_t HuboDescription::receiveInfo(double timeout_sec)
@@ -280,6 +292,45 @@ bool HuboDescription::_parseJoint(bool strict)
         else if("hardware_index" == components[0])
         {
             new_joint_info.hardware_index = atof(components[1].c_str());
+        }
+        else if("min_max_positions" == components[0])
+        {
+            if(components.size() < 3)
+            {
+                _parser.error() << "min_max_positions must give both a minimum and a maximum value!";
+                _parser.report_error();
+            }
+            else
+            {
+                new_joint_info.min_position = atof(components[1].c_str());
+                new_joint_info.max_position = atof(components[2].c_str());
+            }
+        }
+        else if("nominal_and_max_speeds" == components[0])
+        {
+            if(components.size() < 3)
+            {
+                _parser.error() << "nominal_and_max_speeds must give both a nominal and a maximum value!";
+                _parser.report_error();
+            }
+            else
+            {
+                new_joint_info.nominal_speed = atof(components[1].c_str());
+                new_joint_info.max_speed = atof(components[2].c_str());
+            }
+        }
+        else if("nominal_and_max_accels" == components[0])
+        {
+            if(components.size() < 3)
+            {
+                _parser.error() << "nominal_and_max_accels must give both a nominal and a maximum value!";
+                _parser.report_error();
+            }
+            else
+            {
+                new_joint_info.nominal_accel = atof(components[1].c_str());
+                new_joint_info.max_accel = atof(components[2].c_str());
+            }
         }
         else if("jmc_name" == components[0])
         {

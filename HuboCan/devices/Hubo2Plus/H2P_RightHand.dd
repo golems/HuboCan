@@ -12,6 +12,10 @@ encoder     128
 hardware_index  0
 jmc_name        EJMC4
 
+min_max_positions       -3.14   3.14
+nominal_and_max_speeds  1       10
+nominal_and_max_accels  1       20
+
 end     Joint
 
 ###########################
@@ -28,6 +32,10 @@ encoder     128
 
 hardware_index  1
 jmc_name        EJMC4
+
+min_max_positions       -3.14   3.14
+nominal_and_max_speeds  1       10
+nominal_and_max_accels  1       20
 
 end     Joint
 
@@ -46,6 +54,10 @@ encoder     128
 hardware_index  2
 jmc_name        EJMC4
 
+min_max_positions       -3.14   3.14
+nominal_and_max_speeds  1       10
+nominal_and_max_accels  1       20
+
 end     Joint
 
 ###########################
@@ -63,6 +75,10 @@ encoder     128
 hardware_index  3
 jmc_name        EJMC4
 
+min_max_positions       -3.14   3.14
+nominal_and_max_speeds  1       10
+nominal_and_max_accels  1       20
+
 end     Joint
 
 ###########################
@@ -79,5 +95,9 @@ encoder     128
 
 hardware_index  4
 jmc_name        EJMC4
+
+min_max_positions       -3.14   3.14
+nominal_and_max_speeds  1       10
+nominal_and_max_accels  1       20
 
 end     Joint

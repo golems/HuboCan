@@ -16,6 +16,11 @@ public:
     
     Operator(double timeout=1);
     Operator(const HuboCan::HuboDescription& description);
+
+    virtual bool open_channels();
+
+    virtual bool receive_description(double timeout_sec);
+    virtual void load_description(const HuboCan::HuboDescription& description);
     
     /*!
      * \fn setJointIndices(const IndexArray& joint_names)
@@ -113,16 +118,43 @@ public:
      * joint index map being set.
      */
     inline const Path& getWaypoints() const { return _input_path; }
-    
-    
-    
+
+    /*!
+     * \fn send_new_trajectory()
+     * \brief
+     * \param instruction
+     * \return
+     */
+    HuboCan::error_result_t sendNewTrajectory(
+                            hubo_path_instruction_t instruction = HUBO_PATH_RUN,
+                            int timeout_sec = 5);
+
+    hubo_path_command_t command;
+
+    const hubo_player_state_t& getPlayerState();
+
+    // TODO: Make functions for inputting control schemes
+
 protected:
     
+    bool _channels_opened;
+
     bool _check_mapping_set(std::string calling_function);
     bool _mapping_set;
     IndexArray _index_map;
     void _initialize_operator();
     Path _input_path;
+
+    void _construct_trajectory();
+    Trajectory _trajectory;
+    hubo_player_state_t _state;
+
+    void _update_state();
+
+    ach_channel_t _instruction_chan;
+    ach_channel_t _output_chan;
+    ach_channel_t _feedback_chan;
+    ach_channel_t _state_chan;
     
 };
 

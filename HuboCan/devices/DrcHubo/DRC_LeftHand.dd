@@ -12,6 +12,10 @@ encoder     128
 hardware_index  0
 jmc_name        EJMC5
 
+min_max_positions       -3.14   3.14 # FIXME
+nominal_and_max_speeds  1       6
+nominal_and_max_accels  0.8     15
+
 end     Joint
 
 ###########################
@@ -28,5 +32,9 @@ encoder     128
 
 hardware_index  1
 jmc_name        EJMC5
+
+min_max_positions       -3.14   3.14
+nominal_and_max_speeds  1       10
+nominal_and_max_accels  1       20
 
 end     Joint

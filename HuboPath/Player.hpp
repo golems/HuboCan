@@ -12,9 +12,14 @@ public:
     Player(double timeout=1);
     Player(const HuboCan::HuboDescription& description);
 
+    virtual bool receive_description(double timeout_sec);
+    virtual void load_description(const HuboCan::HuboDescription& description);
+
     virtual bool open_channels();
 
     bool step();
+
+    const hubo_path_element_t& current_element();
 
 protected:
 
@@ -22,6 +27,8 @@ protected:
 
     bool _receive_incoming_trajectory();
     void _send_element_commands(const hubo_path_element_t& elem);
+
+    void _report_state();
 
     bool _first_step;
     bool _new_trajectory;
@@ -31,7 +38,7 @@ protected:
     bool _channels_opened;
     void _initialize_player();
 
-    Trajectory _current_traj;
+    Trajectory _trajectory;
     size_t _current_index;
     hubo_path_element_t _current_elem;
     hubo_path_element_t _last_elem;
@@ -42,6 +49,7 @@ protected:
     ach_channel_t _instruction_chan;
     ach_channel_t _input_chan;
     ach_channel_t _feedback_chan;
+    ach_channel_t _state_chan;
 };
 
 } // namespace HuboPath

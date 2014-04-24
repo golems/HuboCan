@@ -42,7 +42,6 @@ void State::load_description(const HuboCan::HuboDescription &description)
 
 void State::_initialize()
 {
-    _channels_opened = false;
     _last_cmd_data = NULL;
 }
 

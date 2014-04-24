@@ -22,7 +22,8 @@ set(HEADER_INSTALL_PATH ${CMAKE_INSTALL_PREFIX}/include)
 #set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 
 include_directories(${PROJECT_SOURCE_DIR})
-include_directories("./")
+include_directories(${CMAKE_CURRENT_LIST_DIR})
+
 
 set(library_name ${PROJECT_NAME})
 set(lib_source "")

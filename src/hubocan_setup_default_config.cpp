@@ -36,6 +36,8 @@ int main(int argc, char* argv[])
                           +":3:65536:"+ACHD_PUSH_STRING+":");
     mgr.register_new_chan(std::string("traj_rx_feedback:")+HUBO_PATH_FEEDBACK_CHANNEL
                           +":5:64:"+ACHD_PULL_STRING+":");
+    mgr.register_new_chan(std::string("player:")+HUBO_PATH_PLAYER_STATE_CHANNEL
+                          +":5:64:"+ACHD_PULL_STRING+":");
 
     std::string robot_type = "Hubo2Plus";
     for(int i=1; i<argc; ++i)

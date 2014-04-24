@@ -21,6 +21,7 @@ int main(int argc, char* argv[])
     {
         if(strcmp(argv[i],"virtual")==0)
         {
+            std::cout << "virtual flag noticed -- will run in virtual can mode" << std::endl;
             virtual_can = true;
         }
         else if(strcmp(argv[i],"robot")==0)
@@ -36,7 +37,7 @@ int main(int argc, char* argv[])
         }
     }
 
-    SocketCanPump can(200, 1e6, 2, virtual_can);
+    SocketCanPump can(200, 1e6, 2, 1000, virtual_can);
 
     HuboDescription desc;
     if(!desc.parseFile("/opt/hubo/devices/"+robot_name+".dd"))

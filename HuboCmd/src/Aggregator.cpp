@@ -147,22 +147,22 @@ void Aggregator::_init_aggregator()
     {
         if(_rt.daemonization_status() == 13)
         {
-            std::cerr << "Did not have permissions to create the aggregator. Run with sudo!" << std::endl;
+            std::cout << "Did not have permissions to create the aggregator. Run with sudo!" << std::endl;
         }
         else if(_rt.daemonization_status() == 17)
         {
-            std::cerr << "Not launching a new aggregator, because one seems to already exist." << std::endl;
+            std::cout << "Not launching a new aggregator, because one seems to already exist." << std::endl;
         }
         else
         {
-            std::cerr << "Could not properly daemonize the aggregator. Uncommon error ("
+            std::cout << "Could not properly daemonize the aggregator. Uncommon error ("
                       << _rt.daemonization_status() << "). Check the syslog!" << std::endl;
         }
         exit(0);
     }
     if(!open_channels())
     {
-        std::cerr << "Could not open the ach channels for aggregation: quitting!" << std::endl;
+        std::cout << "Could not open the ach channels for aggregation: quitting!" << std::endl;
         _quit_aggregator();
     }
 }
@@ -189,21 +189,21 @@ void Aggregator::_aggregator_loop()
 
         if( ACH_OK != result )
         {
-            std::cerr << "Ach error: (" << (int)result << ")" << ach_result_to_string(result) << std::endl;
+            std::cout << "Ach error: (" << (int)result << ")" << ach_result_to_string(result) << std::endl;
             // TODO: Broadcast the fact that we had an ach error?
             continue;
         }
 
         if(hubo_cmd_header_check(_input_data) != HUBO_DATA_OKAY)
         {
-            std::cerr << "Malformed command header!" << std::endl;
+            std::cout << "Malformed command header!" << std::endl;
             // TODO: Broadcast the fact that the header was malformed?
             continue;
         }
 
         if( hubo_cmd_data_get_size(_input_data) != fs )
         {
-            std::cerr << "Data size error! Expected size:" << hubo_cmd_data_get_size(_input_data)
+            std::cout << "Data size error! Expected size:" << hubo_cmd_data_get_size(_input_data)
                          << ", Frame size:" << fs <<", Max size:" << max_expected_size << std::endl;
             // TODO: Broadcast the fact that we had a sizing error?
             continue;
@@ -313,7 +313,7 @@ const JointCmdArray& Aggregator::update()
 {
     if(!_memory_set)
     {
-        std::cerr << "Trying to update commands before a valid HuboDescription has been loaded! Don't do that!!" << std::endl;
+        std::cout << "Trying to update commands before a valid HuboDescription has been loaded! Don't do that!!" << std::endl;
         return _aggregated_cmds;
     }
 
@@ -336,7 +336,9 @@ void Aggregator::_copy_final_data_to_array()
     {
         std::cout << "Mismatch between final data size (" << hubo_cmd_data_get_total_num_joints(_final_data)
                   << ") and the command array size (" << _aggregated_cmds.size()
-                  << ")! THIS SHOULD BE IMPOSSIBLE. REPORT BUG IMMEDIATELY." << std::endl;
+                  << ")!\n"
+                  << " -- You must have a defunct aggregator for a different version of Hubo running!"
+                  << std::endl;
         return;
     }
 
