@@ -18,13 +18,6 @@ int main(int argc, char* argv[])
             virtual_can = true;
         }
     }
-    
-    double frequency = 200;
-    SocketCanPump can(frequency, 1e6, 2, 1000, virtual_can);
-
-    HuboRT::Daemonizer rt;
-    rt.redirect_signals();
-    rt.prioritize(45);
 
     HuboDescription desc;
     if(!desc.parseFile("../HuboCan/devices/DrcHubo.dd"))
@@ -33,6 +26,13 @@ int main(int argc, char* argv[])
         return 1;
     }
     desc.broadcastInfo();
+    
+    double frequency = 200;
+    SocketCanPump can(frequency, 1e6, 2, 1000, virtual_can);
+
+    HuboRT::Daemonizer rt;
+    rt.redirect_signals();
+    rt.prioritize(45);
 
     can.load_description(desc);
 

@@ -5,11 +5,11 @@
 int main(int argc, char* argv[])
 {
     HuboCan::HuboDescription desc;
-    desc.parseFile("../HuboCan/devices/Hubo2Plus.dd");
+//    desc.parseFile("../HuboCan/devices/Hubo2Plus.dd");
 //    desc.parseFile("../HuboCan/devices/DrcHubo.dd");
-    desc.broadcastInfo();
+//    desc.broadcastInfo();
 
-//    desc.receiveInfo();
+    desc.receiveInfo();
 
 //    std::cout << desc.getJointTable() << std::endl << std::endl;
 
@@ -36,6 +36,9 @@ int main(int argc, char* argv[])
         std::cout << indices[i] << "\t";
     std::cout << std::endl;
 
+    std::cout << "Name: " << desc.params.name
+              << ", Frequency: " << desc.params.frequency
+              << ", CAN buses: " << desc.params.can_bus_count << std::endl;
 
     return 0;
 }

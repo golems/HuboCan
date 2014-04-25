@@ -20,6 +20,7 @@ int main(int argc, char* argv[])
                           +":10:4096:"+ACHD_PULL_STRING+":");
     mgr.register_new_chan(std::string("info:")+HUBO_INFO_DATA_CHANNEL
                           +":10:4096:"+ACHD_PULL_STRING+":");
+
     mgr.register_new_chan(std::string("command:")+HUBO_CMD_CHANNEL
                           +":10:4096:"+ACHD_INTERNAL_STRING+":");
     mgr.register_new_chan(std::string("aggregate:")+HUBO_AGG_CHANNEL

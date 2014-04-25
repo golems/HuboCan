@@ -1,4 +1,6 @@
 
+include     DrcHubo/meta.dd
+
 include     DrcHubo/DRC_JMCs.dd
 
 include     DrcHubo/DRC_Body.dd         # Joint range: 00 - 00

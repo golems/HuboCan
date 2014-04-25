@@ -1,4 +1,6 @@
 
+include     Hubo2Plus/meta.dd
+
 include     Hubo2Plus/H2P_JMCs.dd
 
 include     Hubo2Plus/H2P_Body.dd           # Joint range: 00 - 00

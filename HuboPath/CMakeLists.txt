@@ -5,6 +5,8 @@ get_filename_component(dir_name ${CMAKE_CURRENT_LIST_DIR} NAME)
 file(GLOB dir_source "src/*.cpp" "src/*.c" "*.hpp" "*.h")
 list(SORT dir_source)
 
+add_subdirectory("interpolation")
+
 set(lib_source ${lib_source} ${dir_source} PARENT_SCOPE)
 
 file(GLOB unit_tests_source "test/*.cpp")

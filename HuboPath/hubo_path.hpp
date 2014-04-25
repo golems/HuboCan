@@ -29,7 +29,6 @@ std::ostream& operator<<(std::ostream& stream, const hubo_path_instruction_t& ty
 //const char* hubo_path_params_to_string(const hubo_path_params_t& params);
 std::ostream& operator<<(std::ostream& stream, const hubo_path_params_t& params);
 
-std::ostream& operator<<(std::ostream& stream, const HuboPath::Trajectory& traj);
 
 const char* hubo_path_rx_state_to_string(const hubo_path_rx_state_t& state);
 std::ostream& operator<<(std::ostream& stream, const hubo_path_rx_state_t& state);

@@ -15,6 +15,7 @@ HuboDescription::HuboDescription()
 {
     _okay = false;
     _data = NULL;
+    memset(&params, 0, sizeof(params));
 }
 
 HuboDescription::HuboDescription(const HuboDescription &desc)
@@ -52,6 +53,8 @@ void HuboDescription::_copy_description(const HuboDescription &desc)
         sensors.push_back(newSensor);
     }
 
+    params = desc.params;
+
     _okay = true;
 
     _data = NULL;
@@ -83,6 +86,8 @@ void HuboDescription::_clear_memory()
         delete sensors[i];
     }
     sensors.clear();
+
+    memset(&params, 0, sizeof(params));
 }
 
 error_result_t HuboDescription::receiveInfo(double timeout_sec)
@@ -118,6 +123,8 @@ error_result_t HuboDescription::receiveInfo(double timeout_sec)
         sensors.push_back(newSensor);
     }
 
+    memcpy(&params, hubo_info_get_params_info(_data), sizeof(params));
+
     free(_data);
     _data = NULL;
 
@@ -148,6 +155,8 @@ error_result_t HuboDescription::broadcastInfo()
         size_t loc = hubo_info_get_sensor_location(_data, i);
         memcpy(_data+loc, &(sensors[i]->info), sizeof(hubo_jmc_info_t));
     }
+
+    memcpy(hubo_info_get_params_info(_data), &params, sizeof(params));
 
     int result = hubo_info_send_data(_data);
 
@@ -228,6 +237,11 @@ bool HuboDescription::_parseDevice(const std::string &device_type)
     else if("ForceTorque" == device_type)
     {
         if(!_parseForceTorque())
+            return false;
+    }
+    else if("meta" == device_type)
+    {
+        if(!_parseMeta())
             return false;
     }
 
@@ -415,7 +429,8 @@ bool HuboDescription::_parseJMC(bool strict)
         {
             if(components[1].size() > HUBO_COMPONENT_NAME_MAX_LENGTH)
             {
-                _parser.error() << "Component name string overflow! Max size is " << HUBO_COMPONENT_NAME_MAX_LENGTH;
+                _parser.error() << "Component name string overflow! Max size is "
+                                << HUBO_COMPONENT_NAME_MAX_LENGTH;
                 _parser.report_error();
             }
             else
@@ -427,7 +442,8 @@ bool HuboDescription::_parseJMC(bool strict)
         {
             if(components[1].size() > HUBO_COMPONENT_NAME_MAX_LENGTH)
             {
-                _parser.error() << "Component type string overflow! max size is " << HUBO_COMPONENT_TYPE_MAX_LENGTH;
+                _parser.error() << "Component type string overflow! max size is "
+                                << HUBO_COMPONENT_TYPE_MAX_LENGTH;
                 _parser.report_error();
             }
             else
@@ -516,6 +532,54 @@ bool HuboDescription::_parseIMU(bool strict)
 
 bool HuboDescription::_parseForceTorque(bool strict)
 {
+
+    return true;
+}
+
+bool HuboDescription::_parseMeta(bool strict)
+{
+    StringArray components;
+    while(_parser.next_line(components) == HuboCan::DD_OKAY)
+    {
+        if(components.size() < 2)
+        {
+            _parser.error() << "Every component must have at least one argument!";
+            _parser.report_error();
+        }
+
+        if(     "name" == components[0])
+        {
+            if(components[1].size() > HUBO_COMPONENT_NAME_MAX_LENGTH)
+            {
+                _parser.error() << "Component name string overflow! Max size is "
+                                << HUBO_COMPONENT_NAME_MAX_LENGTH;
+                _parser.report_error();
+            }
+            else
+            {
+                strcpy(params.name, components[1].c_str());
+            }
+        }
+        else if("default_frequency" == components[0])
+        {
+            params.frequency = atof(components[1].c_str());
+        }
+        else if("default_can_bus_count" == components[0])
+        {
+            params.can_bus_count = atoi(components[1].c_str());
+        }
+        else
+        {
+            if(strict)
+            {
+                _parser.error() << "Invalid component: " << components[0];
+                _parser.report_error();
+            }
+        }
+
+        if(_parser.status() == DD_ERROR)
+            return false;
+    }
 
     return true;
 }

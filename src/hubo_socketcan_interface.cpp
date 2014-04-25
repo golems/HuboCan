@@ -16,6 +16,7 @@ int main(int argc, char* argv[])
     }
 
     bool virtual_can = false;
+    double frequency_override = 0;
     std::string robot_name = "Hubo2Plus";
     for(int i=1; i<argc; ++i)
     {
@@ -35,9 +36,18 @@ int main(int argc, char* argv[])
                 robot_name = argv[i+1];
             }
         }
+        else if(strcmp(argv[i],"frequency")==0)
+        {
+            if(i+1 >= argc)
+            {
+                std::cout << "The 'frequency' argument must be followed by a value!" << std::endl;
+            }
+            else
+            {
+                frequency_override = atof(argv[i+1]);
+            }
+        }
     }
-
-    SocketCanPump can(200, 1e6, 2, 1000, virtual_can);
 
     HuboDescription desc;
     if(!desc.parseFile("/opt/hubo/devices/"+robot_name+".dd"))
@@ -46,6 +56,12 @@ int main(int argc, char* argv[])
         return 2;
     }
     desc.broadcastInfo();
+
+    if(frequency_override > 0)
+        desc.params.frequency = frequency_override;
+
+
+    SocketCanPump can(desc.params.frequency, 1e6, desc.params.can_bus_count, 1000, virtual_can);
 
     can.load_description(desc);
 

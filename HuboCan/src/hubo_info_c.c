@@ -219,6 +219,16 @@ int hubo_info_send_data(const hubo_info_data *data)
     return 0;
 }
 
+hubo_params_info_t* hubo_info_get_params_info(hubo_info_data* data)
+{
+    if(data == NULL)
+    {
+        return NULL;
+    }
+
+    return &( ( (hubo_meta_info_t*)data )->params );
+}
+
 hubo_joint_info_t* hubo_info_get_joint_info(hubo_info_data *data, size_t joint_index)
 {
     if(joint_index >= hubo_info_get_joint_count(data))

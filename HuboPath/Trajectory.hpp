@@ -72,8 +72,20 @@ public:
             claim_joint(joint_indices[i]);
         }
     }
+
+    bool interpolate();
+    bool interpolate(hubo_path_interp_t type);
+
+protected:
+
+    bool _optimal_interpolation();
+    bool _spline_interpolation();
+    bool _densify();
+
 };
 
 } // namespace HuboPath
+
+std::ostream& operator<<(std::ostream& stream, const HuboPath::Trajectory& traj);
 
 #endif // HUBOPATH_TRAJECTORY_HPP

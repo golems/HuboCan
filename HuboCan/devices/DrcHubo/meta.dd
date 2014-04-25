@@ -1,0 +1,8 @@
+
+begin   meta
+
+name    DrcHubo
+default_frequency       200
+default_can_bus_count   2
+
+end meta

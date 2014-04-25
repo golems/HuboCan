@@ -37,7 +37,7 @@
 
 typedef enum hubo_path_interp {
     
-    HUBO_PATH_SPLINE,   /*! Go from waypoint to waypoint based on a series of splines,
+    HUBO_PATH_SPLINE=0, /*! Go from waypoint to waypoint based on a series of splines,
                             coming to a stop at each waypoint                               */
     HUBO_PATH_OPTIMIZE, /*! Minimize the time spent travelling along the path, but without
                             violating the joints' nominal speed and acceleration settings   */
@@ -105,6 +105,7 @@ typedef struct hubo_path_params {
     
     double frequency;
     hubo_path_interp_t interp;
+    double tolerance;
     uint64_t bitmap;
     
     // TODO: Add any parameters which apply to all elements in the path

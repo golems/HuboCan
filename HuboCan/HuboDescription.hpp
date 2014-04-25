@@ -116,6 +116,7 @@ public:
 
     size_t getJmcIndex(const std::string& jmc_name);
 
+    hubo_params_info_t params;
     HuboJointPtrArray joints;
     HuboJmcPtrArray jmcs;
     HuboSensorPtrArray sensors;
@@ -137,6 +138,7 @@ protected:
     virtual bool _parseJMC(bool strict=true);
     virtual bool _parseIMU(bool strict=true);
     virtual bool _parseForceTorque(bool strict=true);
+    virtual bool _parseMeta(bool strict=true);
 
     virtual bool _postParseProcessing();
 

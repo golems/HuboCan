@@ -8,6 +8,7 @@
 #define HUBO_INFO_META_CHANNEL "hubo_info_meta"
 #define HUBO_INFO_DATA_CHANNEL "hubo_info_data"
 
+
 /*                           123456789012345 */
 #define HUBO_INFO_META_CODE "META_INFO_V0.01"
 #define HUBO_INFO_META_CODE_SIZE 16
@@ -15,7 +16,32 @@
 #define HUBO_COMPONENT_NAME_MAX_LENGTH 32
 #define HUBO_COMPONENT_TYPE_MAX_LENGTH 32
 
+/*
+ * This is kind of an annoying and complex way to handle the transfer of
+ * HuboDescription data. Maybe consider using the HuboState::HuboData
+ * paradigm instead.
+ */
 typedef uint8_t hubo_info_data;
+/*
+ * A hubo_info_data structure basically consists of the hubo_meta_info header
+ * starting at the first byte, and then a hubo_joint_info array, followed by
+ * a hubo_jmc_info array, followed by a hubo_sensor_info array.
+ *
+ * The access functions at the bottom of this page enable accessing the
+ * data in the different arrays based on the desired index number.
+ *
+ * hubo_info_data is a typedef of a single byte in order to make it easy
+ * to use pointer operations to retrieve relevant data.
+ *
+ */
+
+typedef struct hubo_params_info {
+
+    char name[HUBO_COMPONENT_NAME_MAX_LENGTH];
+    double frequency;
+    uint32_t can_bus_count;
+
+}__attribute__((packed)) hubo_params_info_t;
 
 typedef struct hubo_meta_info {
 
@@ -24,6 +50,7 @@ typedef struct hubo_meta_info {
     uint8_t jmc_count;
     uint8_t sensor_count;
     size_t data_size;
+    hubo_params_info_t params;
 
 }__attribute__((packed)) hubo_meta_info_t;
 
@@ -86,6 +113,8 @@ hubo_info_data* hubo_info_init_data(size_t joint_count, size_t jmc_count, size_t
 hubo_info_data* hubo_info_receive_data(double timeout); ///< Will return NULL pointer if there is an error
 
 int hubo_info_send_data(const hubo_info_data* data);
+
+hubo_params_info_t* hubo_info_get_params_info(hubo_info_data* data);
 
 hubo_joint_info_t* hubo_info_get_joint_info(hubo_info_data* data, size_t joint_index);
 
