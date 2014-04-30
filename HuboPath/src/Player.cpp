@@ -349,6 +349,17 @@ bool Player::step()
         return true;
     }
 
+    if( HUBO_PATH_QUIT == _incoming_cmd.instruction
+            && HUBO_PATH_QUIT != _current_cmd.instruction )
+    {
+        release_joints();
+        _trajectory.clear();
+        _current_cmd = _incoming_cmd;
+
+        _report_state();
+        return true;
+    }
+
     if( HUBO_PATH_QUIT == _current_cmd.instruction )
     {
         if( HUBO_PATH_QUIT != _incoming_cmd.instruction )
