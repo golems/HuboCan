@@ -34,6 +34,8 @@ protected:
     bool _new_trajectory;
     bool _new_instruction;
     void _check_for_instructions();
+    
+    bool _check_limits();
 
     bool _channels_opened;
     void _initialize_player();

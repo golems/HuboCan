@@ -20,7 +20,9 @@ bool HuboPath::Trajectory::interpolate()
     }
     else if( HUBO_PATH_SPLINE == params.interp )
     {
-        return _spline_interpolation();
+        // TODO: fill in the guts of the spline interpolation
+//        return _spline_interpolation();
+        return _optimal_interpolation();
     }
     else if( HUBO_PATH_DENSIFY == params.interp )
     {

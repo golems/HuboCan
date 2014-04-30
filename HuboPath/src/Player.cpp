@@ -27,6 +27,9 @@ void Player::_initialize_player()
     memset(&_last_elem, 0, sizeof(_last_elem));
     _current_index = 0;
     open_channels();
+    
+    if(_desc.okay())
+        _trajectory.desc = _desc;
 }
 
 bool Player::receive_description(double timeout_sec)
@@ -124,6 +127,76 @@ void Player::_check_for_instructions()
     }
 }
 
+static void print_limit_violation(const std::string& type, 
+                                  const std::string& name,
+                                  size_t joint_index,
+                                  double limit, double value,
+                                  size_t traj_index)
+{
+    std::cout << "Joint " << name << "(" << joint_index << ") violated its "
+              << type << " (" << limit << ") with a value of " << value
+              << " at index " << traj_index << "!\n";
+}
+
+// TODO: This should probably be a function in the trajectory class instead
+bool Player::_check_limits()
+{
+    bool limits_okay = true;
+    for(size_t i=0; i<_trajectory.size(); ++i)
+    {
+        hubo_path_element_t& elem = _trajectory.elements[i];
+        hubo_path_element_t& last_elem = ( i==0 ) ?
+                    _trajectory.elements[0] : _trajectory.elements[i-1];
+        
+        hubo_path_element_t& next_elem = ( i == _trajectory.size()-1 ) ?
+                    _trajectory.elements.back() : _trajectory.elements[i+1];
+        
+        for(size_t j=0; j<_desc.joints.size(); ++j)
+        {
+            if( ((_trajectory.params.bitmap >> j) & 0x01) != 0x01 )
+            {
+                continue;
+            }
+            
+            hubo_joint_info_t& info = _desc.joints[j]->info;
+            if( info.max_position < elem.references[j] )
+            {
+                print_limit_violation("max position", info.name, j,
+                                      info.max_position, elem.references[j], i);
+                limits_okay = false;
+            }
+            else if( info.min_position > elem.references[j] )
+            {
+                print_limit_violation("min position", info.name, j,
+                                      info.min_position, elem.references[j], i);
+                limits_okay = false;
+            }
+            
+            double speed = fabs(elem.references[j] - last_elem.references[j])
+                           * _desc.params.frequency;
+            if( speed > info.max_speed )
+            {
+                print_limit_violation("max speed", info.name, j,
+                                      info.max_speed, speed, i);
+                limits_okay = false;
+            }
+            
+            double accel = fabs(next_elem.references[j]
+                                - 2*elem.references[j]
+                                + last_elem.references[j])
+                           * _desc.params.frequency * _desc.params.frequency;
+            if( accel > info.max_accel )
+            {
+                print_limit_violation("max acceleration", info.name, j,
+                                      info.max_accel, accel, i);
+                limits_okay = false;
+            }
+        }
+    }
+    
+    return limits_okay;
+}
+
 bool Player::_receive_incoming_trajectory()
 {
     ach_flush(&_input_chan);
@@ -138,7 +211,7 @@ bool Player::_receive_incoming_trajectory()
     // Almost certainly.
 //    bool all_valid = true;
     std::vector<bool> invalid_joints;
-    for(size_t i=0; i<HUBO_PATH_JOINT_MAX_SIZE; ++i)
+    for(size_t i=0; i<_desc.joints.size(); ++i)
     {
         if( ((_trajectory.params.bitmap >> i) & 0x01) == 0x01 )
         {
@@ -151,7 +224,7 @@ bool Player::_receive_incoming_trajectory()
 
     if(invalid_joints.size() == 0)
     {
-        for(size_t i=0; i<HUBO_PATH_JOINT_MAX_SIZE; ++i)
+        for(size_t i=0; i<_desc.joints.size(); ++i)
         {
             if( ((_trajectory.params.bitmap >> i) & 0x01) == 0x01 )
             {
@@ -172,6 +245,16 @@ bool Player::_receive_incoming_trajectory()
         std::cout << std::endl;
         return false;
     }
+    
+    if(!_trajectory.interpolate())
+    {
+        std::cout << "Failed to interpolate the trajectory with the following params: "
+                  << _trajectory.params << std::endl;
+        return false;
+    }
+    
+    if(!_check_limits())
+        return false;
 
     send_commands();
     _current_index = 0;
@@ -307,7 +390,7 @@ bool Player::step()
 
 void Player::_send_element_commands(const hubo_path_element_t& elem)
 {
-    for(size_t i=0; i<HUBO_PATH_JOINT_MAX_SIZE; ++i)
+    for(size_t i=0; i<_desc.joints.size(); ++i)
     {
         if( ((_trajectory.params.bitmap >> i) & 0x01) == 0x01 )
         {

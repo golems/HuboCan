@@ -25,6 +25,7 @@ int main(int argc, char* argv[])
         op.addWaypoint(vec);
     }
 
+//    op.setInterpolationMode(HUBO_PATH_OPTIMIZE);
     op.sendNewTrajectory();
 
     return 0;

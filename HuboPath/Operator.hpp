@@ -128,10 +128,23 @@ public:
     HuboCan::error_result_t sendNewTrajectory(
                             hubo_path_instruction_t instruction = HUBO_PATH_RUN,
                             int timeout_sec = 5);
+    
+    HuboCan::error_result_t sendNewTrajectory(
+                            const Trajectory& premade_trajectory,
+                            hubo_path_instruction_t instruction = HUBO_PATH_RUN,
+                            int timeout_sec = 5);
+    
+    HuboCan::error_result_t sendInstruction(hubo_path_instruction_t instruction);
 
     hubo_path_command_t command;
+    
+    void setInterpolationMode(hubo_path_interp_t mode);
+    bool interpolate();
+    hubo_path_params_t params;
 
     const hubo_player_state_t& getPlayerState();
+    
+    const Trajectory& getCurrentTrajectory();
 
     // TODO: Make functions for inputting control schemes
 
@@ -156,6 +169,7 @@ protected:
     ach_channel_t _feedback_chan;
     ach_channel_t _state_chan;
     
+    void _outgoing_instruction_state_machine(hubo_path_instruction_t& s);
 };
 
 } // HuboPath

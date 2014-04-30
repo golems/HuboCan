@@ -22,8 +22,12 @@ void Operator::_initialize_operator()
     _trajectory.clear();
     _trajectory.desc = _desc;
     memset(&command, 0, sizeof(command));
+    memset(&params, 0, sizeof(params));
 
     open_channels();
+    
+    if(_desc.okay())
+        _trajectory.desc = _desc;
 }
 
 bool Operator::receive_description(double timeout_sec)
@@ -279,9 +283,20 @@ const hubo_player_state_t& Operator::getPlayerState()
     return _state;
 }
 
+void Operator::setInterpolationMode(hubo_path_interp_t mode)
+{
+    params.interp = mode;
+}
+
+bool Operator::interpolate()
+{
+    return _trajectory.interpolate();
+}
+
 void Operator::_construct_trajectory()
 {
     _trajectory.clear();
+    _trajectory.params = params;
 
     _trajectory.claim_joints(_index_map);
     hubo_path_element_t elem;
@@ -296,10 +311,49 @@ void Operator::_construct_trajectory()
         }
         _trajectory.push_back(elem);
     }
-    std::cout << "Sending:\n" << _trajectory << std::endl;
 }
 
-HuboCan::error_result_t Operator::sendNewTrajectory(hubo_path_instruction_t instruction, int timeout_sec)
+const Trajectory& Operator::getCurrentTrajectory()
+{
+    _construct_trajectory();
+    return _trajectory;
+}
+
+HuboCan::error_result_t Operator::sendInstruction(hubo_path_instruction_t instruction)
+{
+    command.instruction = instruction;
+    
+    ach_status_t result = ach_put(&_instruction_chan, &command, sizeof(command));
+    if( ACH_OK != result )
+    {
+        std::cout << "Ach error on player command channel: " << ach_result_to_string(result)
+                  << std::endl;
+        return HuboCan::ACH_ERROR;
+    }
+    
+    return HuboCan::OKAY;
+}
+
+void Operator::_outgoing_instruction_state_machine(hubo_path_instruction_t &s)
+{
+    switch(s)
+    {
+        case HUBO_PATH_RUN:
+        case HUBO_PATH_LOAD_N_GO:
+            s = HUBO_PATH_LOAD_N_GO; break;
+        case HUBO_PATH_PAUSE:
+        case HUBO_PATH_REVERSE:
+        case HUBO_PATH_LOAD:
+            s = HUBO_PATH_LOAD; break;
+        case HUBO_PATH_QUIT:
+        default:
+            s = HUBO_PATH_QUIT;
+    }
+}
+
+HuboCan::error_result_t Operator::sendNewTrajectory(const Trajectory &premade_trajectory,
+                                                    hubo_path_instruction_t instruction,
+                                                    int timeout_sec)
 {
     if(!_channels_opened)
     {
@@ -312,20 +366,8 @@ HuboCan::error_result_t Operator::sendNewTrajectory(hubo_path_instruction_t inst
     }
 
     _update_state();
-
-    switch(instruction)
-    {
-        case HUBO_PATH_RUN:
-        case HUBO_PATH_LOAD_N_GO:
-            instruction = HUBO_PATH_LOAD_N_GO; break;
-        case HUBO_PATH_PAUSE:
-        case HUBO_PATH_REVERSE:
-        case HUBO_PATH_LOAD:
-            instruction = HUBO_PATH_LOAD; break;
-        case HUBO_PATH_QUIT:
-        default:
-            instruction = HUBO_PATH_QUIT;
-    }
+    
+    _outgoing_instruction_state_machine(instruction);
 
     if(HUBO_PATH_QUIT == instruction)
     {
@@ -333,45 +375,17 @@ HuboCan::error_result_t Operator::sendNewTrajectory(hubo_path_instruction_t inst
         return HuboCan::INDEX_OUT_OF_BOUNDS;
     }
 
-//    if(_state.current_instruction != HUBO_PATH_QUIT)
-//    {
-//        command.instruction = HUBO_PATH_QUIT;
-//        ach_put(&_instruction_chan, &command, sizeof(command));
+    ach_flush(&_feedback_chan);
+    sendInstruction(instruction);
 
-//        int attempts = 0;
+    return send_trajectory(_output_chan, _feedback_chan, premade_trajectory, timeout_sec);
+}
 
-//        struct timespec t;
-//        size_t fs;
-//        do {
-//            clock_gettime(ACH_DEFAULT_CLOCK, &t);
-//            t.tv_sec += 1; ++attempts;
-//            ach_status_t result = ach_get(&_state_chan, &_state, sizeof(_state), &fs,
-//                                          &t, ACH_O_LAST | ACH_O_WAIT);
-
-//            if( ACH_OK != result && ACH_TIMEOUT != result && ACH_MISSED_FRAME != result)
-//            {
-//                std::cout << "Unexpected ach result while waiting for quit confirmation:"
-//                             << ach_result_to_string(result) << std::endl;
-//                return HuboCan::ACH_ERROR;
-//            }
-
-//        } while( _state.current_instruction != HUBO_PATH_QUIT && attempts <= timeout_sec );
-//    }
-
+HuboCan::error_result_t Operator::sendNewTrajectory(hubo_path_instruction_t instruction,
+                                                    int timeout_sec)
+{
     _construct_trajectory();
 
-
-    command.instruction = instruction;
-
-    ach_flush(&_feedback_chan);
-    ach_status_t result = ach_put(&_instruction_chan, &command, sizeof(command));
-    if( ACH_OK != result )
-    {
-        std::cout << "Ach error on player command channel: " << ach_result_to_string(result)
-                  << std::endl;
-        return HuboCan::ACH_ERROR;
-    }
-
-    return send_trajectory(_output_chan, _feedback_chan, _trajectory, timeout_sec);
+    return sendNewTrajectory(_trajectory, instruction, timeout_sec);
 }
 
