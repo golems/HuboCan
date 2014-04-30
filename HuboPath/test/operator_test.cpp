@@ -49,6 +49,19 @@ int main(int argc, char* argv[])
 
         op.addWaypoint(vec);
     }
+    else if(test_number == 3)
+    {
+        mapping.clear();
+        mapping.push_back("RWY");
+        op.setJointIndices(mapping);
+        vec.resize(1);
+
+        vec[0] = 45*M_PI/180.0;
+        op.addWaypoint(vec);
+
+        vec[0] = 0;
+        op.addWaypoint(vec);
+    }
     else
     {
         std::cout << "We do not go up to a test #" << test_number << "!" << std::endl;

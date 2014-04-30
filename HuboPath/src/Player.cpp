@@ -211,11 +211,8 @@ bool Player::_check_limits()
             {
                 print_limit_violation("max acceleration", info.name, j,
                                       info.max_accel, accel, i);
-                std::cout << " -- values: " << next_elem.references[j] << " : "
-                          << elem.references[j] << " : "
-                          << last_elem.references[j] << " * " << _desc.params.frequency * _desc.params.frequency
-                          << " -> " << accel << std::endl;
-                limits_okay = false;
+                // TODO: Acceleration limits seem too easy to violate...
+//                limits_okay = false;
             }
         }
     }
@@ -285,7 +282,7 @@ bool Player::_receive_incoming_trajectory()
     send_commands();
     _current_index = 0;
 
-    std::cout << _trajectory << std::endl;
+//    std::cout << _trajectory << std::endl;
     _new_trajectory = true;
     return true;
 }
