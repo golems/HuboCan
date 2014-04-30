@@ -82,7 +82,8 @@ HuboCan::error_result_t State::update(double timeout_sec)
     if( joints.get_time() != imus.get_time()
      || joints.get_time() != force_torques.get_time())
     {
-        return HuboCan::SYNCH_ERROR;
+//        return HuboCan::SYNCH_ERROR;
+        std::cout << HuboCan::error_result_t(HuboCan::SYNCH_ERROR) << std::endl;
     }
 
     return result;
