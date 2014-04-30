@@ -161,6 +161,14 @@ bool Player::_check_limits()
             }
             
             hubo_joint_info_t& info = _desc.joints[j]->info;
+
+            if( !(elem.references[j] == elem.references[j]) )
+            {
+                print_limit_violation("NaN detection", info.name, j,
+                                      0, elem.references[j], i);
+                limits_okay = false;
+            }
+
             if( info.max_position+eps < elem.references[j] )
             {
                 print_limit_violation("max position", info.name, j,
