@@ -149,6 +149,8 @@ public:
     // TODO: Make functions for inputting control schemes
 
 protected:
+
+    bool _constructed;
     
     bool _channels_opened;
 
