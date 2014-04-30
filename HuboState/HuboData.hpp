@@ -53,6 +53,7 @@ template<class DataClass>
 hubo_data* initialize_data(size_t array_size)
 {
     hubo_data* new_data = (hubo_data*)malloc(predict_data_size<DataClass>(array_size));
+    memset(new_data, 0, predict_data_size<DataClass>(array_size));
 
     hubo_data_header_t header;
     strcpy(header.code, HUBO_DATA_HEADER_CODE);
