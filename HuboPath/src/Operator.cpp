@@ -388,12 +388,12 @@ HuboCan::error_result_t Operator::sendNewTrajectory(const Trajectory &premade_tr
         return HuboCan::UNINITIALIZED;
     }
 
-//    if(premade_trajectory.size() < 2)
-//    {
-//        std::cout << "Trajectory size is " << premade_trajectory.size()
-//                  << ", but it must be at least size 2 before we send it!" << std::endl;
-//        return HuboCan::ARRAY_MISMATCH;
-//    }
+    if(premade_trajectory.size() < 2)
+    {
+        std::cout << "Trajectory size is " << premade_trajectory.size()
+                  << ", but it must be at least size 2 before we send it!" << std::endl;
+        return HuboCan::ARRAY_MISMATCH;
+    }
 
     _update_state();
     

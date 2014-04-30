@@ -334,7 +334,7 @@ void Manager::stop_process(const std::string &name)
     }
 }
 
-void Manager::stop_all_processes()
+void Manager::stop_all_processes(bool report)
 {
     StringArray procs = _grab_files_in_dir(_rt_lock_dir);
     
@@ -343,7 +343,8 @@ void Manager::stop_all_processes()
         _stop_process_raw(procs[i]);
     }
     
-    _report_no_error(STOP_ALL_PROCS);
+    if(report)
+        _report_no_error(STOP_ALL_PROCS);
 }
 
 void Manager::kill_process(const std::string &name)
@@ -582,17 +583,19 @@ void Manager::start_up()
     // TODO: Hardware-related things
 
     StringArray reply = create_all_ach_chans(false);
-    run_all_processes();
+    run_all_processes(false);
 
-
+    _relay_string_array(START_UP, reply);
 }
 
 void Manager::shut_down()
 {
-    stop_all_processes();
-    close_all_ach_chans();
+    stop_all_processes(false);
+    close_all_ach_chans(false);
     
     // TODO: Hardware-related things
+
+    _report_no_error(SHUT_DOWN);
 }
 
 void Manager::list_configs()

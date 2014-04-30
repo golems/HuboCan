@@ -28,7 +28,7 @@ void Hubo2PlusBasicJmc::update()
 
     if(_aux_commands.size() > 0)
     {
-        std::cout << "AUX COMMAND" << std::endl;
+//        std::cout << "AUX COMMAND" << std::endl;
         _process_auxiliary_commands();
         // If there are auxiliary commands that need to be handled, we put off requesting
         // encoder readings and sending position commands in order to reduce the load on

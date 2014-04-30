@@ -52,7 +52,7 @@ public:
     void run_all_processes(bool report=true);
     
     void stop_process(const std::string& name);
-    void stop_all_processes();
+    void stop_all_processes(bool report=true);
     
     void kill_process(const std::string& name);
     void kill_all_processes();

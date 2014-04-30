@@ -46,6 +46,8 @@ int main(int argc, char* argv[])
 
         vec[3] = 20*M_PI/180.0;
         vec[2] = 30*M_PI/180.0;
+
+        op.addWaypoint(vec);
     }
     else
     {
