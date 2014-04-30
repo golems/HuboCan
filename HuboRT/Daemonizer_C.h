@@ -47,6 +47,8 @@ extern int hubo_rt_sig_usr1;
 extern int hubo_rt_sig_usr2;
 extern int hubo_rt_sig_alarm;
 extern int hubo_rt_sig_child;
+extern int hubo_rt_last_child_pid;
+extern int hubo_rt_last_child_status;
 
 int hubo_rt_daemonize(const char* daemon_name, const char *lock_directory, const char *log_directory);
 
