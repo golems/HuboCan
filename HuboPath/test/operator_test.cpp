@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    op.interpolate();
+//    op.interpolate();
     std::cout << op.getCurrentTrajectory() << std::endl;
     op.sendNewTrajectory();
 
