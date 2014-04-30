@@ -1,6 +1,8 @@
 
 #include "../Player.hpp"
 
+const double eps = 1e-6;
+
 using namespace HuboPath;
 
 Player::Player(double timeout) :
@@ -159,33 +161,45 @@ bool Player::_check_limits()
             }
             
             hubo_joint_info_t& info = _desc.joints[j]->info;
-            if( info.max_position < elem.references[j] )
+            if( info.max_position+eps < elem.references[j] )
             {
                 print_limit_violation("max position", info.name, j,
                                       info.max_position, elem.references[j], i);
                 limits_okay = false;
             }
-            else if( info.min_position > elem.references[j] )
+            else if( info.min_position-eps > elem.references[j] )
             {
                 print_limit_violation("min position", info.name, j,
                                       info.min_position, elem.references[j], i);
                 limits_okay = false;
             }
+
+            if( i == 0 )
+            {
+                // No sense in checking speed if this is the first element
+                continue;
+            }
             
             double speed = fabs(elem.references[j] - last_elem.references[j])
                            * _desc.params.frequency;
-            if( speed > info.max_speed )
+            if( speed > info.max_speed + eps )
             {
                 print_limit_violation("max speed", info.name, j,
                                       info.max_speed, speed, i);
                 limits_okay = false;
             }
             
+            if( i == 0 || i == _trajectory.size()-1 )
+            {
+                // No sense in checking acceleration if this is the first or last element
+                continue;
+            }
+
             double accel = fabs(next_elem.references[j]
                                 - 2*elem.references[j]
                                 + last_elem.references[j])
                            * _desc.params.frequency * _desc.params.frequency;
-            if( accel > info.max_accel )
+            if( accel > info.max_accel + eps )
             {
                 print_limit_violation("max acceleration", info.name, j,
                                       info.max_accel, accel, i);

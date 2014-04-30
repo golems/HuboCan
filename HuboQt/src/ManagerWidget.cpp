@@ -136,15 +136,18 @@ void ManagerWidget::_disconnect_achds(AchdPtrArray &achds)
 
 void ManagerWidget::startup_everything()
 {
-    StringArray reply;
-    manager_err_t result = _req->start_up(reply);
+//    StringArray reply;
+//    manager_err_t result = _req->start_up(reply);
     
-    _set_status(result, "startup command");
+//    _set_status(result, "startup command");
     
-    if(NO_ERROR != result)
-        return;
+//    if(NO_ERROR != result)
+//        return;
     
-    _parse_channel_descriptions(reply);
+//    _parse_channel_descriptions(reply);
+
+    create_all();
+    launch_all();
 }
 
 void ManagerWidget::_clear_achd_handles(AchdPtrArray &achds)
