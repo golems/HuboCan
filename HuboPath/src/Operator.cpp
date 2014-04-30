@@ -19,6 +19,7 @@ void Operator::_initialize_operator()
 {
     _mapping_set = false;
     _channels_opened = false;
+    _constructed = false;
     _trajectory.clear();
     _trajectory.desc = _desc;
     memset(&command, 0, sizeof(command));
@@ -101,6 +102,8 @@ HuboCan::error_result_t Operator::setJointIndices(const StringArray &joint_names
                   << std::endl;
         return HuboCan::UNINITIALIZED;
     }
+
+    _constructed = false;
     
     _index_map = _desc.getJointIndices(joint_names);
     
@@ -124,6 +127,7 @@ HuboCan::error_result_t Operator::setJointIndices(const StringArray &joint_names
         }
         std::cout << std::endl;
         _index_map.clear();
+        _mapping_set = false;
         return HuboCan::INDEX_OUT_OF_BOUNDS;
     }
     
@@ -141,6 +145,8 @@ HuboCan::error_result_t Operator::setJointIndices(const IndexArray &joint_indice
                   << std::endl;
         return HuboCan::UNINITIALIZED;
     }
+
+    _constructed = false;
     
     IndexArray invalids;
     for(size_t i=0; i<joint_indices.size(); ++i)
@@ -163,6 +169,7 @@ HuboCan::error_result_t Operator::setJointIndices(const IndexArray &joint_indice
         }
         std::cout << std::endl;
         _index_map.clear();
+        _mapping_set = false;
         return HuboCan::INDEX_OUT_OF_BOUNDS;
     }
     
@@ -192,6 +199,8 @@ HuboCan::error_result_t Operator::addWaypoint(const Eigen::VectorXd &waypoint)
     {
         return HuboCan::UNINITIALIZED;
     }
+
+    _constructed = false;
     
     if((size_t)waypoint.size() != _index_map.size())
     {
@@ -258,17 +267,17 @@ HuboCan::error_result_t Operator::addWaypoints(const std::vector<Eigen::VectorXd
 
 HuboCan::error_result_t Operator::removeLast()
 {
-    if(_index_map.size() == 0)
+    if(_input_path.size() == 0)
         return HuboCan::INDEX_OUT_OF_BOUNDS;
     
-    _index_map.pop_back();
+    _input_path.pop_back();
     
     return HuboCan::OKAY;
 }
 
 void Operator::clearWaypoints()
 {
-    _index_map.clear();
+    _input_path.clear();
 }
 
 void Operator::_update_state()
@@ -290,17 +299,29 @@ void Operator::setInterpolationMode(hubo_path_interp_t mode)
 
 bool Operator::interpolate()
 {
+    _construct_trajectory();
     return _trajectory.interpolate();
 }
 
 void Operator::_construct_trajectory()
 {
+    if(_constructed)
+        return;
+
     _trajectory.clear();
     _trajectory.params = params;
 
     _trajectory.claim_joints(_index_map);
     hubo_path_element_t elem;
     memset(&elem, 0, sizeof(elem));
+
+    update(0);
+    for(size_t j=0; j<_desc.joints.size(); ++j)
+    {
+        elem.references[j] = joints[j].reference;
+    }
+    _trajectory.push_back(elem);
+
     for(size_t i=0; i<_input_path.size(); ++i)
     {
         for(size_t j=0; j<_index_map.size(); ++j)
@@ -311,6 +332,8 @@ void Operator::_construct_trajectory()
         }
         _trajectory.push_back(elem);
     }
+
+    _constructed = true;
 }
 
 const Trajectory& Operator::getCurrentTrajectory()
@@ -365,6 +388,13 @@ HuboCan::error_result_t Operator::sendNewTrajectory(const Trajectory &premade_tr
         return HuboCan::UNINITIALIZED;
     }
 
+//    if(premade_trajectory.size() < 2)
+//    {
+//        std::cout << "Trajectory size is " << premade_trajectory.size()
+//                  << ", but it must be at least size 2 before we send it!" << std::endl;
+//        return HuboCan::ARRAY_MISMATCH;
+//    }
+
     _update_state();
     
     _outgoing_instruction_state_machine(instruction);
@@ -386,6 +416,7 @@ HuboCan::error_result_t Operator::sendNewTrajectory(hubo_path_instruction_t inst
 {
     _construct_trajectory();
 
+    _constructed = false;
     return sendNewTrajectory(_trajectory, instruction, timeout_sec);
 }
 

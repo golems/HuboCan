@@ -36,7 +36,7 @@ HuboCan::error_result_t HuboPath::send_trajectory(ach_channel_t &output_channel,
     if(attempts > max_wait_time)
     {
         std::cout << "We did not receive readiness acknowledgment from listener\n"
-                  << " -- Status: " << feedback << "\n"
+                  << " -- " << feedback << "\n"
                   << " -- We will NOT send off the trajectory!" << std::endl;
     }
 

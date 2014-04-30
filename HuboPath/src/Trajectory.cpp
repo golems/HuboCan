@@ -10,6 +10,9 @@ bool HuboPath::Trajectory::interpolate(hubo_path_interp_t type)
 
 bool HuboPath::Trajectory::interpolate()
 {
+    if( elements.size() < 2 )
+        return true;
+
     if( HUBO_PATH_RAW == params.interp )
     {
         return true;
@@ -56,7 +59,7 @@ bool HuboPath::Trajectory::_optimal_interpolation()
     {
         for(size_t j=0; j<joint_mapping.size(); ++j)
         {
-            next_point[j] = elements[i].references[j];
+            next_point[j] = elements[i].references[joint_mapping[j]];
         }
         waypoints.push_back(next_point);
     }

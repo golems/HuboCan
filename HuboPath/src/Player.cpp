@@ -259,6 +259,7 @@ bool Player::_receive_incoming_trajectory()
     send_commands();
     _current_index = 0;
 
+    std::cout << _trajectory << std::endl;
     _new_trajectory = true;
     return true;
 }
