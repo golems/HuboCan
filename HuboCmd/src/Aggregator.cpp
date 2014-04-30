@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <iostream>
+#include <unistd.h>
 
 using namespace HuboCmd;
 using namespace HuboCan;

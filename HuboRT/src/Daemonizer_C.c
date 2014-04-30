@@ -67,12 +67,12 @@ static void hubo_rt_daemon_sig_handler(int signum)
 {
     switch(signum)
     {
-        case SIGALRM: hubo_rt_sig_alarm++; break;
+        case SIGALRM: ++hubo_rt_sig_alarm; break;
         case SIGUSR1: hubo_rt_sig_usr1 = 1; break;
         case SIGUSR2: hubo_rt_sig_usr2 = 1; break;
         case SIGCHLD:
             hubo_rt_last_child_pid = wait(&hubo_rt_last_child_status);
-            hubo_rt_sig_child++; break;
+            ++hubo_rt_sig_child; break;
         case SIGINT:
         case SIGTERM:
             hubo_rt_sig_quit = 1; break;

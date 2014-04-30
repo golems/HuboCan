@@ -13,6 +13,7 @@ extern "C" {
 #include <iostream>
 #include <dirent.h>
 #include <fstream>
+#include <unistd.h>
 
 #include "../utils.hpp"
 
