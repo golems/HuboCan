@@ -70,9 +70,7 @@ bool HuboPath::Trajectory::_optimal_interpolation()
     {
         velocities[j] = desc.joints[joint_mapping[j]]->info.nominal_speed;
         accelerations[j] = desc.joints[joint_mapping[j]]->info.nominal_accel;
-        std::cout << desc.joints[joint_mapping[j]]->info.name << ":" << accelerations[j] << ", ";
     }
-    std::cout << std::endl;
 
     double tolerance = params.tolerance;
     if(tolerance == 0)
