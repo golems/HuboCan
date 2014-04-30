@@ -1,7 +1,7 @@
 
 #include "../Aggregator.hpp"
 #include <iostream>
-
+#include <unistd.h>
 
 size_t simple_min(size_t x, size_t y)
 {
