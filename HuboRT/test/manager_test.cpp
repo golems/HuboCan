@@ -12,6 +12,8 @@ extern "C" {
 int main(int argc, char* argv[])
 {
     HuboRT::Manager mgr;
+    HuboRT::Daemonizer rt;
+    rt.redirect_signals();
 
     std::string command = "";
     for(int i=1; i<argc; ++i)
