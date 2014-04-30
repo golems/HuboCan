@@ -12,9 +12,11 @@ int main(int argc, char* argv[])
 
     while( player.step() && rt.good() )
     {
+/*
         std::cout << player.joints[4].reference
                   << " : " << player.current_element().references[4]
                   << std::endl;
+*/
     }
 
 
