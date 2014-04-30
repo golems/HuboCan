@@ -211,6 +211,10 @@ bool Player::_check_limits()
             {
                 print_limit_violation("max acceleration", info.name, j,
                                       info.max_accel, accel, i);
+                std::cout << " -- values: " << next_elem.references[j] << " : "
+                          << elem.references[j] << " : "
+                          << last_elem.references[j] << " * " << _desc.params.frequency * _desc.params.frequency
+                          << " -> " << accel << std::endl;
                 limits_okay = false;
             }
         }
