@@ -146,11 +146,11 @@ bool Player::_check_limits()
     bool limits_okay = true;
     for(size_t i=0; i<_trajectory.size(); ++i)
     {
-        hubo_path_element_t& elem = _trajectory.elements[i];
-        hubo_path_element_t& last_elem = ( i==0 ) ?
+        const hubo_path_element_t& elem = _trajectory.elements[i];
+        const hubo_path_element_t& last_elem = ( i==0 ) ?
                     _trajectory.elements[0] : _trajectory.elements[i-1];
         
-        hubo_path_element_t& next_elem = ( i == _trajectory.size()-1 ) ?
+        const hubo_path_element_t& next_elem = ( i == _trajectory.size()-1 ) ?
                     _trajectory.elements.back() : _trajectory.elements[i+1];
         
         for(size_t j=0; j<_desc.joints.size(); ++j)

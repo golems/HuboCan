@@ -92,7 +92,7 @@ bool HuboPath::Trajectory::_optimal_interpolation()
     double frequency = desc.params.frequency;
     if( 0 == frequency )
     {
-        std::cout << "Warning: Your Trajectory object's HuboDescription"
+        std::cout << "Warning: Your Trajectory object's HuboDescription "
                      "contained a frequency parameter of 0\n"
                      " -- We will default this to 200" << std::endl;
         frequency = 200;
