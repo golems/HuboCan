@@ -35,6 +35,128 @@ bool HuboPath::Trajectory::interpolate()
     return false;
 }
 
+static void print_limit_violation(const std::string& type, 
+                                  const std::string& name,
+                                  size_t joint_index,
+                                  double limit, double value,
+                                  size_t traj_index)
+{
+    std::cout << "Joint " << name << "(" << joint_index << ") violated its "
+              << type << " (" << limit << ") with a value of " << value
+              << " at index " << traj_index << "!\n";
+}
+
+const double eps = 1e-6;
+bool HuboPath::Trajectory::check_limits() const
+{
+    if(!desc.okay() && (params.use_custom_limits != 1))
+    {
+        std::cout << "Could not properly check trajectory limit violations!\n"
+                  << " -- Need either a valid description to be loaded or to have custom limits set!"
+                  << std::endl;
+        return false;
+    }
+    
+    size_t joint_count = 0;
+    if(params.use_custom_limits == 1)
+    {
+        joint_count = HUBO_PATH_JOINT_MAX_SIZE;
+    }
+    else
+    {
+        joint_count = desc.joints.size();
+    }
+    
+    double frequency = desc.okay()? desc.params.frequency : params.frequency;
+    // TODO: Should I handle things differently if this is not a raw trajectory?
+    if(frequency == 0)
+    {
+        std::cout << "No frequency is given for this trajectory. Defaulting to 200!" << std::endl;
+        frequency = 200;
+    }
+    
+    bool limits_okay = true;
+    for(size_t i=0; i<elements.size(); ++i)
+    {
+        const hubo_path_element_t& elem = elements[i];
+        const hubo_path_element_t& last_elem = ( i==0 ) ?
+                    elements[0] : elements[i-1];
+        
+        const hubo_path_element_t& next_elem = ( i == elements.size()-1 ) ?
+                    elements.back() : elements[i+1];
+        
+        for(size_t j=0; j<joint_count; ++j)
+        {
+            const hubo_joint_limits_t& limits = (params.use_custom_limits==1) ?
+                                        params.limits[j] : desc.joints[j]->info.limits;
+            std::string name = desc.okay() ?
+                                   desc.joints[j]->info.name : "";
+            
+            if( ((params.bitmap >> j) & 0x01) != 0x01 )
+            {
+                continue;
+            }
+
+            if( !(elem.references[j] == elem.references[j]) )
+            {
+                print_limit_violation("NaN detection", name, j,
+                                      0, elem.references[j], i);
+                limits_okay = false;
+            }
+
+            if( limits.max_position+eps < elem.references[j] )
+            {
+                print_limit_violation("max position", name, j,
+                                      limits.max_position, elem.references[j], i);
+                limits_okay = false;
+            }
+            else if( limits.min_position-eps > elem.references[j] )
+            {
+                print_limit_violation("min position", name, j,
+                                      limits.min_position, elem.references[j], i);
+                limits_okay = false;
+            }
+
+            if( i == 0 )
+            {
+                // No sense in checking speed if this is the first element
+                continue;
+            }
+            
+            double speed = fabs(elem.references[j] - last_elem.references[j])
+                           * frequency;
+            if( speed > limits.max_speed + eps )
+            {
+                print_limit_violation("max speed", name, j,
+                                      limits.max_speed, speed, i);
+                limits_okay = false;
+            }
+            
+            if( i == 0 || i == elements.size()-1 )
+            {
+                // No sense in checking acceleration if this is the first or last element
+                continue;
+            }
+
+            double accel = fabs(next_elem.references[j]
+                                - 2*elem.references[j]
+                                + last_elem.references[j])
+                           * frequency * frequency;
+            if( accel > limits.max_accel + eps )
+            {
+                print_limit_violation("max acceleration", name, j,
+                                      limits.max_accel, accel, i);
+                std::cout << next_elem.references[j] << " : " << elem.references[j]
+                          << " : " << last_elem.references[j] << " | " << frequency << std::endl;
+                // TODO: Acceleration limits seem too easy to violate...
+                limits_okay = false;
+            }
+        }
+    }
+    
+    return limits_okay;
+}
+
 bool HuboPath::Trajectory::_optimal_interpolation()
 {
     if(!desc.okay())
@@ -68,8 +190,8 @@ bool HuboPath::Trajectory::_optimal_interpolation()
     Eigen::VectorXd accelerations(joint_mapping.size());
     for(size_t j=0; j<joint_mapping.size(); ++j)
     {
-        velocities[j] = desc.joints[joint_mapping[j]]->info.nominal_speed;
-        accelerations[j] = desc.joints[joint_mapping[j]]->info.nominal_accel;
+        velocities[j] = desc.joints[joint_mapping[j]]->info.limits.nominal_speed;
+        accelerations[j] = desc.joints[joint_mapping[j]]->info.limits.nominal_accel;
     }
 
     double tolerance = params.tolerance;

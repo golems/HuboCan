@@ -129,97 +129,6 @@ void Player::_check_for_instructions()
     }
 }
 
-static void print_limit_violation(const std::string& type, 
-                                  const std::string& name,
-                                  size_t joint_index,
-                                  double limit, double value,
-                                  size_t traj_index)
-{
-    std::cout << "Joint " << name << "(" << joint_index << ") violated its "
-              << type << " (" << limit << ") with a value of " << value
-              << " at index " << traj_index << "!\n";
-}
-
-// TODO: This should probably be a function in the trajectory class instead
-bool Player::_check_limits()
-{
-    bool limits_okay = true;
-    for(size_t i=0; i<_trajectory.size(); ++i)
-    {
-        const hubo_path_element_t& elem = _trajectory.elements[i];
-        const hubo_path_element_t& last_elem = ( i==0 ) ?
-                    _trajectory.elements[0] : _trajectory.elements[i-1];
-        
-        const hubo_path_element_t& next_elem = ( i == _trajectory.size()-1 ) ?
-                    _trajectory.elements.back() : _trajectory.elements[i+1];
-        
-        for(size_t j=0; j<_desc.joints.size(); ++j)
-        {
-            if( ((_trajectory.params.bitmap >> j) & 0x01) != 0x01 )
-            {
-                continue;
-            }
-            
-            hubo_joint_info_t& info = _desc.joints[j]->info;
-
-            if( !(elem.references[j] == elem.references[j]) )
-            {
-                print_limit_violation("NaN detection", info.name, j,
-                                      0, elem.references[j], i);
-                limits_okay = false;
-            }
-
-            if( info.max_position+eps < elem.references[j] )
-            {
-                print_limit_violation("max position", info.name, j,
-                                      info.max_position, elem.references[j], i);
-                limits_okay = false;
-            }
-            else if( info.min_position-eps > elem.references[j] )
-            {
-                print_limit_violation("min position", info.name, j,
-                                      info.min_position, elem.references[j], i);
-                limits_okay = false;
-            }
-
-            if( i == 0 )
-            {
-                // No sense in checking speed if this is the first element
-                continue;
-            }
-            
-            double speed = fabs(elem.references[j] - last_elem.references[j])
-                           * _desc.params.frequency;
-            if( speed > info.max_speed + eps )
-            {
-                print_limit_violation("max speed", info.name, j,
-                                      info.max_speed, speed, i);
-                limits_okay = false;
-            }
-            
-            if( i == 0 || i == _trajectory.size()-1 )
-            {
-                // No sense in checking acceleration if this is the first or last element
-                continue;
-            }
-
-            double accel = fabs(next_elem.references[j]
-                                - 2*elem.references[j]
-                                + last_elem.references[j])
-                           * _desc.params.frequency * _desc.params.frequency;
-            if( accel > info.max_accel + eps )
-            {
-                print_limit_violation("max acceleration", info.name, j,
-                                      info.max_accel, accel, i);
-                // TODO: Acceleration limits seem too easy to violate...
-//                limits_okay = false;
-            }
-        }
-    }
-    
-    return limits_okay;
-}
-
 bool Player::_receive_incoming_trajectory()
 {
     ach_flush(&_input_chan);
@@ -233,7 +142,7 @@ bool Player::_receive_incoming_trajectory()
     // TODO: Should the trajectory be passed through the controller before evaluating the refs?
     // Almost certainly.
 //    bool all_valid = true;
-    std::vector<bool> invalid_joints;
+    std::vector<size_t> invalid_joints;
     for(size_t i=0; i<_desc.joints.size(); ++i)
     {
         if( ((_trajectory.params.bitmap >> i) & 0x01) == 0x01 )
@@ -260,8 +169,10 @@ bool Player::_receive_incoming_trajectory()
         std::cout << "Error! The following joints had invalid starting values: ";
         for(size_t i=0; i<invalid_joints.size(); ++i)
         {
-            std::cout << _desc.getJointName(i) << " ("
-                      << _trajectory.elements[0].references[i] << ")";
+            size_t invalid = invalid_joints[i];
+            std::cout << _desc.getJointName(invalid) << " ("
+                      << _trajectory.elements[0].references[invalid]
+                      << ":" << joints[invalid].reference << ")";
             if(i+1 < invalid_joints.size())
                 std::cout << ", ";
         }
@@ -276,7 +187,7 @@ bool Player::_receive_incoming_trajectory()
         return false;
     }
     
-    if(!_check_limits())
+    if(!_trajectory.check_limits())
         return false;
 
     send_commands();

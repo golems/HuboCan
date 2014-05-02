@@ -6,6 +6,7 @@
 #include <sys/types.h>
 
 #include "HuboCan/AchIncludes.h"
+#include "HuboCan/hubo_info_c.h"
 
 #define HUBO_PATH_INSTRUCTION_CHANNEL "hubo_path_instruction"
 #define HUBO_PATH_INPUT_CHANNEL "hubo_path_input"
@@ -107,6 +108,9 @@ typedef struct hubo_path_params {
     hubo_path_interp_t interp;
     double tolerance;
     uint64_t bitmap;
+    
+    uint8_t use_custom_limits;
+    hubo_joint_limits_t limits[HUBO_PATH_JOINT_MAX_SIZE];
     
     // TODO: Add any parameters which apply to all elements in the path
     

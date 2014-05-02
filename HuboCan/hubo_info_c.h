@@ -54,6 +54,19 @@ typedef struct hubo_meta_info {
 
 }__attribute__((packed)) hubo_meta_info_t;
 
+typedef struct hubo_joint_limits {
+    
+    float min_position;
+    float max_position;
+
+    float nominal_speed;
+    float max_speed;
+
+    float nominal_accel;
+    float max_accel;
+    
+}__attribute__((packed)) hubo_joint_limits_t;
+
 typedef struct hubo_joint_info {
 
     char name[HUBO_COMPONENT_NAME_MAX_LENGTH];
@@ -71,14 +84,7 @@ typedef struct hubo_joint_info {
     uint16_t hardware_index;
     char jmc_name[HUBO_COMPONENT_NAME_MAX_LENGTH];
 
-    float min_position;
-    float max_position;
-
-    float nominal_speed;
-    float max_speed;
-
-    float nominal_accel;
-    float max_accel;
+    hubo_joint_limits_t limits;
 
 }__attribute__((packed)) hubo_joint_info_t;
 

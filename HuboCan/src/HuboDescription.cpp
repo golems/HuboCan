@@ -316,8 +316,8 @@ bool HuboDescription::_parseJoint(bool strict)
             }
             else
             {
-                new_joint_info.min_position = atof(components[1].c_str());
-                new_joint_info.max_position = atof(components[2].c_str());
+                new_joint_info.limits.min_position = atof(components[1].c_str());
+                new_joint_info.limits.max_position = atof(components[2].c_str());
             }
         }
         else if("nominal_and_max_speeds" == components[0])
@@ -329,8 +329,8 @@ bool HuboDescription::_parseJoint(bool strict)
             }
             else
             {
-                new_joint_info.nominal_speed = atof(components[1].c_str());
-                new_joint_info.max_speed = atof(components[2].c_str());
+                new_joint_info.limits.nominal_speed = atof(components[1].c_str());
+                new_joint_info.limits.max_speed = atof(components[2].c_str());
             }
         }
         else if("nominal_and_max_accels" == components[0])
@@ -342,8 +342,8 @@ bool HuboDescription::_parseJoint(bool strict)
             }
             else
             {
-                new_joint_info.nominal_accel = atof(components[1].c_str());
-                new_joint_info.max_accel = atof(components[2].c_str());
+                new_joint_info.limits.nominal_accel = atof(components[1].c_str());
+                new_joint_info.limits.max_accel = atof(components[2].c_str());
             }
         }
         else if("jmc_name" == components[0])

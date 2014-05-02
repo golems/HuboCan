@@ -75,6 +75,8 @@ public:
 
     bool interpolate();
     bool interpolate(hubo_path_interp_t type);
+    
+    bool check_limits() const;
 
 protected:
 
