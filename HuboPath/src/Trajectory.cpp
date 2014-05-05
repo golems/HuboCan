@@ -1,6 +1,8 @@
 
 #include "../Trajectory.hpp"
 #include "../interpolation/Trajectory.h"
+#include "../interpolation/Spline.hpp"
+
 
 bool HuboPath::Trajectory::interpolate(hubo_path_interp_t type)
 {
@@ -17,15 +19,15 @@ bool HuboPath::Trajectory::interpolate()
     {
         return true;
     }
-    else if( HUBO_PATH_OPTIMIZE == params.interp )
+    
+    
+    if( HUBO_PATH_OPTIMIZE == params.interp )
     {
         return _optimal_interpolation();
     }
     else if( HUBO_PATH_SPLINE == params.interp )
     {
-        // TODO: fill in the guts of the spline interpolation
-//        return _spline_interpolation();
-        return _optimal_interpolation();
+        return _spline_interpolation();
     }
     else if( HUBO_PATH_DENSIFY == params.interp )
     {
@@ -146,9 +148,6 @@ bool HuboPath::Trajectory::check_limits() const
             {
                 print_limit_violation("max acceleration", name, j,
                                       limits.max_accel, accel, i);
-                std::cout << next_elem.references[j] << " : " << elem.references[j]
-                          << " : " << last_elem.references[j] << " | " << frequency << std::endl;
-                // TODO: Acceleration limits seem too easy to violate...
                 limits_okay = false;
             }
         }
@@ -159,10 +158,11 @@ bool HuboPath::Trajectory::check_limits() const
 
 bool HuboPath::Trajectory::_optimal_interpolation()
 {
+    // TODO: 
     if(!desc.okay())
     {
         std::cout << "This trajectory does not have a HuboDescription loaded!\n"
-                  << " -- We cannot interpolate using HUBO_PATH_OPTIMIZE!" << std::endl;
+                  << " -- We cannot interpolate!" << std::endl;
         return false;
     }
 
@@ -241,7 +241,24 @@ bool HuboPath::Trajectory::_optimal_interpolation()
 
 bool HuboPath::Trajectory::_spline_interpolation()
 {
-    // TODO
+    if(!desc.okay())
+    {
+        std::cout << "This trajectory does not have a HuboDescription loaded!\n"
+                  << " -- We cannot interpolate!" << std::endl;
+        return false;
+    }
+
+    IndexArray joint_mapping;
+    for(size_t i=0; i<HUBO_PATH_JOINT_MAX_SIZE; ++i)
+    {
+        if( ((params.bitmap >> i) & 0x01) == 1)
+        {
+            joint_mapping.push_back(i);
+        }
+    }
+    
+    
+    
     return false;
 }
 
