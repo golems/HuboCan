@@ -217,6 +217,32 @@ hubo_data_error_t hubo_cmd_data_register_joint(hubo_cmd_data *data, size_t joint
     return HUBO_DATA_OKAY;
 }
 
+hubo_data_error_t hubo_cmd_data_unregister_released_joints(hubo_cmd_data *data)
+{
+    hubo_data_error_t check = hubo_cmd_header_check(data);
+    if( check != HUBO_DATA_OKAY )
+    {
+        return check;
+    }
+
+    size_t num_total_joints = hubo_cmd_data_get_total_num_joints(data);
+    size_t i=0;
+    hubo_cmd_header_t* header = (hubo_cmd_header_t*)data;
+    for(i=0; i<num_total_joints; ++i)
+    {
+        hubo_joint_cmd_t* cmd = hubo_cmd_data_access_joint_cmd(data, i);
+        if(HUBO_CMD_RELEASE == cmd->mode)
+        {
+            cmd->mode = HUBO_CMD_IGNORE;
+            uint64_t inverse_bitmap = ~(header->bitmap);
+            inverse_bitmap |= (0x01 << i);
+            header->bitmap = ~(inverse_bitmap);
+        }
+    }
+
+    return HUBO_DATA_OKAY;
+}
+
 hubo_joint_cmd_t* hubo_cmd_data_access_joint_cmd(hubo_cmd_data *data, size_t joint_index)
 {
     size_t total_num_joints = hubo_cmd_data_get_total_num_joints(data);

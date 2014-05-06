@@ -84,6 +84,8 @@ hubo_joint_cmd_t* hubo_cmd_data_access_joint_cmd(hubo_cmd_data* data, size_t joi
 
 hubo_data_error_t hubo_cmd_data_register_joint(hubo_cmd_data* data, size_t joint_index);
 
+hubo_data_error_t hubo_cmd_data_unregister_released_joints(hubo_cmd_data* data);
+
 size_t hubo_cmd_data_get_size(const hubo_cmd_data* data);
 
 int hubo_cmd_data_check_if_joint_is_set(const hubo_cmd_data* data, size_t joint_index);

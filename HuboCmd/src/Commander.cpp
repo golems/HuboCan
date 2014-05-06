@@ -419,6 +419,8 @@ HuboCan::error_result_t Commander::send_commands()
 
     ach_put(&_cmd_chan, _compressed_data, hubo_cmd_data_get_min_data_size(_compressed_data));
 
+    hubo_cmd_data_unregister_released_joints(cmd_data);
+
     _has_been_updated = false;
 
     return HuboCan::OKAY;
