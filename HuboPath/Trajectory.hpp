@@ -77,11 +77,18 @@ public:
     bool interpolate(hubo_path_interp_t type);
     
     bool check_limits() const;
+    
+    void get_active_indices(std::vector<size_t>& mapping);
+    bool get_active_joint_limits(std::vector<hubo_joint_limits_t>& limits);
 
 protected:
 
-    bool _optimal_interpolation();
-    bool _spline_interpolation();
+    bool _optimal_interpolation(const Eigen::VectorXd& velocities,
+                                const Eigen::VectorXd& accelerations,
+                                double frequency);
+    bool _spline_interpolation(const Eigen::VectorXd& velocities,
+                               const Eigen::VectorXd& accelerations,
+                               double frequency);
     bool _densify();
 
 };

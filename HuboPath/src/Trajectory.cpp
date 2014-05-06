@@ -20,14 +20,39 @@ bool HuboPath::Trajectory::interpolate()
         return true;
     }
     
+    std::vector<size_t> joint_mapping;
+    get_active_indices(joint_mapping);
     
-    if( HUBO_PATH_OPTIMIZE == params.interp )
+    std::vector<hubo_joint_limits_t> limits;
+    if(!get_active_joint_limits(limits))
     {
-        return _optimal_interpolation();
+        std::cout << "Cannot interpolate without knowing joint limits!" << std::endl;
+        return false;
+    }
+    
+    Eigen::VectorXd velocities(joint_mapping.size());
+    Eigen::VectorXd accelerations(joint_mapping.size());
+    for(size_t j=0; j<joint_mapping.size(); ++j)
+    {
+        velocities[j] = limits[j].nominal_speed;
+        accelerations[j] = limits[j].nominal_accel;
+    }
+    
+    double frequency = desc.okay()? desc.params.frequency : params.frequency;
+    if( 0 == frequency )
+    {
+        std::cout << "Warning: Your Trajectory contained a frequency parameter of 0\n"
+                     " -- We will default this to 200" << std::endl;
+        frequency = 200;
+    }
+    
+    if( HUBO_PATH_OPTIMAL == params.interp )
+    {
+        return _optimal_interpolation(velocities, accelerations, frequency);
     }
     else if( HUBO_PATH_SPLINE == params.interp )
     {
-        return _spline_interpolation();
+        return _spline_interpolation(velocities, accelerations, frequency);
     }
     else if( HUBO_PATH_DENSIFY == params.interp )
     {
@@ -156,24 +181,50 @@ bool HuboPath::Trajectory::check_limits() const
     return limits_okay;
 }
 
-bool HuboPath::Trajectory::_optimal_interpolation()
+void HuboPath::Trajectory::get_active_indices(std::vector<size_t> &mapping)
 {
-    // TODO: 
-    if(!desc.okay())
-    {
-        std::cout << "This trajectory does not have a HuboDescription loaded!\n"
-                  << " -- We cannot interpolate!" << std::endl;
-        return false;
-    }
-
-    IndexArray joint_mapping;
+    mapping.clear();
     for(size_t i=0; i<HUBO_PATH_JOINT_MAX_SIZE; ++i)
     {
         if( ((params.bitmap >> i) & 0x01) == 1)
         {
-            joint_mapping.push_back(i);
+            mapping.push_back(i);
         }
     }
+}
+
+bool HuboPath::Trajectory::get_active_joint_limits(std::vector<hubo_joint_limits_t> &limits)
+{
+    if(!desc.okay() && (params.use_custom_limits != 1))
+    {
+        std::cout << "Could not retrieve joint limits!\n"
+                  << " -- Need either a valid description to be loaded or to have custom limits set!"
+                  << std::endl;
+        return false;
+    }
+    
+    std::vector<size_t> mapping;
+    get_active_indices(mapping);
+    
+    hubo_joint_limits_t joint_limits;
+    for(size_t i=0; i<mapping.size(); ++i)
+    {
+        size_t index = mapping[i];
+        joint_limits = (params.use_custom_limits==1) ?
+                           params.limits[index] : desc.joints[index]->info.limits;
+        limits.push_back(joint_limits);
+    }
+    
+    return true;
+}
+
+bool HuboPath::Trajectory::_optimal_interpolation(const Eigen::VectorXd& velocities,
+                                                  const Eigen::VectorXd& accelerations,
+                                                  double frequency)
+{
+
+    IndexArray joint_mapping;
+    get_active_indices(joint_mapping);
 
     std::list<Eigen::VectorXd> waypoints;
     Eigen::VectorXd next_point(joint_mapping.size());
@@ -186,13 +237,6 @@ bool HuboPath::Trajectory::_optimal_interpolation()
         waypoints.push_back(next_point);
     }
 
-    Eigen::VectorXd velocities(joint_mapping.size());
-    Eigen::VectorXd accelerations(joint_mapping.size());
-    for(size_t j=0; j<joint_mapping.size(); ++j)
-    {
-        velocities[j] = desc.joints[joint_mapping[j]]->info.limits.nominal_speed;
-        accelerations[j] = desc.joints[joint_mapping[j]]->info.limits.nominal_accel;
-    }
 
     double tolerance = params.tolerance;
     if(tolerance == 0)
@@ -211,14 +255,6 @@ bool HuboPath::Trajectory::_optimal_interpolation()
         return false;
     }
 
-    double frequency = desc.params.frequency;
-    if( 0 == frequency )
-    {
-        std::cout << "Warning: Your Trajectory object's HuboDescription "
-                     "contained a frequency parameter of 0\n"
-                     " -- We will default this to 200" << std::endl;
-        frequency = 200;
-    }
 
     double dt = 1.0/frequency;
     size_t traj_count = optimal_traj.getDuration()*frequency;
@@ -235,31 +271,55 @@ bool HuboPath::Trajectory::_optimal_interpolation()
     }
 
     params.interp = HUBO_PATH_RAW;
+    
+    std::cout << "Successfully performed an optimal interpolation" << std::endl;
 
     return true;
 }
 
-bool HuboPath::Trajectory::_spline_interpolation()
+bool HuboPath::Trajectory::_spline_interpolation(const Eigen::VectorXd& velocities,
+                                                 const Eigen::VectorXd& accelerations,
+                                                 double frequency)
 {
-    if(!desc.okay())
+    IndexArray joint_mapping;
+    get_active_indices(joint_mapping);
+    
+    std::vector<Eigen::VectorXd> waypoints;
+    Eigen::VectorXd next_point(joint_mapping.size());
+    for(size_t i=0; i<elements.size(); ++i)
     {
-        std::cout << "This trajectory does not have a HuboDescription loaded!\n"
-                  << " -- We cannot interpolate!" << std::endl;
+        for(size_t j=0; j<joint_mapping.size(); ++j)
+        {
+            next_point[j] = elements[i].references[joint_mapping[j]];
+        }
+        waypoints.push_back(next_point);
+    }
+    
+    spline_interpolation::Spline cubic_spline(waypoints, velocities, accelerations, frequency);
+    if(!cubic_spline.valid())
+    {
+        std::cout << "ERROR: Could not produce a valid cubic spline interpolation!" << std::endl;
         return false;
     }
-
-    IndexArray joint_mapping;
-    for(size_t i=0; i<HUBO_PATH_JOINT_MAX_SIZE; ++i)
+    
+    std::vector<Eigen::VectorXd> interpolation = cubic_spline.getTrajectory();
+    elements.clear();
+    elements.resize(interpolation.size());
+    
+    for(size_t i=0; i<interpolation.size(); ++i)
     {
-        if( ((params.bitmap >> i) & 0x01) == 1)
+        Eigen::VectorXd& point = interpolation[i];
+        
+        for(size_t j=0; j<joint_mapping.size(); ++j)
         {
-            joint_mapping.push_back(i);
+            elements[i].references[joint_mapping[j]] = point[j];
         }
     }
+    params.interp = HUBO_PATH_RAW;
     
+    std::cout << "Successfully performed a spline interpolation" << std::endl;
     
-    
-    return false;
+    return true;
 }
 
 bool HuboPath::Trajectory::_densify()

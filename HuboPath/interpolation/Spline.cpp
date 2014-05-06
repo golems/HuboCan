@@ -34,6 +34,7 @@ Spline::Spline(const std::vector<Eigen::VectorXd> &path,
     _path_segment_map.push_back(0);
     for(size_t i=1; i<path.size(); ++i)
     {
+        _current_step_num = i;
         if(!_checkConfigSize(path[i], i))
             return;
         _interpolateNextStep(path[i],path[i-1]);
@@ -76,14 +77,31 @@ void Spline::_interpolateNextStep(const Eigen::VectorXd &next_config,
 double Spline::_getMinimumTime(const Eigen::VectorXd &diff)
 {
     double minTime = 0;
+    std::string minReason;
     double time = 0;
+    std::string reason;
+    size_t minJoint = (size_t)(-1);
     for(int i=0; i<diff.size(); ++i)
     {
-        time = _getCubicSplineTime(diff[i], _maxVelocity[i], _maxAccel[i]);
+        time = _getCubicSplineTime(diff[i], _maxVelocity[i], _maxAccel[i], reason, i);
         if( time > minTime )
         {
             minTime = time;
+            minReason = reason;
+            minJoint = i;
         }
+    }
+    
+    if( minJoint == (size_t)(-1) )
+    {
+        std::cout << "Zero minimum time required for step #" << _current_step_num
+                  << " with a displacement of " << diff.norm() << std::endl;
+    }
+    else
+    {
+        std::cout << "Minimum time for step #" << _current_step_num
+              << " is " << minTime << " sec due to " << reason
+              << " in joint #" << minJoint << std::endl;
     }
     
     return minTime;
@@ -91,13 +109,44 @@ double Spline::_getMinimumTime(const Eigen::VectorXd &diff)
 
 double Spline::_getCubicSplineTime(double dx,
                                    double max_vel,
-                                   double max_accel)
+                                   double max_accel,
+                                   std::string& reason,
+                                   size_t joint_num)
 {
     max_vel = fabs(max_vel);
     max_accel = fabs(max_accel);
+    dx = fabs(dx);
+
+    if(max_vel <= 0)
+    {
+        std::cout << "Error! " << max_vel << " max velocity found for joint #"
+                  << joint_num << "!" << std::endl;
+        _error = true;
+    }
+    
+    if(max_accel <= 0)
+    {
+        std::cout << "Error! " << max_accel << " max acceleration found for joint #"
+                  << joint_num << "!" << std::endl;
+        _error = true;
+    }
+    
+    if(_error)
+        return 0;
     
     double T_max_vel = (3*dx)/(2*max_vel);
     double T_max_accel = sqrt(6*dx/max_accel);
+    
+    if(T_max_accel > T_max_vel)
+    {
+        reason = "acceleration";
+        return T_max_accel;
+    }
+    else
+    {
+        reason = "velocity";
+        return T_max_vel;
+    }
     
     return std::max(T_max_vel, T_max_accel);
 }

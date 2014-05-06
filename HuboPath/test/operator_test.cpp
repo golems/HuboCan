@@ -169,31 +169,36 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-//    op.interpolate();
+//    op.setInterpolationMode(HUBO_PATH_OPTIMAL);
+    op.interpolate();
     const HuboPath::Trajectory& traj = op.getCurrentTrajectory();
     
-//    std::cout << op.getCurrentTrajectory() << "\n" << std::endl;
-//    traj.check_limits();
     
-    for(size_t i=0; i<traj.size(); ++i)
-    {
-        bool hit_first = false;
-        for(size_t j=0; j<HUBO_PATH_JOINT_MAX_SIZE; ++j)
-        {
-            if( ((traj.params.bitmap>>j) & 0x01) == 1 )
-            {
-                if(hit_first)
-                    std::cout << ", ";
-                else
-                    hit_first = true;
+    std::cout << op.getCurrentTrajectory() << "\n" << std::endl;
+    
+    traj.check_limits();
+    
+    
+    
+//    for(size_t i=0; i<traj.size(); ++i)
+//    {
+//        bool hit_first = false;
+//        for(size_t j=0; j<HUBO_PATH_JOINT_MAX_SIZE; ++j)
+//        {
+//            if( ((traj.params.bitmap>>j) & 0x01) == 1 )
+//            {
+//                if(hit_first)
+//                    std::cout << ", ";
+//                else
+//                    hit_first = true;
                 
-                std::cout << traj.elements[i].references[j];
-            }
-        }
-        std::cout << ";" << std::endl;
-    }
+//                std::cout << traj.elements[i].references[j];
+//            }
+//        }
+//        std::cout << ";" << std::endl;
+//    }
     
-    op.sendNewTrajectory();
+//    op.sendNewTrajectory();
 
     return 0;
 }

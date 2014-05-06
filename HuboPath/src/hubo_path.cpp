@@ -208,7 +208,7 @@ const char* hubo_path_interp_to_string(const hubo_path_interp_t& type)
     switch(type)
     {
         case HUBO_PATH_SPLINE:      return "HUBO_PATH_SPLINE";  break;
-        case HUBO_PATH_OPTIMIZE:    return "HUBO_PATH_OPTIMIZE";break;
+        case HUBO_PATH_OPTIMAL:    return "HUBO_PATH_OPTIMIZE";break;
         case HUBO_PATH_DENSIFY:     return "HUBO_PATH_DENSIFY"; break;
         case HUBO_PATH_RAW:         return "HUBO_PATH_RAW";     break;
         default:                    return "HUBO_PATH_UNKNOWN"; break;
