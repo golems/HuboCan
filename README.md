@@ -24,9 +24,9 @@ There are five namespaces used in the HuboCan library:
 
 
 
-# HuboCan Namespace
+## HuboCan Namespace
 
-## CanPump
+### CanPump
 
 The purpose of the CanPump class is to provide a skeleton for a real-time CAN-based hardware
 interface. The CanPump class alone is not able to interface with hardware; rather, that is what the
@@ -37,7 +37,7 @@ timing functionality and connection to the rest of the HuboCan framework with no
 inherit the CanPump class overload the virtual functions _send_frame and _wait_on_frame with your
 hardware implementation.
 
-## CanDevice
+### CanDevice
 
 The CanDevice class gives a blueprint for CanDevices to add to the CanPump. The idea is that a CAN
 bus will have any number of devices attached to it (in our case, mostly joints and sensors). Each
@@ -47,7 +47,7 @@ will trigger the update() function on each CanDevice which has been given to it.
 CAN frame is received by the CanPump, it will call the decode() function on each CanDevice to give
 them all the opportunity to read the incoming frames.
 
-## HuboJmc
+### HuboJmc
 
 The physical Hubo robot has JMCs (Joint Motor Controllers) which are connected to the CAN bus.
 Each JMC is considered one device on the CAN bus (whether that JMC controls one, two, or more
@@ -55,12 +55,12 @@ joints). Different JMC types will have very different implementations, so the Hu
 serves as a minimalist blueprint for these devices. The many different types of JMCs can be seen in
 HuboCan/HuboJmc.hpp. This class may serve as a good example of a CanDevice implementation.
 
-## HuboSensor (Not yet fully implemented)
+### HuboSensor (Not yet fully implemented)
 
 In addition to JMCs, the physical robot has sensor devices connected to CAN. HuboSensor represents
 a minimalist blueprint for various sensor classes (i.e. HuboImu and HuboFt)
 
-## HuboDescription
+### HuboDescription
 
 This class is an [abstract factory](http://sourcemaking.com/design_patterns/abstract_factory/cpp/2).
 It reads in a .dd (device description) file and churns out the appropriate CanDevices. When
