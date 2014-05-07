@@ -9,6 +9,8 @@ class CanDevice
 {
 public:
     
+    virtual ~CanDevice();
+    
     inline CanDevice()
     {
         _pump = NULL;
