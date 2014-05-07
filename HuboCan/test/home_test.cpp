@@ -1,11 +1,11 @@
 
-#include "HuboCmd/Initializer.hpp"
+#include "HuboCmd/AuxSender.hpp"
 
 using namespace HuboCmd;
 
 int main(int argc, char* argv[])
 {
-    Initializer initializer;
+    AuxSender initializer;
     HuboCan::HuboDescription desc;
     desc.receiveInfo();
 

@@ -1,5 +1,5 @@
-#ifndef HUBOINITIALIZER_HPP
-#define HUBOINITIALIZER_HPP
+#ifndef HUBOAUXSENDER_HPP
+#define HUBOAUXSENDER_HPP
 
 extern "C" {
 #include "hubo_aux_cmd_c.h"
@@ -11,12 +11,12 @@ namespace HuboCmd {
 
 // TODO: Come up with a better name for this class
 
-class Initializer
+class AuxSender
 {
 public:
     
-    Initializer(bool initialize=true, double timeout_sec=1 );
-    Initializer(const HuboCan::HuboDescription& description);
+    AuxSender(bool initialize=true, double timeout_sec=1 );
+    AuxSender(const HuboCan::HuboDescription& description);
     
     bool initialize(double timeout_sec=1);
 
@@ -49,4 +49,4 @@ protected:
 
 } // namespace HuboCmd
 
-#endif // HUBOINITIALIZER_HPP
+#endif // HUBOAUXSENDER_HPP

@@ -1,10 +1,10 @@
 
-#include "../Initializer.hpp"
+#include "../AuxSender.hpp"
 #include <stdio.h>
 
 using namespace HuboCmd;
 
-Initializer::Initializer(bool initialize, double timeout_sec)
+AuxSender::AuxSender(bool initialize, double timeout_sec)
 {
     _channels_opened = false;
     _clear_command();
@@ -16,7 +16,7 @@ Initializer::Initializer(bool initialize, double timeout_sec)
     open_channels();
 }
 
-Initializer::Initializer(const HuboCan::HuboDescription& description)
+AuxSender::AuxSender(const HuboCan::HuboDescription& description)
 {
     _channels_opened = false;
     _clear_command();
@@ -25,7 +25,7 @@ Initializer::Initializer(const HuboCan::HuboDescription& description)
     open_channels();
 }
 
-bool Initializer::initialize(double timeout_sec)
+bool AuxSender::initialize(double timeout_sec)
 {
     if(!_description_loaded)
         receive_description(timeout_sec);
@@ -35,22 +35,22 @@ bool Initializer::initialize(double timeout_sec)
     return ready();
 }
 
-bool Initializer::ready() { return _description_loaded && _channels_opened; }
+bool AuxSender::ready() { return _description_loaded && _channels_opened; }
 
-bool Initializer::receive_description(double timeout_sec)
+bool AuxSender::receive_description(double timeout_sec)
 {
     HuboCan::error_result_t result = _desc.receiveInfo(timeout_sec);
     _description_loaded = ( result == HuboCan::OKAY );
     return _description_loaded;
 }
 
-void Initializer::load_description(const HuboCan::HuboDescription &description)
+void AuxSender::load_description(const HuboCan::HuboDescription &description)
 {
     _desc = description;
     _description_loaded = true;
 }
 
-bool Initializer::open_channels()
+bool AuxSender::open_channels()
 {
     if(_channels_opened)
         return true;
@@ -69,13 +69,13 @@ bool Initializer::open_channels()
     return _channels_opened;
 }
 
-void Initializer::_clear_command()
+void AuxSender::_clear_command()
 {
     memset(&_cmd, 0, sizeof(_cmd));
     strcpy(_cmd.code, HUBO_AUX_CMD_HEADER_CODE);
 }
 
-bool Initializer::_send_command()
+bool AuxSender::_send_command()
 {
     if(!_channels_opened)
     {
@@ -94,27 +94,27 @@ bool Initializer::_send_command()
     return true;
 }
 
-size_t Initializer::_jmc(size_t joint)
+size_t AuxSender::_jmc(size_t joint)
 {
     if(joint >= _desc.joints.size())
         return InvalidIndex;
     return _desc.getJmcIndex(_desc.joints[joint]->info.jmc_name);
 }
 
-size_t Initializer::_hw_index(size_t joint)
+size_t AuxSender::_hw_index(size_t joint)
 {
     if(joint >= _desc.joints.size())
         return InvalidIndex;
     return _desc.getJointInfo(joint).hardware_index;
 }
 
-void Initializer::_set_jmc_info(size_t joint)
+void AuxSender::_set_jmc_info(size_t joint)
 {
     _cmd.jmc = _jmc(joint);
     _cmd.joint = _hw_index(joint);
 }
 
-void Initializer::home_joint(size_t joint)
+void AuxSender::home_joint(size_t joint)
 {
     _clear_command();
     _cmd.id = HOME_JOINT;
@@ -122,7 +122,7 @@ void Initializer::home_joint(size_t joint)
     _send_command();
 }
 
-void Initializer::home_all_joints()
+void AuxSender::home_all_joints()
 {
     _clear_command();
     _cmd.id = HOME_ALL_JOINTS;

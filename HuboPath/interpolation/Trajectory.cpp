@@ -498,7 +498,7 @@ double Trajectory::getAccelerationMaxPathVelocityDeriv(double pathPos) {
 double Trajectory::getVelocityMaxPathVelocityDeriv(double pathPos) {
 	const VectorXd tangent = path.getTangent(pathPos);
 	double maxPathVelocity = numeric_limits<double>::max();
-    unsigned int activeConstraint=0;
+    unsigned int activeConstraint=(unsigned int)(-1);
 	for(unsigned int i = 0; i < n; i++) {
 		const double thisMaxPathVelocity = maxVelocity[i] / abs(tangent[i]);
 		if(thisMaxPathVelocity < maxPathVelocity) {

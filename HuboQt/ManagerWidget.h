@@ -10,7 +10,7 @@
 #include "AchdHandle.h"
 
 #include "HuboRT/ManagerReq.hpp"
-#include "HuboCmd/Initializer.hpp"
+#include "HuboCmd/AuxSender.hpp"
 
 namespace HuboQt {
 
@@ -37,7 +37,7 @@ protected:
     Ui::ManagerWidget* _ui;
     
     HuboRT::ManagerReq* _req;
-    HuboCmd::Initializer _init;
+    HuboCmd::AuxSender _init;
     
     AchdPtrArray _perm_achd_handles;    // This is for the Manager's channels which will
                                         // always be exactly the same
@@ -78,7 +78,6 @@ protected Q_SLOTS:
     void stop_all();
     void kill_all();
     
-    void refresh_startup();
     void refresh_chans();
     void refresh_registered_procs();
     void refresh_registered_procs_raw();

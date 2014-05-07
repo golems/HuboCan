@@ -245,8 +245,8 @@ void ManagerWidget::_display_locked_processes(const StringArray &locks)
 
 void ManagerWidget::shutdown_everything()
 {
-    manager_err_t result = _req->shut_down();
-    _set_status(result, "shutdown command");
+    stop_all();
+    destroy_all();
 }
 
 void ManagerWidget::homeall()
@@ -289,12 +289,6 @@ void ManagerWidget::stop_all()
 void ManagerWidget::kill_all()
 {
     _set_status(_req->kill_all_processes(), "kill all processes");
-}
-
-void ManagerWidget::refresh_startup()
-{
-    refresh_chans();
-    set_displaying_locked_procs(true);
 }
 
 void ManagerWidget::refresh_chans()
