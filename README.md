@@ -22,7 +22,7 @@ There are five namespaces used in the HuboCan library:
 | HuboPath | This namespace provides tools for creating, interpolating, and running trajectories on Hubo (as well as interrupting and reversing trajectories while they are running) | Operator, Player, Trajectory |
 | HuboRT (Real Time) | This namespace contains the tools which are used for creating real-time processes and managing those processes, as well as their Ach channels | Daemonizer, Manager, ManagerReq |
 
-## HuboQt Namespace
+### HuboQt Namespace
 
 #### ManagerWidget
 
@@ -33,7 +33,7 @@ also provides a convenient interface for managing Ach Networking Daemons by simp
 Reconnect/Disconnect. This widget is intended to be the "front page" of any Qt-based operating
 software for Hubo.
 
-## HuboPath Namespace
+### HuboPath Namespace
 
 #### Operator
 
@@ -50,13 +50,13 @@ which will be able to modify trajectories on the fly based on sensor feedback.
 #### Trajectory
 
 The Trajectory class is a container class for handling trajectory data. Currently this only includes
-jointspace waypoints, but in the future will (hopefully) include control schemes, end effector
-waypoints, and self-collision checks.
+jointspace waypoints and limit (position, velocity, and acceleration) checking, but in the future
+will (hopefully) include control schemes, end effector waypoints, and self-collision checks.
 
-Note: The Trajectory class has a very nice C++ stream operator which will print out its contents
-in a clean and easy-to-read format.
+Note: The Trajectory class has a very nice C++ stream operator (std::cout << ) which will print out
+its contents in a clean and easy-to-read format.
 
-## HuboCan Namespace
+### HuboCan Namespace
 
 #### CanPump
 
