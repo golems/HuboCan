@@ -8,18 +8,18 @@ ShowUsage()
     echo " This is for installing HuboCan on the physical Hubo itself."
     echo " When running the script, pass in 'robot' followed by the"
     echo " version of Hubo which you have. Ex:"
-    echo "sudo ./setup robot Hubo2Plus"
+    echo "$ ./setup robot Hubo2Plus"
     echo " "
     echo " Currently supported versions include:"
     echo " - Hubo2Plus"
     echo " - DrcHubo"
     echo " "
-    echo " -- remote -- "
+    echo " -- workstation -- "
     echo " This is for installing HuboCan on a remote workstation"
     echo " (i.e. a computer which is for developing code or for"
     echo " an operator to use). When running the script, simply"
-    echo " pass in 'remote'. Ex:"
-    echo "sudo ./setup remote"
+    echo " pass in 'workstation'. Ex:"
+    echo "$ ./setup workstation"
     echo " "
 }
 
@@ -39,6 +39,12 @@ CopyDevices()
 {
     echo 'Copying device files into /opt/hubo/devices'
     cp -r ../HuboCan/devices /opt/hubo/
+}
+
+AutostartManager()
+{
+    echo 'Adding hubomgr to the upstart list'
+    sudo cp ../misc/hubomgr.conf /etc/init/hubomgr.conf
 }
 
 RawRobotInstall()
@@ -61,6 +67,7 @@ RawRobotInstall()
 
     CreateOptHubo
     CopyDevices
+    AutostartManager
 
     /usr/bin/hubocan_setup_default_config "$2"
 }
@@ -81,7 +88,7 @@ RobotInstall()
     esac
 }
 
-RemoteInstall()
+WorkstationInstall()
 {
     if [ -d "build" ]
     then
@@ -105,8 +112,8 @@ case "$1" in
         RobotInstall $@
     ;;
 
-    'remote')
-        RemoteInstall $@
+    'workstation')
+        WorkstationInstall $@
     ;;
 
     *)
