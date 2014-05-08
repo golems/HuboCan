@@ -180,7 +180,7 @@ std::vector<DataClass> get_vector_from_data(hubo_data* data)
     return data_vector;
 }
 
-typedef std::map<std::string, size_t> NameMap;
+typedef std::map<std::string, size_t> StringMap;
 
 template<class DataClass>
 class HuboData
@@ -269,7 +269,7 @@ public:
 
     DataClass& operator[](const std::string& name)
     {
-        NameMap::iterator it = _mapping.find(name);
+        StringMap::iterator it = _mapping.find(name);
         if(it == _mapping.end())
         {
             std::cout << "You have requested a data member which does not exist for channel '"
@@ -289,7 +289,7 @@ public:
         _names.clear();
         for(size_t i=0; i<names.size(); ++i)
         {
-            NameMap::iterator it = _mapping.find(names[i]);
+            StringMap::iterator it = _mapping.find(names[i]);
             if(it == _mapping.end())
             {
                 _mapping[names[i]] = i;
@@ -483,7 +483,7 @@ protected:
         }
     }
     
-    NameMap _mapping;
+    StringMap _mapping;
     std::vector<std::string> _names;
     std::string _channel_name;
     ach_channel_t _channel;
