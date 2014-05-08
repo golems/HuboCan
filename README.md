@@ -14,9 +14,9 @@ work seamlessly for every version of Hubo which currently exists and which may e
 
 This package currently has two (and a third optional) external dependencies:
 
-1. [Ach](https://github.com/golems/ach) For interprocess communication
-2. [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page) For fancy matrix operations
-3. (Optional) [Qt](http://qt-project.org/) For user interface creation
+1. [Ach](https://github.com/golems/ach) for interprocess communication
+2. [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page) for fancy matrix operations
+3. (Optional) [Qt](http://qt-project.org/) for user interface creation
 
 ### Installation script
 

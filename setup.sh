@@ -100,8 +100,17 @@ RobotInstall()
             exit 2
         ;;
 
-        *)
+        'Hubo2Plus')
             RawRobotInstall $@
+        ;;
+        
+        'DrcHubo')
+            RawRobotInstall $@
+        ;;
+        
+        *)
+            ShowUsage
+            exit 2
         ;;
 
     esac
