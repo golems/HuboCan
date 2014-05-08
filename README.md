@@ -20,9 +20,10 @@ This package currently has two (and a third optional) external dependencies:
 
 ### Installation script
 
-For your convenience, a bash script is already written which will automatically install these
-packages for you as long as you have an internet connection during the installation. The script
-is called setup.sh and resides in the root of the source tree.
+For your convenience, a bash script is already written which will automatically install the
+dependenceis for you as long as you have an internet connection during the installation. The script
+is called setup.sh and resides in the root of the source tree. Of course it also handles building
+and installing the HuboCan package.
 
 You are strongly encouraged to run setup.sh from the same directory that it resides in, because it
 will create its own build directory relative to the current working directory of the terminal.
@@ -37,7 +38,7 @@ Simply run the setup script as follows:
 $ ./setup robot <robot_type>
 ```
 
-Replace <robot_type> with either Hubo2Plus or DrcHubo depending on which version of Hubo you have.
+Replace &lt;robot_type&gt; with either Hubo2Plus or DrcHubo depending on which version of Hubo you have.
 
 #### Workstation installation
 
