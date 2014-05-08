@@ -111,6 +111,8 @@ WorkstationInstall()
 {
     SetupAptList
     GetDependencies
+    sudo apt-get install libqt4-dev
+
     MakeBuildDirectory
 
     cd build
