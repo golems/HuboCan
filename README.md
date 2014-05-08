@@ -12,7 +12,7 @@ work seamlessly for every version of Hubo which currently exists and which may e
 
 ### Dependencies
 
-This package currently has two (and a third optional) external dependencies:
+This package currently has two (and an optional third) external dependencies:
 
 1. [Ach](https://github.com/golems/ach) for interprocess communication
 2. [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page) for fancy matrix operations
@@ -68,7 +68,7 @@ There are five namespaces used in the HuboCan library:
 |-----------|-------------|------------|
 | HuboCan | This is the foundational namespace of the library which deals with low-level CAN protocol and hardware interface | CanPump, CanDevice, HuboDescription, HuboJmc, HuboJoint, HuboSensor |
 | HuboCmd | This namespace deals with sending and receiving real-time control commands (i.e. commands which must be updated every control cycle) to the lowest layer of the framework | Commander, Aggregator, AuxSender, AuxReceiver |
-| HuboState | This namespace is used to collect state data which gets published by the hardware interface level of the HuboCan framework, and can be used to synchronize a process with the low-level control cycle | State |
+| HuboState | This namespace is used to collect state data which gets published by the hardware interface level of the HuboCan framework, and can be used to synchronize a process with the low-level control cycle | State, HuboData |
 | HuboPath | This namespace provides tools for creating, interpolating, and running trajectories on Hubo (as well as interrupting and reversing trajectories while they are running) | Operator, Player, Trajectory |
 | HuboRT (Real Time) | This namespace contains the tools which are used for creating real-time processes and managing those processes, as well as their Ach channels | Daemonizer, Manager, ManagerReq |
 
@@ -110,7 +110,21 @@ its contents in a clean and easy-to-read format.
 
 #### State
 
-The State class reads the 
+The State class reads the data which has been published by the JMC and sensor CanDevices. The
+data is provided in the form of a templated HuboData<T> class.
+
+You can also use the State class to synchronize the actions of a process to the hardware control
+loop. The update() function will do a blocking wait up to the duration passed into its only
+argument. The default argument is 1, so by default it will wait for new state information for up to
+one second before giving up. Passing in an argument of 0 will have it simply check if a new state
+has been published, grab it if it has, and return immediately.
+
+#### HuboData
+
+This is a templated class designed to make it easy to transmit variable-sized data over Ach.
+Currently three types of data are taking advantage of this class: hubo_joint_state_t,
+hubo_imu_state_t, and hubo_ft_state_t. The definitions for these data structures can be found in
+hubo_sensor_c.h
 
 ### HuboCan Namespace
 
