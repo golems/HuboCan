@@ -23,6 +23,30 @@ ShowUsage()
     echo " "
 }
 
+MakeBuildDirectory()
+{
+    if [ -d "build" ]
+    then
+        echo 'Build directory was found'
+    else
+        echo 'Making build directory'
+        mkdir build
+    fi
+}
+
+SetupAptList()
+{
+    echo 'Updating golems.list'
+    sudo cp misc/golems.list /etc/apt/sources.list.d/golems.list
+}
+
+GetDependencies()
+{
+    sudo apt-get update
+    sudo apt-get install libach-dev ach-utils
+    sudo apt-get install libeigen3-dev
+}
+
 CreateOptHubo()
 {
     if [ -d "/opt/hubo" ]
@@ -51,14 +75,9 @@ RawRobotInstall()
 {
     echo "Performing robot installation for $2"
 
-    # I hate bash scripts
-    if [ -d "build" ]
-    then
-        echo 'Build directory was found'
-    else
-        echo 'Making build directory'
-        mkdir build
-    fi
+    SetupAptList
+    GetDependencies
+    MakeBuildDirectory
 
     cd build
     cmake .. -DBuildHuboQt=OFF -DCMAKE_INSTALL_PREFIX=/usr
@@ -90,13 +109,9 @@ RobotInstall()
 
 WorkstationInstall()
 {
-    if [ -d "build" ]
-    then
-        echo 'Build directory was found'
-    else
-        echo 'Making build directory'
-        mkdir build
-    fi
+    SetupAptList
+    GetDependencies
+    MakeBuildDirectory
 
     cd build
     cmake .. -DBuildHuboQt=ON -DCMAKE_INSTALL_PREFIX=/usr
