@@ -1,7 +1,7 @@
 HuboCan
 =======
 
-Complete framework for real-time operation of Hubo on Linux. This single framework is intended to
+A complete framework for real-time operation of Hubo on Linux. This single framework is intended to
 work seamlessly for every version of Hubo which currently exists and which may exist in the future
 (pending software updates).
 
