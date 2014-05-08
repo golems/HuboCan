@@ -114,8 +114,10 @@ The State class reads the data which has been published by the JMC and sensor Ca
 data is provided in the form of a templated HuboData<T> class.
 
 You can also use the State class to synchronize the actions of a process to the hardware control
-loop. The update() function will do a blocking wait up to the duration passed into its only
-argument. The default argument is 1, so by default it will wait for new state information for up to
+loop. The update() function will do a blocking wait (a blocking wait means that it does NOT eat up
+any computer resources while waiting) up to whatever argument is passed in.
+
+The default argument is 1, so by default it will wait for new state information for up to
 one second before giving up. Passing in an argument of 0 will have it simply check if a new state
 has been published, grab it if it has, and return immediately.
 
@@ -124,7 +126,7 @@ has been published, grab it if it has, and return immediately.
 This is a templated class designed to make it easy to transmit variable-sized data over Ach.
 Currently three types of data are taking advantage of this class: hubo_joint_state_t,
 hubo_imu_state_t, and hubo_ft_state_t. The definitions for these data structures can be found in
-hubo_sensor_c.h
+hubo_sensor_c.h.
 
 ### HuboCan Namespace
 
