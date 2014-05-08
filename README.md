@@ -1,7 +1,56 @@
 HuboCan
 =======
 
-Complete framework for real-time operation of Hubo on Linux
+Complete framework for real-time operation of Hubo on Linux. This single framework is intended to
+work seamlessly for every version of Hubo which currently exists and which may exist in the future
+(pending software updates).
+
+
+# Basic Usage
+
+## Installation
+
+### Dependencies
+
+This package currently has two (and a third optional) external dependencies:
+
+1. [Ach](https://github.com/golems/ach) For interprocess communication
+2. [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page) For fancy matrix operations
+3. (Optional) [Qt](http://qt-project.org/) For user interface creation
+
+### Installation script
+
+For your convenience, a bash script is already written which will automatically install these
+packages for you as long as you have an internet connection during the installation. The script
+is called setup.sh and resides in the root of the source tree.
+
+You are strongly encouraged to run setup.sh from the same directory that it resides in, because it
+will create its own build directory relative to the current working directory of the terminal.
+
+There are two modes of installation for the HuboCan package. One is meant to be used on the internal
+computer of the physical robot. The other is meant to be used on remote workstations
+
+#### Robot installation
+
+Simply run the setup script as follows:
+```bash
+$ ./setup robot <robot_type>
+```
+
+Replace <robot_type> with either Hubo2Plus or DrcHubo depending on which version of Hubo you have.
+
+#### Workstation installation
+
+Simply run the setup script as follows:
+```bash
+$ ./setup workstation
+```
+
+You do not need to specify a version of the robot for a workstation install, because the robot will
+inform you which version it is when you connect to it. So the same workstation can be used to
+operate a Hubo2Plus or a DrcHubo with no changes whatsoever necessary.
+
+# Code Description
 
 This source code compiles into two libraries:
 
@@ -44,8 +93,8 @@ instructions to the Player to start, pause, or reverse its current trajectory.
 #### Player
 
 The Player class is designed to provide a framework for receiving, sanity-checking, and executing
-trajectories. In the future this class will be upgraded to accept a real-time controller class
-which will be able to modify trajectories on the fly based on sensor feedback.
+trajectories in real time. In the future, this class will be upgraded to accept a real-time
+controller class which will be able to modify trajectories on the fly based on sensor feedback.
 
 #### Trajectory
 
@@ -55,6 +104,12 @@ will (hopefully) include control schemes, end effector waypoints, and self-colli
 
 Note: The Trajectory class has a very nice C++ stream operator (std::cout << ) which will print out
 its contents in a clean and easy-to-read format.
+
+### HuboState Namespace
+
+#### State
+
+The State class reads the 
 
 ### HuboCan Namespace
 
