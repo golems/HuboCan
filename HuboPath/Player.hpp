@@ -20,6 +20,8 @@ public:
     bool step();
 
     const hubo_path_element_t& current_element();
+    
+    void report_state();
 
 protected:
 
@@ -28,7 +30,6 @@ protected:
     bool _receive_incoming_trajectory();
     void _send_element_commands(const hubo_path_element_t& elem);
 
-    void _report_state();
 
     bool _first_step;
     bool _new_trajectory;

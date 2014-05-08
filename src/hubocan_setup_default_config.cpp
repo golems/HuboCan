@@ -48,6 +48,8 @@ int main(int argc, char* argv[])
 
     mgr.register_new_proc(std::string("socketcan_interface")
                             +":/usr/bin/hubo_socketcan_interface:robot "+robot_type+":");
+    mgr.register_new_proc(std::string("player")
+                          + ":/usr/bin/huboplayer::");
 
     return 0;
 }
