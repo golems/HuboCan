@@ -84,6 +84,7 @@ void Manager::launch()
 void Manager::run()
 {
     manager_req_t incoming_msg;
+    std::cout << "Beginning Manager loop" << std::endl;
     while(_rt.good())
     {
         size_t fs;
@@ -153,6 +154,8 @@ void Manager::run()
             default: _report_malformed_error("Unknown command type");           break;
         }
     }
+
+    std::cout << "Exiting Manager" << std::endl;
 }
 
 StringArray Manager::_grab_files_in_dir(const std::string &directory)
