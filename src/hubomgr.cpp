@@ -8,8 +8,8 @@ int main(int argc, char* argv[])
     HuboRT::Manager mgr;
 
     syslog( LOG_NOTICE, "About to launch manager" );
-//    mgr.launch();
-    mgr.run();
+    mgr.launch();
+//    mgr.run();
 
     return 0;
 }
