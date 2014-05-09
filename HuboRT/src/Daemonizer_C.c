@@ -213,7 +213,7 @@ int hubo_rt_daemonize(const char* daemon_name, const char* lock_directory,
     int lfp = open(lockfile, O_RDWR|O_CREAT|O_EXCL, S_IRUSR | S_IRGRP | S_IROTH); // lockfile pointer
     if( lfp < 0 )
     {
-        syslog( LOG_ERR, "Unable to create lock file '%s', code=%d (%s)\n",
+        syslog( LOG_ERR, "Unable to create lock file '%s', code=%d (%s)",
                 lockfile, errno, strerror(errno));
         return errno;
     }
@@ -225,7 +225,17 @@ int hubo_rt_daemonize(const char* daemon_name, const char* lock_directory,
         if( pw )
         {
             syslog( LOG_NOTICE, "Setting user to root");
-            setuid( pw->pw_uid );
+            if( setuid( pw->pw_uid ) != 0 )
+            {
+                syslog( LOG_ERR, "Could not set user to root. Error: '%s', code=%d."
+                        " Please run with sudo!", strerror(errno), errno);
+                return -3;
+            }
+        }
+        else
+        {
+            syslog( LOG_ERR, "Could not find root account. What??");
+            return -4;
         }
     }
 
@@ -249,18 +259,24 @@ int hubo_rt_daemonize(const char* daemon_name, const char* lock_directory,
     {
         syslog( LOG_ERR, "Unable to create new session, code=%d (%s)",
                errno, strerror(errno) );
-        return -3;
+        return -5;
     }
     
     if( chdir("/") < 0 )
     {
         syslog( LOG_ERR, "Unable to change directory, code=%d (%s)",
                 errno, strerror(errno) );
-        return -4;
+        return -6;
     }
     
     FILE* fp;
     fp = fopen(lockfile, "w");
+    if( fp == NULL )
+    {
+        syslog( LOG_ERR, "Could not open lockfile! Error: %s, code=%d",
+                strerror(errno), errno);
+        return -7;
+    }
     fprintf(fp, "%d", sid);
     fclose(fp);
     
@@ -273,7 +289,7 @@ int hubo_rt_daemonize(const char* daemon_name, const char* lock_directory,
     {
         syslog( LOG_ERR, "Unable to create log files, code=%d (%s)",
                 errno, strerror(errno));
-        return -5;
+        return -8;
     }
     
     if(     !freopen(output_file, "w", stdout) ||
@@ -281,7 +297,7 @@ int hubo_rt_daemonize(const char* daemon_name, const char* lock_directory,
     {
         syslog(LOG_ERR, "Unable to stream output, code=%d (%s)",
                errno, strerror(errno) );
-        return -6;
+        return -9;
     }
     
     kill(parent, SIGUSR1); // Let the parent process know that we're okay
