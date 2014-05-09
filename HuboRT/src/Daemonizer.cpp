@@ -89,7 +89,7 @@ bool Daemonizer::daemonize(std::string daemon_name)
             case -4: std::cout << "Could not find root account??"; break;
             case -5: std::cout << "Could not create new session"; break;
             case -6: std::cout << "Could not change current directory"; break;
-            case -7: std::cout << "Could not open lockfile"; break;
+            case -7: std::cout << "Could not open lockfile -- try running with sudo"; break;
             case -8: std::cout << "Could not create log files"; break;
             case -9: std::cout << "Could not stream output"; break;
             case 17: std::cout << "Lockfile already exists!"; break;
