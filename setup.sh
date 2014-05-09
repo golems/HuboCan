@@ -93,7 +93,7 @@ RawRobotInstall()
 
 RobotInstall()
 {
-    case "$1" in
+    case "$2" in
 
         '')
             ShowUsage
