@@ -92,6 +92,7 @@ bool Daemonizer::daemonize(std::string daemon_name)
             case -7: std::cout << "Could not open lockfile"; break;
             case -8: std::cout << "Could not create log files"; break;
             case -9: std::cout << "Could not stream output"; break;
+            case 17: std::cout << "Lockfile already exists!"; break;
         }
 
         std::cout << "\n -- Check syslog for details" << std::endl;
