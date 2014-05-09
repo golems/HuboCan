@@ -44,6 +44,7 @@ extern "C" {
 #include <stdlib.h>
 }
 
+#include <iostream>
 #include "../Daemonizer.hpp"
 
 using namespace HuboRT;
@@ -75,7 +76,28 @@ bool Daemonizer::daemonize(std::string daemon_name)
                                    _log_directory.c_str());
     hubo_rt_stack_prefault(stack_prefault_size);
     if(_d_status == 1)
+    {
         _successful_launch = true;
+    }
+    else
+    {
+        switch(_d_status)
+        {
+            case -1: std::cout << "Requested priority is too high"; break;
+            case -2: std::cout << "Could not set scheduling for real-time prioritization"; break;
+            case -3: std::cout << "Could not set user to root"; break;
+            case -4: std::cout << "Could not find root account??"; break;
+            case -5: std::cout << "Could not create new session"; break;
+            case -6: std::cout << "Could not change current directory"; break;
+            case -7: std::cout << "Could not open lockfile"; break;
+            case -8: std::cout << "Could not create log files"; break;
+            case -9: std::cout << "Could not stream output"; break;
+        }
+
+        std::cout << "\n -- Check syslog for details" << std::endl;
+    }
+
+
 
     return _d_status == 1;
 }
