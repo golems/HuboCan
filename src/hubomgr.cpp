@@ -5,7 +5,7 @@ int main(int argc, char* argv[])
 {
     HuboRT::Manager mgr;
 
-    mgr.run();
+    mgr.launch();
 
     return 0;
 }
