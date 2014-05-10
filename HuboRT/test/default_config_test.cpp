@@ -12,7 +12,7 @@ extern "C"{
 
 // Note: This is really only meant for testing the format
 
-int main(int argc, char* argv[])
+int main(int, char* [])
 {
     HuboRT::Manager mgr;
 

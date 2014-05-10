@@ -140,7 +140,7 @@ error_result_t HuboDescription::broadcastInfo()
 
     for(size_t i=0; i < joints.size(); ++i)
     {
-        size_t loc = hubo_info_get_joint_location(_data, i);
+        size_t loc = hubo_info_get_joint_location(/*_data,*/ i);
         memcpy(_data+loc, &(joints[i]->info), sizeof(hubo_joint_info_t));
     }
 
@@ -522,7 +522,7 @@ bool HuboDescription::_parseJMC(bool strict)
     return true;
 }
 
-bool HuboDescription::_parseIMU(bool strict)
+bool HuboDescription::_parseIMU(bool )
 {
 
 
@@ -530,7 +530,7 @@ bool HuboDescription::_parseIMU(bool strict)
     return true;
 }
 
-bool HuboDescription::_parseForceTorque(bool strict)
+bool HuboDescription::_parseForceTorque(bool )
 {
 
     return true;

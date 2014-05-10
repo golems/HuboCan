@@ -111,3 +111,7 @@ double State::get_time()
 {
     return joints.get_time();
 }
+
+State::State(const State&) { }
+
+State& State::operator=(const State&) { return *this; }

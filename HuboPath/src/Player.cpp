@@ -309,8 +309,8 @@ bool Player::step()
     if( HUBO_PATH_RUN == _current_cmd.instruction )
     {
         ++_current_index;
-        if(_current_index >= _trajectory.size())
-            _current_index = _trajectory.size()-1;
+        if(_current_index >= (int)_trajectory.size())
+            _current_index = (int)(_trajectory.size())-1;
     }
     else if( HUBO_PATH_PAUSE == _current_cmd.instruction )
     {

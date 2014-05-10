@@ -42,14 +42,14 @@ void CanPump::load_description(HuboDescription& desc)
     }
 }
 
-bool CanPump::_send_frame(const can_frame_t& frame, size_t channel)
+bool CanPump::_send_frame(const can_frame_t&, size_t)
 {
     std::cout << "WARNING: Attempting to send CAN frames using an instance of an abstract CAN"
               << " Pump!" << std::endl;
     return false;
 }
 
-bool CanPump::_wait_on_frame(const timespec_t& relative_timeout)
+bool CanPump::_wait_on_frame(const timespec_t&)
 {
     std::cout << "WARNING: Attempting to read CAN frames using an instance of an abstract CAN"
               << " Pump!" << std::endl;
@@ -132,7 +132,7 @@ bool CanPump::pump()
     }
     
     int expectation = _get_max_frame_expectation();
-    if(expectation * can_frame_bit_size > _bitrate * diff /*_timestep*/) // TODO: Use diff here instead of _timestep?
+    if(expectation * can_frame_bit_size > _bitrate * diff)
     {
         std::cout << "WARNING: Expected size of CAN frame transfer (" << expectation*can_frame_bit_size
                   << ") exceeds the bitrate setting (" << _bitrate * diff << ")\n"

@@ -89,8 +89,8 @@ protected:
 
     HuboRT::Daemonizer _rt;
 
-    inline Aggregator(const Aggregator& doNotCopy) { }
-    inline Aggregator& operator=(const Aggregator& doNotCopy) { return *this; }
+    Aggregator(const Aggregator& doNotCopy);
+    Aggregator& operator=(const Aggregator& doNotCopy);
 
     hubo_joint_cmd_t _dummy;
 

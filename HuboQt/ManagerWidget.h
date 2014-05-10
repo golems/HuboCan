@@ -95,8 +95,8 @@ protected Q_SLOTS:
     
 private:
     
-    inline ManagerWidget(const ManagerWidget& doNotCopy) { }
-    inline ManagerWidget& operator=(const ManagerWidget& doNotCopy) { return *this; }
+    ManagerWidget(const ManagerWidget& doNotCopy);
+    ManagerWidget& operator=(const ManagerWidget& doNotCopy);
     
 };
 

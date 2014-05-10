@@ -128,8 +128,8 @@ protected:
 
     ach_channel_t _cmd_chan;
 
-    inline Commander(const Commander& doNotCopy) { }
-    inline Commander& operator=(const Commander& doNotCopy) { return *this; }
+    Commander(const Commander& doNotCopy);
+    Commander& operator=(const Commander& doNotCopy);
 
 };
 

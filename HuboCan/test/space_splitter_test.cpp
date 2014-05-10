@@ -11,7 +11,7 @@ void print_array(const StringArray& array)
     }
 }
 
-int main(int argc, char* argv[])
+int main(int, char* [])
 {
     HuboCan::DdParser parser;
 

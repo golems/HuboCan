@@ -140,8 +140,8 @@ protected:
     hubo_cmd_data*    _last_cmd_data;
     HuboCan::HuboDescription _desc;
 
-    inline State(const State& doNotCopy) { }
-    inline State& operator=(const State& doNotCopy) { return *this; }
+    State(const State& doNotCopy);
+    State& operator=(const State& doNotCopy);
 
 };
 

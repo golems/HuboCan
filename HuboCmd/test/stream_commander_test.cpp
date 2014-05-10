@@ -3,7 +3,7 @@
 #include "math.h"
 #include <iostream>
 
-int main(int argc, char* argv[])
+int main(int, char* [])
 {
     HuboCmd::Commander cmd;
     if(!cmd.initialized())

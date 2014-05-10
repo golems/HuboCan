@@ -426,9 +426,16 @@ HuboCan::error_result_t Commander::send_commands()
     return HuboCan::OKAY;
 }
 
+Commander::Commander(const Commander &doNotCopy) :
+    HuboState::State(doNotCopy)
+{
 
+}
 
-
+Commander& Commander::operator =(const Commander&)
+{
+    return *this;
+}
 
 
 

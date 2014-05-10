@@ -8,7 +8,7 @@ size_t simple_min(size_t x, size_t y)
     return (x < y) ? x : y;
 }
 
-int main(int argc, char* argv[])
+int main(int /*argc*/, char* /*argv*/[])
 {
     HuboCan::HuboDescription desc;
     desc.parseFile("../HuboCan/misc/Hubo2Plus.dd");

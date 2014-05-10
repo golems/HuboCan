@@ -3,7 +3,7 @@
 #include <string>
 #include <iostream>
 
-int main(int argc, char* argv[])
+int main(int, char* [])
 {
     const std::string name = "proc:hubocan:/usr/bin/hubocan:-r -s:";
     std::vector<std::string> array;

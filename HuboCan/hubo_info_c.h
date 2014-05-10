@@ -128,7 +128,7 @@ hubo_jmc_info_t* hubo_info_get_jmc_info(const hubo_info_data *data, size_t jmc_i
 
 hubo_sensor_info_t* hubo_info_get_sensor_info(const hubo_info_data *data, size_t sensor_index);
 
-size_t hubo_info_get_joint_location(const hubo_info_data* data, size_t joint_index);
+size_t hubo_info_get_joint_location(/*const hubo_info_data* data,*/ size_t joint_index);
 
 size_t hubo_info_get_jmc_location(const hubo_info_data* data, size_t jmc_index);
 

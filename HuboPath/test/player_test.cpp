@@ -3,7 +3,7 @@
 #include "HuboRT/Daemonizer.hpp"
 
 
-int main(int argc, char* argv[])
+int main(int, char* [])
 {
     HuboPath::Player player;
     HuboRT::Daemonizer rt;

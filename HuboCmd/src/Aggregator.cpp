@@ -351,9 +351,9 @@ void Aggregator::_copy_final_data_to_array()
 }
 
 
+Aggregator::Aggregator(const Aggregator&) { }
 
-
-
+Aggregator& Aggregator::operator =(const Aggregator&) { return *this; }
 
 
 

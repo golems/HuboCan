@@ -3,7 +3,7 @@
 #include "HuboRT/Daemonizer.hpp"
 
 
-int main(int argc, char* argv[])
+int main(int, char* [])
 {
     HuboRT::Daemonizer rt;
     if(!rt.begin("player", 40))

@@ -2,7 +2,7 @@
 #include "HuboCan/HuboDescription.hpp"
 #include <iostream>
 
-int main(int argc, char* argv[])
+int main(int, char* [])
 {
     HuboCan::HuboDescription desc;
 //    desc.parseFile("../HuboCan/devices/Hubo2Plus.dd");

@@ -8,7 +8,7 @@ error_result_t make_an_error()
     return ARRAY_MISMATCH;
 }
 
-int main(int argc, char* argv[])
+int main(int , char* [])
 {
     
     error_result_t okay;

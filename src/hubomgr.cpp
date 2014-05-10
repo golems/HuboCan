@@ -2,7 +2,7 @@
 #include "HuboRT/Manager.hpp"
 #include <syslog.h>
 
-int main(int argc, char* argv[])
+int main(int, char* [])
 {
     syslog( LOG_NOTICE, "About to instantiate manager" );
     HuboRT::Manager mgr;

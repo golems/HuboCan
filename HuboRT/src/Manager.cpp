@@ -774,7 +774,7 @@ void Manager::_report_malformed_error(const std::string &error_description)
     _report_error(MALFORMED_REQUEST, error_description);
 }
 
-void Manager::_report_no_existence(manager_cmd_t original_req)
+void Manager::_report_no_existence(manager_cmd_t /*original_req*/)
 {
     _report_error(NONEXISTENT_ENTRY, "");
 }

@@ -353,7 +353,7 @@ bool DdParser::current_line(StringArray &components)
     while(components.empty())
     {
 
-        if(_next_index-backtrack >= 0 && _next_index-backtrack < _contents.size())
+        if(_next_index-backtrack < _contents.size())
         {
             components = get_string_components(_contents[_next_index-backtrack].data);
         }

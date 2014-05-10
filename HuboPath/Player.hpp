@@ -40,7 +40,7 @@ protected:
     void _initialize_player();
 
     Trajectory _trajectory;
-    size_t _current_index;
+    int _current_index;
     hubo_path_element_t _current_elem;
     hubo_path_element_t _last_elem;
 

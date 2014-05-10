@@ -1,7 +1,7 @@
 
 #include "../SocketCanPump.hpp"
 
-int main(int argc, char* argv[])
+int main(int, char* [])
 {
     HuboCan::SocketCanPump canpump(200, 1e6, 2, true);
     

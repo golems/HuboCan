@@ -31,7 +31,7 @@ size_t hubo_info_get_sensor_count(const hubo_info_data* data)
     return header->sensor_count;
 }
 
-size_t hubo_info_get_joint_location(const hubo_info_data* data, size_t joint_index)
+size_t hubo_info_get_joint_location(/*const hubo_info_data* data,*/ size_t joint_index)
 {
     return sizeof(hubo_meta_info_t)
             + joint_index*sizeof(hubo_joint_info_t);
@@ -238,7 +238,7 @@ hubo_joint_info_t* hubo_info_get_joint_info(hubo_info_data *data, size_t joint_i
         return NULL;
     }
 
-    return (hubo_joint_info_t*)(data+hubo_info_get_joint_location(data, joint_index));
+    return (hubo_joint_info_t*)(data+hubo_info_get_joint_location(/*data,*/ joint_index));
 }
 
 hubo_jmc_info_t* hubo_info_get_jmc_info(const hubo_info_data *data, size_t jmc_index)

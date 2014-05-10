@@ -1,7 +1,7 @@
 
 #include "../hubo_path.hpp"
 
-int main(int argc, char* argv[])
+int main(int, char* [])
 {
     HuboPath::Trajectory traj;
     hubo_path_element_t elem;

@@ -18,6 +18,9 @@ using namespace HuboQt;
 const char* anw_save_directory = "/opt/hubo/qt/anw";
 const char* anw_save_hostname_file = "/opt/hubo/qt/anw/hostname.txt";
 
+ManagerWidget::ManagerWidget(const ManagerWidget&) : QWidget() { }
+ManagerWidget& ManagerWidget::operator =(const ManagerWidget&) { return *this; }
+
 ManagerWidget::ManagerWidget() :
     _ui(new Ui::ManagerWidget),
     _init(false)

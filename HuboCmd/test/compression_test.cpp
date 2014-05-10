@@ -5,7 +5,7 @@ extern "C" {
 
 #include <iostream>
 
-int main(int argc, char* argv[])
+int main(int, char* [])
 {
     size_t num_joints = 10;
     hubo_cmd_data* cx = hubo_cmd_init_data(num_joints);

@@ -2,7 +2,7 @@
 #include "../interpolation/Trajectory.h"
 #include "../hubo_path.hpp"
 
-int main(int argc, char* argv[])
+int main(int, char* [])
 {
     std::list<Eigen::VectorXd> waypoints;
 

@@ -11,19 +11,13 @@ public:
     
     virtual ~CanDevice();
     
-    inline CanDevice()
-    {
-        _pump = NULL;
-    }
+    CanDevice();
 
-    inline virtual void registerPump(CanPump& pump)
-    {
-        pump.add_device(this);
-        _pump = &pump;
-    }
+    virtual void registerPump(CanPump& pump);
 
-    inline virtual void update() { }
-    inline virtual bool decode(const can_frame_t& frame, size_t channel) { return false; }
+    virtual void startup();
+    virtual void update();
+    virtual bool decode(const can_frame_t& frame, size_t channel);
 
 protected:
 

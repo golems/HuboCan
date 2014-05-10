@@ -3,7 +3,7 @@
 
 using namespace HuboState;
 
-int main(int argc, char* argv[])
+int main(int, char* [])
 {
     HuboData<hubo_joint_state_t> rec_data;
     rec_data.verbose = true;

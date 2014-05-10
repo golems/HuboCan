@@ -15,7 +15,7 @@ extern "C" {
 
 using namespace HuboRT;
 
-int main(int argc, char* argv[])
+int main(int, char* [])
 {
     StringArray result;
     

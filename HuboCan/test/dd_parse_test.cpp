@@ -1,7 +1,7 @@
 #include "HuboCan/DdParser.hpp"
 #include <iostream>
 
-int main(int argc, char* argv[])
+int main(int, char* [])
 {
     HuboCan::DdParser parser;
     parser.load_file("../HuboCan/misc/TestDevice.dd");

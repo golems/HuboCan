@@ -144,7 +144,7 @@ bool SocketCanPump::_initialize_device(const char *device_name, size_t index)
     return true;
 }
 
-bool SocketCanPump::_deactivate_device(const char *device_name)
+bool SocketCanPump::_deactivate_device(const char *)
 {
     // TODO: Decide if device should really be deactivated
     // Would this accomplish anything?
