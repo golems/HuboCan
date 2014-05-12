@@ -3,7 +3,7 @@
 
 int main(int, char* [])
 {
-    HuboCan::SocketCanPump canpump(200, 1e6, 2, true);
+    HuboCan::SocketCanPump(200, 1e6, 2, 1000, true);
     
     return 0;
 }
