@@ -63,14 +63,13 @@ public:
      * \param daemon_name
      * \return true iff the daemonization worked properly
      *
-     * Good practice dictates that the name given to the daemon matches the name
-     * of the process, or is some kind of unique identifier to make sure that no
-     * duplicates are accidentally launched.
+     * Good practice dictates that the name given to the daemon matches the name of the process, or
+     * is some kind of unique identifier to make sure that no duplicates are accidentally launched.
      *
-     * argv[0] contains the name of the current process, so this could be passed in
-     * if you would like to automate things.
+     * argv[0] contains the name of the current process, so this could be passed in if you would
+     * like to automate things.
      */
-    bool daemonize(std::string daemon_name);
+    bool daemonize(const std::string& daemon_name);
 
     /*!
      * \fn prioritize()
@@ -78,10 +77,10 @@ public:
      * \param priority
      * \return
      *
-     * Critical kernel processes generally operate at a value of 50. HuboCan
-     * processes which critically need to operate at real time priorities run
-     * with a value of 49. Good practice would be to use 30 - 40 for things
-     * which should try to be real time but aren't absolutely critically real time
+     * Critical kernel processes generally operate at a value of 50. HuboCan processes which
+     * critically need to operate at real time priorities run with a value of 49. Good practice
+     * would be to use 30 - 40 for things which should try to be real time but aren't absolutely
+     * critically real time
      */
     bool prioritize(int priority = 40);
 
@@ -97,8 +96,8 @@ public:
      * \brief Returns true iff this process has received SIGUSR1
      * \return
      *
-     * Also resets the usr1 flag to false so that the next time SIGUSR1 is sent, it will
-     * switch this back to true.
+     * Also resets the usr1 flag to false so that the next time SIGUSR1 is
+     * sent, it will switch this back to true.
      */
     bool usr1();
 
@@ -107,8 +106,8 @@ public:
      * \brief Returns true iff this process has received SIGUSR2
      * \return
      *
-     * Also resets the usr2 flag to false so that the next time SIGUSR2 is sent, it will
-     * switch this back to true.
+     * Also resets the usr2 flag to false so that the next time SIGUSR2 is
+     * sent, it will switch this back to true.
      */
     bool usr2();
 
@@ -124,12 +123,10 @@ public:
      * \brief Returns the number of child processes which have quit
      * \return
      *
-     * Using the GNU/Linux function fork() will spawn child processes.
-     * Whenever a child process quits (with or without error) it will
-     * send a signal SIGCHLD to the process it spawned from. This function
-     * will return a count of how many times this process received a
-     * SIGCHLD which should be indicative of how many times a child
-     * process has quit.
+     * Using the GNU/Linux function fork() will spawn child processes. Whenever a child process
+     * quits (with or without error) it will send a signal SIGCHLD to the process it spawned from.
+     * This function will return a count of how many times this process received a SIGCHLD which
+     * should be indicative of how many times a child process has quit.
      */
     size_t child_processes_exited() const;
 
@@ -139,14 +136,14 @@ public:
      * \param condition
      * \return
      *
-     * If the first argument (condition) is false, this will have one of two effects
-     * depending on the second condition:
+     * If the first argument (condition) is false, this will have one of two effects depending on
+     * the second condition:
      *
-     * \li quit_immediately = true : Immediately cease execution while cleaning up the
-     * daemon's lock file
+     * \li quit_immediately = true : Immediately cease execution while cleaning up the daemon's
+     * lock file
      *
-     * \li quit_immediately = false : Behave as though an abort signal has been sent, so
-     * the call to good() will return false from now on
+     * \li quit_immediately = false : Behave as though an abort signal has been sent, so the call
+     * to good() will return false from now on
      */
     bool check(bool condition, std::string message, bool quit_immediately=false);
 
@@ -157,12 +154,12 @@ public:
      * \brief Cleans up the daemonization by removing the lock file
      * \return
      *
-     * This function is called in Daemonizer's destructor, so you typically will not need
-     * this on your own.
+     * This function is called in Daemonizer's destructor, so you typically will not need this on
+     * your own.
      *
-     * However, this does mean that you need to make sure your Daemonizer
-     * instance is created in either global scope or the scope of your main()
-     * function, or else it might be destructed prematurely.
+     * However, this does mean that you need to make sure your Daemonizer instance is created in
+     * either global scope or the scope of your main() function, or else it might be destructed
+     * prematurely.
      */
     void close();
 
@@ -171,6 +168,12 @@ public:
      * \brief Reroutes incoming signals so that safe shutdown can be performed
      */
     void redirect_signals();
+
+    /*!
+     * \fn redirect_logs();
+     * \brief Reroutes stdout and stderr to files
+     */
+    bool redirect_logs(const std::string& daemon_name);
 
     // TODO: Document this function
     int daemonization_status() const;

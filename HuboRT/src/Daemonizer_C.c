@@ -71,7 +71,7 @@ static void hubo_rt_daemon_sig_handler(int signum)
         case SIGUSR1: hubo_rt_sig_usr1 = 1; break;
         case SIGUSR2: hubo_rt_sig_usr2 = 1; break;
         case SIGCHLD:
-//            hubo_rt_last_child_pid = wait(&hubo_rt_last_child_status);
+            hubo_rt_last_child_pid = wait(&hubo_rt_last_child_status);
             ++hubo_rt_sig_child; break;
         case SIGINT:
         case SIGTERM:
@@ -200,14 +200,7 @@ int hubo_rt_daemonize(const char* daemon_name, const char* lock_directory,
     int make_dir_error = hubo_rt_safe_make_directory(lock_directory);
     if(make_dir_error != 0)
         return make_dir_error;
-    
-    char my_log_directory[MAX_FILENAME_SIZE];
-    sprintf(my_log_directory, "%s/%s", log_directory, daemon_name);
-    make_dir_error = hubo_rt_safe_make_directory(my_log_directory);
-    if(make_dir_error != 0)
-        return make_dir_error;
 
-    
     char lockfile[MAX_FILENAME_SIZE];
     sprintf(lockfile, "%s/%s", lock_directory, daemon_name);
     int lfp = open(lockfile, O_RDWR|O_CREAT|O_EXCL, S_IRUSR | S_IRGRP | S_IROTH); // lockfile pointer
@@ -280,6 +273,25 @@ int hubo_rt_daemonize(const char* daemon_name, const char* lock_directory,
     fprintf(fp, "%d", sid);
     fclose(fp);
     
+    kill(parent, SIGUSR1); // Let the parent process know that we're okay
+
+    int log_error = hubo_rt_redirect_logs(daemon_name, log_directory);
+    if(log_error != 0)
+        return log_error;
+    
+    syslog( LOG_NOTICE, "Finished daemonization for '%s'", daemon_name);
+
+    return 1;
+}
+
+int hubo_rt_redirect_logs(const char* daemon_name, const char* log_directory)
+{
+    char my_log_directory[MAX_FILENAME_SIZE];
+    sprintf(my_log_directory, "%s/%s", log_directory, daemon_name);
+    int make_dir_error = hubo_rt_safe_make_directory(my_log_directory);
+    if(make_dir_error != 0)
+        return make_dir_error;
+
     char output_file[MAX_FILENAME_SIZE];
     sprintf(output_file, "%s/output", my_log_directory);
     char error_file[MAX_FILENAME_SIZE];
@@ -291,7 +303,7 @@ int hubo_rt_daemonize(const char* daemon_name, const char* lock_directory,
                 errno, strerror(errno));
         return -8;
     }
-    
+
     if(     !freopen(output_file, "w", stdout) ||
             !freopen(error_file, "w", stderr) )
     {
@@ -299,12 +311,8 @@ int hubo_rt_daemonize(const char* daemon_name, const char* lock_directory,
                errno, strerror(errno) );
         return -9;
     }
-    
-    kill(parent, SIGUSR1); // Let the parent process know that we're okay
-    
-    syslog( LOG_NOTICE, "Finished daemonization for '%s'", daemon_name);
 
-    return 1;
+    return 0;
 }
 
 

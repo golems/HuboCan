@@ -160,24 +160,7 @@ void Manager::run()
 
 StringArray Manager::_grab_files_in_dir(const std::string &directory)
 {
-    StringArray result;
-    
-    DIR* dptr = opendir(directory.c_str());
-    if(dptr == NULL)
-    {
-        return result;
-    }
-    
-    struct dirent* entry;
-    while( NULL != (entry = readdir(dptr)) )
-    {
-        if(DT_REG == entry->d_type)
-        {
-            result.push_back(entry->d_name);
-        }
-    }
-    
-    return result;
+    return grab_files_in_dir(directory);
 }
 
 void Manager::_relay_directory_contents(manager_cmd_t original_req, const std::string &directory)

@@ -52,6 +52,8 @@ extern int hubo_rt_last_child_status;
 
 int hubo_rt_daemonize(const char* daemon_name, const char *lock_directory, const char *log_directory);
 
+int hubo_rt_redirect_logs(const char* daemon_name, const char* log_directory);
+
 void hubo_rt_redirect_signals();
 
 int hubo_rt_prioritize(int priority);

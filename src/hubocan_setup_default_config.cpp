@@ -4,6 +4,7 @@
 #include "HuboCmd/Aggregator.hpp"
 #include "HuboState/State.hpp"
 #include "HuboPath/hubo_path.hpp"
+#include "HuboRT/LogRelay.hpp"
 
 #include <iostream>
 
@@ -39,6 +40,9 @@ int main(int argc, char* argv[])
                           +":5:64:"+ACHD_PULL_STRING+":");
     mgr.register_new_chan(std::string("player:")+HUBO_PATH_PLAYER_STATE_CHANNEL
                           +":5:64:"+ACHD_PULL_STRING+":");
+
+    mgr.register_new_chan(std::string("log:")+HUBO_RT_LOG_RELAY_CHAN
+                          +":10:4608:"+ACHD_PULL_STRING+":");
 
     std::string robot_type = "Hubo2Plus";
     for(int i=1; i<argc; ++i)

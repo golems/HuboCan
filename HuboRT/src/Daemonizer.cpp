@@ -69,7 +69,7 @@ bool Daemonizer::begin(std::string daemon_name, int priority)
     return daemonize(daemon_name) && prioritize(priority);
 }
 
-bool Daemonizer::daemonize(std::string daemon_name)
+bool Daemonizer::daemonize(const std::string& daemon_name)
 {
     _daemon_name = daemon_name;
     _d_status = hubo_rt_daemonize(daemon_name.c_str(), _lock_directory.c_str(),
@@ -98,9 +98,12 @@ bool Daemonizer::daemonize(std::string daemon_name)
         std::cout << "\n -- Check syslog for details" << std::endl;
     }
 
-
-
     return _d_status == 1;
+}
+
+bool Daemonizer::redirect_logs(const std::string& daemon_name)
+{
+    return (hubo_rt_redirect_logs(daemon_name.c_str(), _log_directory.c_str())==0);
 }
 
 bool Daemonizer::prioritize(int priority)
