@@ -30,7 +30,7 @@ public:
 
     bool open_channels();
 
-    bool send();
+    bool send(int timeout = 2);
 
     bool receive(std::string& log_name, std::string& contents);
 

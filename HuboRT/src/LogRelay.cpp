@@ -5,6 +5,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/select.h>
+#include <errno.h>
 
 using namespace HuboRT;
 
@@ -13,7 +14,7 @@ LogRelay::LogRelay()
     _initialize();
 }
 
-LogRelay::_initialize()
+void LogRelay::_initialize()
 {
     _channels_opened = false;
     _log_directory = hubo_rt_default_log_dir;
