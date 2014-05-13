@@ -524,7 +524,7 @@ bool Manager::_register(const std::string &directory,
     std::ofstream output;
     output.open( (directory+"/"+components[0]).c_str() );
     
-    std::cout << "Registering " << components[0] << ": ";
+    std::cout << "Registering in " << directory << " .:. " << components[0] << ": ";
     for(size_t i=1; i < components.size(); ++i)
     {
         output << components[i] << ":";
