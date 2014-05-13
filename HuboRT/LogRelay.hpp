@@ -23,11 +23,12 @@ typedef struct hubo_rt_log_message {
 
 namespace HuboRT{
 
-class FileHandler
+class FileHandle
 {
 public:
     int fd;
     std::string filename;
+    long int read_so_far;
 };
 
 class LogRelay
@@ -45,15 +46,16 @@ public:
 protected:
 
     void _add_file_descriptor(const std::string& directory, const std::string& log_name);
-    void _read_through_fd(const FileHandler &fh);
+    void _read_through_fd(FileHandle &fh);
 
     void _initialize();
 
     void _check_for_new_logs();
+    void _check_for_truncation();
 
     std::string _log_directory;
 
-    std::vector<FileHandler> _handles;
+    std::vector<FileHandle> _handles;
     std::map<std::string,size_t> _fd_tracker;
 
 

@@ -7,6 +7,7 @@
 #include <sys/select.h>
 #include <errno.h>
 #include <unistd.h>
+#include <stdio.h>
 
 using namespace HuboRT;
 
@@ -51,11 +52,11 @@ bool LogRelay::receive(std::string &log_name, std::string &contents, int timeout
     bool new_message = false;
 
     struct timespec t;
-    clock_gettime(CLOCK_MONOTONIC, &t);
+    clock_gettime(ACH_DEFAULT_CLOCK, &t);
     t.tv_sec += timeout;
 
     size_t fs;
-    ach_status_t r = ach_get(&_log_chan, &_buffer, sizeof(_buffer), &fs, &t, 0);
+    ach_status_t r = ach_get(&_log_chan, &_buffer, sizeof(_buffer), &fs, &t, ACH_O_WAIT);
     if( ACH_OK == r || ACH_MISSED_FRAME == r )
     {
         new_message = true;
@@ -88,6 +89,7 @@ bool LogRelay::send(int timeout)
     }
 
     _check_for_new_logs();
+    _check_for_truncation();
 
     fd_set set;
     FD_ZERO(&set);
@@ -121,10 +123,12 @@ bool LogRelay::send(int timeout)
         }
     }
 
+    usleep(5e5);
+
     return true;
 }
 
-void LogRelay::_read_through_fd(const FileHandler& fh)
+void LogRelay::_read_through_fd(FileHandle& fh)
 {
     strcpy(_buffer.log_name, fh.filename.c_str());
 
@@ -132,14 +136,16 @@ void LogRelay::_read_through_fd(const FileHandler& fh)
     while( s == LOG_MESSAGE_CONTENT_SIZE )
     {
         s = read(fh.fd, _buffer.contents, LOG_MESSAGE_CONTENT_SIZE);
-        if( s < 0 )
+        if( s < 0 && errno != EINTR )
         {
             std::cout << "Error in attempting to read log of '" << fh.filename
                       << "': " << strerror(errno) << std::endl;
+            break;
         }
         else if( s == 0 )
             break;
 
+        fh.read_so_far += s;
         _buffer.content_size = s;
         ach_put(&_log_chan, &_buffer, sizeof(_buffer));
     }
@@ -166,6 +172,34 @@ void LogRelay::_check_for_new_logs()
     }
 }
 
+void LogRelay::_check_for_truncation()
+{
+    struct stat stats;
+    for(size_t i=0; i<_handles.size(); ++i)
+    {
+        FileHandle& handle = _handles[i];
+        if( fstat(handle.fd, &stats) != 0 )
+        {
+            std::cerr << "Error in log named '" << handle.filename
+                      << "': " << strerror(errno) << std::endl;
+            continue;
+        }
+
+        if( stats.st_size < handle.read_so_far )
+        {
+            std::cout << "size: " << stats.st_size << " | read: " << handle.read_so_far << std::endl;
+
+            strcpy(_buffer.log_name, handle.filename.c_str());
+            strcpy(_buffer.contents, "\n .::. ===== LOG RESTARTED ===== .::. \n");
+            _buffer.content_size = strlen(_buffer.contents);
+            ach_put(&_log_chan, &_buffer, sizeof(_buffer));
+
+            lseek(handle.fd, 0, SEEK_SET);
+            handle.read_so_far = 0;
+        }
+    }
+}
+
 void LogRelay::_add_file_descriptor(const std::string& directory, const std::string &log_name)
 {
     std::string path = directory+"/"+log_name;
@@ -175,7 +209,7 @@ void LogRelay::_add_file_descriptor(const std::string& directory, const std::str
         int new_fd = open(path.c_str(), O_RDONLY);
         if(new_fd >= 0)
         {
-            FileHandler fh;
+            FileHandle fh;
             fh.fd = new_fd;
             fh.filename = log_name;
             _handles.push_back(fh);

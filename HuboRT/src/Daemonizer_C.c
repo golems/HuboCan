@@ -312,6 +312,9 @@ int hubo_rt_redirect_logs(const char* daemon_name, const char* log_directory)
         return -9;
     }
 
+    fprintf(stdout, "Redirected stdout\n"); fflush(stdout);
+    fprintf(stderr, "Redirected stderr\n"); fflush(stderr);
+
     return 0;
 }
 
