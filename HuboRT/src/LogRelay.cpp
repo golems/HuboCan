@@ -79,7 +79,7 @@ bool LogRelay::receive(std::string &log_name, std::string &contents, int timeout
     return new_message;
 }
 
-bool LogRelay::send(int timeout)
+bool LogRelay::send(double timeout)
 {
     if(!_channels_opened)
     {
@@ -89,41 +89,41 @@ bool LogRelay::send(int timeout)
     }
 
     _check_for_new_logs();
-    _check_for_truncation();
+    _check_for_log_reset();
 
-    fd_set set;
-    FD_ZERO(&set);
-    int nfds = 0;
+//    fd_set set;
+//    FD_ZERO(&set);
+//    int nfds = 0;
+//    for(size_t i=0; i<_handles.size(); ++i)
+//    {
+//        int fd = _handles[i].fd;
+//        FD_SET(fd, &set);
+//        if(fd > nfds)
+//            nfds = fd;
+//    }
+//    ++nfds;
+
+//    struct timespec t;
+//    memset(&t, 0, sizeof(t));
+//    t.tv_sec += timeout;
+
+//    int err = pselect(nfds, &set, NULL, NULL, &t, NULL);
+//    if(err==-1)
+//    {
+//        std::cout << "Error while trying to read logs ("
+//                  << strerror(err) << ")" << std::endl;
+//        return false;
+//    }
+
     for(size_t i=0; i<_handles.size(); ++i)
     {
-        int fd = _handles[i].fd;
-        FD_SET(fd, &set);
-        if(fd > nfds)
-            nfds = fd;
-    }
-    ++nfds;
-
-    struct timespec t;
-    memset(&t, 0, sizeof(t));
-    t.tv_sec += timeout;
-
-    int err = pselect(nfds, &set, NULL, NULL, &t, NULL);
-    if(err==-1)
-    {
-        std::cout << "Error while trying to read logs ("
-                  << strerror(err) << ")" << std::endl;
-        return false;
-    }
-
-    for(size_t i=0; i<_handles.size(); ++i)
-    {
-        if(FD_ISSET(_handles[i].fd, &set)!=0)
-        {
+//        if(FD_ISSET(_handles[i].fd, &set)!=0)
+//        {
             _read_through_fd(_handles[i]);
-        }
+//        }
     }
 
-    usleep(5e5);
+    usleep((int)(timeout*1e6));
 
     return true;
 }
@@ -172,22 +172,31 @@ void LogRelay::_check_for_new_logs()
     }
 }
 
-void LogRelay::_check_for_truncation()
+void LogRelay::_check_for_log_reset()
 {
-    struct stat stats;
+//    struct stat stats;
+    char stamp_test[LOG_STAMP_SIZE];
     for(size_t i=0; i<_handles.size(); ++i)
     {
         FileHandle& handle = _handles[i];
-        if( fstat(handle.fd, &stats) != 0 )
+
+        lseek(handle.fd, 0, SEEK_SET);
+        ssize_t bytes_read = read(handle.fd, stamp_test, LOG_STAMP_SIZE);
+        if( bytes_read != LOG_STAMP_SIZE )
         {
-            std::cerr << "Error in log named '" << handle.filename
-                      << "': " << strerror(errno) << std::endl;
+            std::cerr << "Error checking the stamp of log '" << handle.filename
+                      << "' (" << bytes_read << ")";
+            if( bytes_read < 0 )
+            {
+                std::cerr << " " << strerror(errno);
+            }
+            std::cerr << std::endl;
             continue;
         }
 
-        if( stats.st_size < handle.read_so_far )
+        if( strncmp(stamp_test, handle.last_stamp, LOG_STAMP_SIZE) != 0 )
         {
-            std::cout << "size: " << stats.st_size << " | read: " << handle.read_so_far << std::endl;
+            strncpy(handle.last_stamp, stamp_test, LOG_STAMP_SIZE);
 
             strcpy(_buffer.log_name, handle.filename.c_str());
             strcpy(_buffer.contents, "\n .::. ===== LOG RESTARTED ===== .::. \n");
@@ -196,6 +205,10 @@ void LogRelay::_check_for_truncation()
 
             lseek(handle.fd, 0, SEEK_SET);
             handle.read_so_far = 0;
+        }
+        else
+        {
+            lseek(handle.fd, handle.read_so_far, SEEK_SET);
         }
     }
 }
@@ -221,4 +234,9 @@ void LogRelay::_add_file_descriptor(const std::string& directory, const std::str
                       << "' (" << strerror(errno) << ") " << errno << std::endl;
         }
     }
+}
+
+size_t LogRelay::fd_count() const
+{
+    return _handles.size();
 }

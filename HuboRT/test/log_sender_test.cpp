@@ -10,9 +10,10 @@ int main( int, char* [] )
 
     rt.redirect_signals();
 
+    size_t cycle = 0;
     while(relay.send() && rt.good())
     {
-        std::cout << "Cycle" << std::endl;
+        std::cout << "Cycle " << cycle++ << " | fd count: " << relay.fd_count() << std::endl;
     }
 
 

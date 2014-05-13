@@ -53,6 +53,7 @@
 #include <sched.h>
 #include <sys/mman.h>
 #include <sys/wait.h>
+#include <time.h>
 
 
 int hubo_rt_sig_quit = 0;
@@ -312,8 +313,10 @@ int hubo_rt_redirect_logs(const char* daemon_name, const char* log_directory)
         return -9;
     }
 
-    fprintf(stdout, "Redirected stdout\n"); fflush(stdout);
-    fprintf(stderr, "Redirected stderr\n"); fflush(stderr);
+    time_t ltime;
+    ltime = time(NULL);
+    fprintf(stdout, "Redirected stdout %s", asctime( localtime(&ltime) )); fflush(stdout);
+    fprintf(stderr, "Redirected stderr %s", asctime( localtime(&ltime) )); fflush(stderr);
 
     return 0;
 }

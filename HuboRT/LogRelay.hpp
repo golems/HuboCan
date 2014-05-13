@@ -26,9 +26,18 @@ namespace HuboRT{
 class FileHandle
 {
 public:
+
     int fd;
     std::string filename;
     long int read_so_far;
+    char last_stamp[LOG_STAMP_SIZE];
+
+    inline FileHandle()
+    {
+        fd = -1;
+        read_so_far = 0;
+        memset(last_stamp, 0, LOG_STAMP_SIZE);
+    }
 };
 
 class LogRelay
@@ -39,9 +48,11 @@ public:
 
     bool open_channels();
 
-    bool send(int timeout = 2);
+    bool send(double timeout = 0.5);
 
     bool receive(std::string& log_name, std::string& contents, int timeout=2);
+
+    size_t fd_count() const;
 
 protected:
 
@@ -51,7 +62,7 @@ protected:
     void _initialize();
 
     void _check_for_new_logs();
-    void _check_for_truncation();
+    void _check_for_log_reset();
 
     std::string _log_directory;
 
