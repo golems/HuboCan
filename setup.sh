@@ -67,8 +67,12 @@ CopyDevices()
 
 AutostartManager()
 {
-    echo 'Adding hubomgr to the upstart list'
-    sudo cp ../misc/hubomgr.conf /etc/init/hubomgr.conf
+    echo 'Setting hubomgr to autolaunch after boot'
+#    sudo cp ../misc/hubomgr.conf /etc/init/hubomgr.conf
+    sudo cp ../misc/hubo-manager /etc/init.d/hubo-manager
+    sudo ln -s /etc/init.d/hubo-manager /etc/rc1.d/S95hubo-manager
+    sudo ln -s /etc/init.d/hubo-manager /etc/rc0.d/K20hubo-manager
+    sudo ln -s /etc/init.d/hubo-manager /etc/rc6.d/K20hubo-manager
 }
 
 RawRobotInstall()
@@ -103,11 +107,11 @@ RobotInstall()
         'Hubo2Plus')
             RawRobotInstall $@
         ;;
-        
+
         'DrcHubo')
             RawRobotInstall $@
         ;;
-        
+
         *)
             ShowUsage
             exit 2

@@ -62,6 +62,8 @@ int hubo_rt_lock_memory();
 
 void hubo_rt_stack_prefault(size_t stack_size);
 
+void hubo_rt_remove_lockfile(const char* daemon_name, const char* lock_directory);
+
 void hubo_rt_daemon_close(const char* daemon_name, const char *lock_directory);
 
 int hubo_rt_safe_make_directory(const char* directory_name);

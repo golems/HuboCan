@@ -223,12 +223,14 @@ int hubo_rt_daemonize(const char* daemon_name, const char* lock_directory,
             {
                 syslog( LOG_ERR, "Could not set user to root. Error: '%s', code=%d."
                         " Please run with sudo!", strerror(errno), errno);
+                hubo_rt_remove_lockfile(daemon_name, lock_directory);
                 return -3;
             }
         }
         else
         {
             syslog( LOG_ERR, "Could not find root account. What??");
+            hubo_rt_remove_lockfile(daemon_name, lock_directory);
             return -4;
         }
     }
@@ -253,6 +255,7 @@ int hubo_rt_daemonize(const char* daemon_name, const char* lock_directory,
     {
         syslog( LOG_ERR, "Unable to create new session, code=%d (%s)",
                errno, strerror(errno) );
+        hubo_rt_remove_lockfile(daemon_name, lock_directory);
         return -5;
     }
     
@@ -260,6 +263,7 @@ int hubo_rt_daemonize(const char* daemon_name, const char* lock_directory,
     {
         syslog( LOG_ERR, "Unable to change directory, code=%d (%s)",
                 errno, strerror(errno) );
+        hubo_rt_remove_lockfile(daemon_name, lock_directory);
         return -6;
     }
     
@@ -269,6 +273,7 @@ int hubo_rt_daemonize(const char* daemon_name, const char* lock_directory,
     {
         syslog( LOG_ERR, "Could not open lockfile! Error: %s, code=%d",
                 strerror(errno), errno);
+        hubo_rt_remove_lockfile(daemon_name, lock_directory);
         return -7;
     }
     fprintf(fp, "%d", sid);
@@ -359,10 +364,15 @@ void hubo_rt_stack_prefault(size_t stack_size)
 
 void hubo_rt_daemon_close(const char *daemon_name, const char *lock_directory)
 {
-    char lockfile[MAX_FILENAME_SIZE];
-    sprintf(lockfile, "%s/%s", lock_directory, daemon_name);
-    remove( lockfile );
+    hubo_rt_remove_lockfile(daemon_name, lock_directory);
     fclose( stdout );
     fclose( stderr );
     syslog( LOG_NOTICE, "Terminated daemon %s gracefully", daemon_name);
+}
+
+void hubo_rt_remove_lockfile(const char *daemon_name, const char *lock_directory)
+{
+    char lockfile[MAX_FILENAME_SIZE];
+    sprintf(lockfile, "%s/%s", lock_directory, daemon_name);
+    remove( lockfile );
 }
