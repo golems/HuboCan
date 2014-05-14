@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
     mgr.register_new_proc(std::string("player")
                           + ":/usr/bin/huboplayer::");
     mgr.register_new_proc(std::string("log_publisher")
-                          + "/usr/bin/hubo_log_publisher::");
+                          + ":/usr/bin/hubo_log_publisher::");
 
     return 0;
 }

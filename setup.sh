@@ -69,10 +69,15 @@ AutostartManager()
 {
     echo 'Setting hubomgr to autolaunch after boot'
 #    sudo cp ../misc/hubomgr.conf /etc/init/hubomgr.conf
+
     sudo cp ../misc/hubo-manager /etc/init.d/hubo-manager
-    sudo ln -s /etc/init.d/hubo-manager /etc/rc1.d/S95hubo-manager
-    sudo ln -s /etc/init.d/hubo-manager /etc/rc0.d/K20hubo-manager
-    sudo ln -s /etc/init.d/hubo-manager /etc/rc6.d/K20hubo-manager
+    sudo chmod a+x /etc/init.d/hubo-manager
+    sudo update-rc.d hubo-manager defaults
+}
+
+RemoveAutostart()
+{
+    sudo update-rc.d -f hubo-manager remove
 }
 
 RawRobotInstall()

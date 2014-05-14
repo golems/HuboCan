@@ -1,0 +1,41 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          hubo-manager
+# Required-Start:    $all
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Launches hubomgr
+# Description:       hubomgr is a service daemon which manages proccesses
+#                    and ach channels for operating Hubo.
+### END INIT INFO
+
+start_hubomgr()
+{
+    sudo hubomgr
+}
+
+stop_hubomgr()
+{
+    pkill --signal SIGTERM hubomgr
+    if [ -e "/opt/hubo/mgr/lock/hubo-manager" ]
+    then
+        rm -f /opt/hubo/mgr/lock/hubo-manager
+    fi
+}
+
+case $1 in
+    start)
+        start_hubomgr
+    ;;
+    stop)
+        stop_hubomgr
+    ;;
+    restart|force-reload)
+        stop_hubomgr
+        start_hubomgr
+    ;;
+esac
+
+exit 0
+

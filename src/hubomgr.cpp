@@ -4,12 +4,9 @@
 
 int main(int, char* [])
 {
-    syslog( LOG_NOTICE, "About to instantiate manager" );
     HuboRT::Manager mgr;
 
-    syslog( LOG_NOTICE, "About to launch manager" );
     mgr.launch();
-//    mgr.run();
 
     return 0;
 }
