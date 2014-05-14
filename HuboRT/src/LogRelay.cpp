@@ -72,8 +72,6 @@ bool LogRelay::receive(std::string &log_name, std::string &contents, int timeout
         strncpy(_transition, _buffer.contents, _buffer.content_size);
         _transition[_buffer.content_size] = '\0';
         contents = std::string(_transition);
-
-        std::cout << "size received: " << _buffer.content_size << std::endl;
     }
 
     return new_message;
