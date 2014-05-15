@@ -7,6 +7,7 @@
 
 #include "../ManagerWidget.h"
 #include "HuboRT/utils.hpp"
+#include "HuboRT/Manager.hpp"
 
 extern "C" {
 #include "HuboRT/Daemonizer_C.h"
@@ -87,6 +88,9 @@ ManagerWidget::ManagerWidget() :
     connect(_ui->launch_proc, SIGNAL(clicked()), this, SLOT(launch_proc()));
     connect(_ui->stop_proc, SIGNAL(clicked()), this, SLOT(stop_proc()));
     connect(_ui->kill_proc, SIGNAL(clicked()), this, SLOT(kill_proc()));
+
+    connect(_ui->localMgrLaunch, SIGNAL(clicked()), this, SLOT(local_mgr_launch()));
+    connect(_ui->localMgrStop, SIGNAL(clicked()), this, SLOT(local_mgr_stop()));
 
 
     if(_ui->hostname_edit->text().size() > 0)
@@ -481,6 +485,16 @@ void ManagerWidget::load_hostname()
     hostname.close();
 }
 
+void ManagerWidget::local_mgr_launch()
+{
+    _lmgr.start();
+}
+
+void ManagerWidget::local_mgr_stop()
+{
+    _lmgr.quit();
+}
+
 void ManagerWidget::save_hostname(const QString& new_name)
 {
     QFile hostname(anw_save_hostname_file);
@@ -495,7 +509,12 @@ void ManagerWidget::save_hostname(const QString& new_name)
     hostname.close();
 }
 
+void LocalManager::run()
+{
+    HuboRT::Manager mgr;
 
+    mgr.run();
+}
 
 
 

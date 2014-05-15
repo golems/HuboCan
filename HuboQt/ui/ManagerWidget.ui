@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>607</width>
-    <height>573</height>
+    <height>606</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -21,15 +21,17 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
-    <widget class="QGroupBox" name="AchNetworking">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QGroupBox {
+    <layout class="QHBoxLayout" name="TopLayout">
+     <item>
+      <widget class="QGroupBox" name="AchNetworking">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QGroupBox {
     border: 1px solid gray;
     border-radius: 9px;
     margin-top: 0.5em;
@@ -40,154 +42,178 @@ QGroupBox::title {
     left: 10px;
     padding: 0 3px 0 3px;
 }</string>
-     </property>
-     <property name="title">
-      <string>Ach Networking</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_4">
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout">
+       </property>
+       <property name="title">
+        <string>Ach Networking</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
         <item>
-         <layout class="QVBoxLayout" name="verticalLayout">
+         <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
-           <spacer name="verticalSpacer_4">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Minimum</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>2</height>
-             </size>
-            </property>
-           </spacer>
+           <layout class="QVBoxLayout" name="verticalLayout">
+            <item>
+             <widget class="QLabel" name="network_status">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Status</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="reconnect">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Reconnect</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="disconnect">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Disconnect</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
           <item>
-           <widget class="QLabel" name="network_status">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>Status</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="reconnect">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>Reconnect</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="disconnect">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>Disconnect</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="verticalSpacer_3">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Minimum</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>2</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <item>
-           <spacer name="verticalSpacer">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Preferred</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>25</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="QLabel" name="label">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>IP Address or Host Name of Hubo</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="hostname_edit">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="verticalSpacer_2">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Preferred</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>10</height>
-             </size>
-            </property>
-           </spacer>
+           <layout class="QVBoxLayout" name="verticalLayout_2">
+            <item>
+             <spacer name="verticalSpacer">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Preferred</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>25</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLabel" name="label">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>IP Address or Host Name of Hubo</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="hostname_edit">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Preferred</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>10</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
           </item>
          </layout>
         </item>
        </layout>
-      </item>
-     </layout>
-    </widget>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="styleSheet">
+        <string notr="true">QGroupBox {
+    border: 1px solid gray;
+    border-radius: 9px;
+    margin-top: 0.5em;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 10px;
+    padding: 0 3px 0 3px;
+}</string>
+       </property>
+       <property name="title">
+        <string>Local Manager</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_8">
+        <item>
+         <widget class="QPushButton" name="localMgrLaunch">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>120</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Launch</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="localMgrStop">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Stop</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="StandardOptions">
      <property name="styleSheet">
       <string notr="true">QGroupBox {
     border: 1px solid gray;
@@ -252,7 +278,7 @@ QGroupBox::title {
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_5">
+    <layout class="QHBoxLayout" name="BottomLayout">
      <item>
       <widget class="QGroupBox" name="ChannelManagement">
        <property name="styleSheet">
@@ -485,7 +511,7 @@ QGroupBox::title {
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_11">
+    <layout class="QHBoxLayout" name="BottomBarLayout">
      <item>
       <widget class="QLabel" name="label_5">
        <property name="sizePolicy">

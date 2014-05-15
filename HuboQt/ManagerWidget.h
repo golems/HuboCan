@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <QVector>
+#include <QThread>
 
 #include "ui_ManagerWidget.h"
 #include "AchdHandle.h"
@@ -40,6 +41,8 @@ public:
     QString selected_button_style;
     
 protected:
+
+    LocalManager _lmgr;
     
     bool _displaying_locked_procs;
     bool _connected;
@@ -72,6 +75,9 @@ protected:
     void _set_status(manager_err_t incoming_status, const QString& status_context);
     
 protected Q_SLOTS:
+
+    void local_mgr_launch();
+    void local_mgr_stop();
     
     void save_hostname(const QString& new_name);
     

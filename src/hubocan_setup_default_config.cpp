@@ -44,18 +44,33 @@ int main(int argc, char* argv[])
     mgr.register_new_chan(std::string("log:")+HUBO_RT_LOG_RELAY_CHAN
                           +":10:4608:"+ACHD_PULL_STRING+":");
 
+
+    mgr.register_new_proc(std::string("player")
+                          + ":/usr/bin/huboplayer::");
+    mgr.register_new_proc(std::string("log_publisher")
+                          + ":/usr/bin/hubo_log_publisher::");
+
+
     std::string robot_type = "Hubo2Plus";
     for(int i=1; i<argc; ++i)
     {
         robot_type = argv[i];
     }
 
+    std::string args;
+    if(robot_type == "virtual")
+        args = "virtual";
+
     mgr.register_new_proc(std::string("socketcan_interface")
-                            +":/usr/bin/hubo_socketcan_interface:robot "+robot_type+":");
-    mgr.register_new_proc(std::string("player")
-                          + ":/usr/bin/huboplayer::");
-    mgr.register_new_proc(std::string("log_publisher")
-                          + ":/usr/bin/hubo_log_publisher::");
+                          +":/usr/bin/hubo_socketcan_interface:robot "+"DrcHubo "+args+":");
+    mgr.save_current_config("DrcHubo");
+
+    mgr.register_new_proc(std::string("socketcan_interface")
+                          +":/usr/bin/hubo_socketcan_interface:robot "+"Hubo2Plus "+args+":");
+    mgr.save_current_config("Hubo2Plus");
+
+    if(robot_type != "virtual")
+        mgr.load_config(robot_type);
 
     return 0;
 }

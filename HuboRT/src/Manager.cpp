@@ -636,6 +636,7 @@ std::string Manager::_stringify_contents(const std::string &directory, const std
 
 void Manager::load_config(const std::string &name)
 {
+    std::cout << "Loading config '" << name << "'... "; fflush(stdout);
     StringArray configs = _grab_files_in_dir(_config_roster);
     bool config_existed = false;
     bool correctly_formed = true;
@@ -644,8 +645,10 @@ void Manager::load_config(const std::string &name)
         if(name == configs[i])
         {
             config_existed = true;
-            
+            std::cout << "config found..."; fflush(stdout);
             correctly_formed = _load_config_raw(name);
+            if(correctly_formed)
+                std::cout << " config loaded." << std::endl;
         }
     }
     
@@ -713,7 +716,7 @@ void Manager::_clear_current_config()
     StringArray chans = _grab_files_in_dir(_chan_roster);
     for(size_t i=0; i < chans.size(); ++i)
     {
-        remove( (_chan_roster+"/"+procs[i]).c_str() );
+        remove( (_chan_roster+"/"+chans[i]).c_str() );
     }
 }
 

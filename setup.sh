@@ -153,6 +153,8 @@ WorkstationInstall()
     CreateOptHubo
     CopyDevices
 
+    /usr/bin/hubocan_setup_default_config virtual
+
     echo 'workstation' > /opt/hubo/install_type
 }
 
