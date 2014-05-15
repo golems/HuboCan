@@ -6,10 +6,10 @@ int main(int, char* [])
 {
     HuboCan::HuboDescription desc;
 //    desc.parseFile("../HuboCan/devices/Hubo2Plus.dd");
-//    desc.parseFile("../HuboCan/devices/DrcHubo.dd");
-//    desc.broadcastInfo();
+    desc.parseFile("../HuboCan/devices/DrcHubo.dd");
+    desc.broadcastInfo();
 
-    desc.receiveInfo();
+//    desc.receiveInfo();
 
 //    std::cout << desc.getJointTable() << std::endl << std::endl;
 

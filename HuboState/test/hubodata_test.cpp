@@ -42,7 +42,7 @@ int main(int, char* [])
     }
     std::cout << std::endl;
     
-    for(size_t i=0; i<test_data.array_count(); ++i)
+    for(size_t i=0; i<test_data.size(); ++i)
     {
         std::cout << test_data[i].position << "\t";
     }

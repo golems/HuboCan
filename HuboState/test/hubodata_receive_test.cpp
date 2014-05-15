@@ -45,7 +45,7 @@ int main(int, char* [])
     }
     std::cout << std::endl;
     
-    for(size_t i=0; i<rec_data.array_count(); ++i)
+    for(size_t i=0; i<rec_data.size(); ++i)
     {
         std::cout << rec_data[i].position << "\t";
     }

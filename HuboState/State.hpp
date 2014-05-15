@@ -129,6 +129,8 @@ public:
     inline bool initialized() { return _initialized && joints.is_initialized()
                 && imus.is_initialized() && force_torques.is_initialized(); }
     
+    inline const HuboCan::HuboDescription& get_description() const { return _desc; }
+
 protected:
 
     bool _initialized;

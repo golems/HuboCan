@@ -403,7 +403,7 @@ public:
 
     const std::string& get_entry_name(size_t i) const
     {
-        if( i < array_count() )
+        if( i < size() )
             return _names[i];
         else
             return _dummy_string;
@@ -443,7 +443,7 @@ public:
     std::string get_channel_name() const { return _channel_name; }
     bool is_initialized() const { return _initialized; }
     
-    size_t array_count() const
+    size_t size() const
     {
         return get_data_component_count(_raw_data);
     }
@@ -505,17 +505,17 @@ std::ostream& operator<<(std::ostream& stream, const HuboState::HuboData<DataCla
     }
 
     stream << "Channel: '" << data.get_channel_name() << "', timestamp: " << data.get_time()
-              << ", entry count: " << data.array_count() << "\n";
+              << ", entry count: " << data.size() << "\n";
 
     size_t s = 0;
-    for(size_t i=0; i<data.array_count(); ++i)
+    for(size_t i=0; i<data.size(); ++i)
     {
         const std::string& entry_name = data.get_entry_name(i);
         if(entry_name.size() > s)
             s = entry_name.size();
     }
 
-    for(size_t i=0; i<data.array_count(); ++i)
+    for(size_t i=0; i<data.size(); ++i)
     {
         stream.width(s);
         stream << data.get_entry_name(i) << " | " << data.const_entry(i) << "\n";

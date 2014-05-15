@@ -46,9 +46,9 @@ public:
      * \brief How many joints the currently running Hubo has
      * \return
      */
-    inline size_t getJointCount() { return joints.size(); }
+    inline size_t getJointCount() const { return joints.size(); }
 
-    inline size_t getJmcCount() { return jmcs.size(); }
+    inline size_t getJmcCount() const { return jmcs.size(); }
 
     /*!
      * \fn getJointIndex()
@@ -58,7 +58,7 @@ public:
      *
      * Returns (size_t)(-1) if the given joint name does not exist.
      */
-    size_t getJointIndex(const std::string& joint_name);
+    size_t getJointIndex(const std::string& joint_name) const;
 
     /*!
      * \fn getJointIndices()
@@ -66,7 +66,7 @@ public:
      * \param joint_names
      * \return
      */
-    IndexArray getJointIndices(StringArray joint_names);
+    IndexArray getJointIndices(StringArray joint_names) const;
 
     /*!
      * \fn getJointName()
@@ -74,7 +74,7 @@ public:
      * \param joint_index
      * \return
      */
-    std::string getJointName(size_t joint_index);
+    std::string getJointName(size_t joint_index) const;
 
     /*!
      * \fn getJointNames(IndexArray joints)
@@ -82,14 +82,14 @@ public:
      * \param joints
      * \return
      */
-    StringArray getJointNames(IndexArray joints);
+    StringArray getJointNames(IndexArray joints) const;
 
     /*!
      * \fn getJointNames()
      * \brief Returns an ordered list of all the joint names of the robot
      * \return
      */
-    StringArray getJointNames();
+    StringArray getJointNames() const;
 
     /*!
      * \fn getJointInfo()
@@ -97,24 +97,24 @@ public:
      * \param joint_index
      * \return
      */
-    hubo_joint_info_t getJointInfo(size_t joint_index);
+    hubo_joint_info_t getJointInfo(size_t joint_index) const;
 
     /*!
      * \fn getJointTable()
      * \brief Produces a table with the basic specs of all loaded joints
      * \return
      */
-    std::string getJointTable();
+    std::string getJointTable() const;
 
     /*!
      * \fn getJmcTable()
      * \brief Produces a table with the basic specs of all loaded JMCs
      * \return
      */
-    std::string getJmcTable();
+    std::string getJmcTable() const;
 
 
-    size_t getJmcIndex(const std::string& jmc_name);
+    size_t getJmcIndex(const std::string& jmc_name) const;
 
     hubo_params_info_t params;
     HuboJointPtrArray joints;

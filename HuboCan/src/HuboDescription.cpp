@@ -169,7 +169,7 @@ error_result_t HuboDescription::broadcastInfo()
         return ACH_ERROR;
 }
 
-std::string HuboDescription::getJointTable()
+std::string HuboDescription::getJointTable() const
 {
     std::stringstream table;
 
@@ -183,7 +183,7 @@ std::string HuboDescription::getJointTable()
     return table.str();
 }
 
-std::string HuboDescription::getJmcTable()
+std::string HuboDescription::getJmcTable() const
 {
     std::stringstream table;
 
@@ -631,7 +631,7 @@ bool HuboDescription::_postParseProcessing()
     return true;
 }
 
-size_t HuboDescription::getJointIndex(const std::string& joint_name)
+size_t HuboDescription::getJointIndex(const std::string& joint_name) const
 {
     for(size_t i=0; i < getJointCount(); ++i)
     {
@@ -645,7 +645,7 @@ size_t HuboDescription::getJointIndex(const std::string& joint_name)
     return InvalidIndex;
 }
 
-IndexArray HuboDescription::getJointIndices(StringArray joint_names)
+IndexArray HuboDescription::getJointIndices(StringArray joint_names) const
 {
     IndexArray result;
     for(size_t i=0; i < joint_names.size(); ++i)
@@ -655,12 +655,12 @@ IndexArray HuboDescription::getJointIndices(StringArray joint_names)
     return result;
 }
 
-std::string HuboDescription::getJointName(size_t joint_index)
+std::string HuboDescription::getJointName(size_t joint_index) const
 {
     return std::string(getJointInfo(joint_index).name);
 }
 
-StringArray HuboDescription::getJointNames(IndexArray joints)
+StringArray HuboDescription::getJointNames(IndexArray joints) const
 {
     StringArray result;
     for(size_t i=0; i<joints.size(); ++i)
@@ -670,7 +670,7 @@ StringArray HuboDescription::getJointNames(IndexArray joints)
     return result;
 }
 
-StringArray HuboDescription::getJointNames()
+StringArray HuboDescription::getJointNames() const
 {
     StringArray result;
     for(size_t i=0; i<getJointCount(); ++i)
@@ -680,7 +680,7 @@ StringArray HuboDescription::getJointNames()
     return result;
 }
 
-hubo_joint_info_t HuboDescription::getJointInfo(size_t joint_index)
+hubo_joint_info_t HuboDescription::getJointInfo(size_t joint_index) const
 {
     if( joint_index >= getJointCount() )
     {
@@ -695,7 +695,7 @@ hubo_joint_info_t HuboDescription::getJointInfo(size_t joint_index)
 }
 
 
-size_t HuboDescription::getJmcIndex(const std::string &jmc_name)
+size_t HuboDescription::getJmcIndex(const std::string &jmc_name) const
 {
     size_t result = InvalidIndex;
     for(size_t i=0; i < jmcs.size(); ++i)
