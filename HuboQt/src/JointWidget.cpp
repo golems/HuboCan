@@ -172,11 +172,11 @@ void JointButton::update()
 }
 
 
-JointGridWidget::JointGridWidget(HuboState::State* state)
+JointGridWidget::JointGridWidget()
 {
     setLayout(new FlowLayout);
     _initialized = false;
-    setStatePtr(state);
+    _sptr = NULL;
 }
 
 HuboState::State* JointGridWidget::getStatePtr() const
@@ -187,6 +187,9 @@ HuboState::State* JointGridWidget::getStatePtr() const
 void JointGridWidget::setStatePtr(HuboState::State *new_state_ptr)
 {
     _sptr = new_state_ptr;
+
+    if( NULL == _sptr )
+        return;
 
     if(!_sptr->initialized())
     {
@@ -220,6 +223,9 @@ void JointGridWidget::setStatePtr(HuboState::State *new_state_ptr)
 
 void JointGridWidget::update()
 {
+    if( NULL == _sptr )
+        return;
+
     if(!_initialized)
     {
         setStatePtr(_sptr);
@@ -236,6 +242,16 @@ void JointGridWidget::update()
 JointWidget::JointWidget()
 {
     setLayout(new QVBoxLayout);
-    grid = new JointGridWidget(&state);
+
+    grid = new JointGridWidget;
     layout()->addWidget(grid);
+}
+
+void JointWidget::initialize()
+{
+    if( NULL == state )
+    {
+        state = new HuboState::State(0);
+        grid->setStatePtr(state);
+    }
 }

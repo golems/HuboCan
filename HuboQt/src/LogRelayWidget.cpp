@@ -123,7 +123,7 @@ LogRelayWidget::LogRelayWidget()
     layout()->addWidget(restart);
 
     worker = new RelayWorker(&tabs);
-    worker->start();
+//    worker->start();
 }
 
 void LogRelayWidget::attempt_restart()

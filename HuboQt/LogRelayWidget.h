@@ -83,7 +83,7 @@ protected:
     LogRelayTabs tabs;
     RelayWorker* worker;
 
-protected Q_SLOTS:
+public Q_SLOTS:
 
     void attempt_restart();
 

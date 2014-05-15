@@ -50,7 +50,8 @@ ManagerWidget::ManagerWidget() :
             this, SLOT(inform_disconnect(int)), Qt::UniqueConnection);
     _perm_achd_handles.push_back(handle);
     
-    _start_achds(_perm_achd_handles);
+    if(_ui->hostname_edit->text().size() > 0)
+        _start_achds(_perm_achd_handles);
     
     _req = new HuboRT::ManagerReq;
     if(!_req->is_initialized())
@@ -139,16 +140,6 @@ void ManagerWidget::_disconnect_achds(AchdPtrArray &achds)
 
 void ManagerWidget::startup_everything()
 {
-//    StringArray reply;
-//    manager_err_t result = _req->start_up(reply);
-    
-//    _set_status(result, "startup command");
-    
-//    if(NO_ERROR != result)
-//        return;
-    
-//    _parse_channel_descriptions(reply);
-
     create_all();
     launch_all();
 }
@@ -197,6 +188,7 @@ void ManagerWidget::_display_channels()
 
         _ui->chan_list->addItem(new_chan);
     }
+    emit channels_opened();
 }
 
 void ManagerWidget::_display_registered_processes(const StringArray &procs)

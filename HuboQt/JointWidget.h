@@ -45,7 +45,7 @@ class JointGridWidget : public QWidget
 
 public:
 
-    explicit JointGridWidget(HuboState::State* state);
+    explicit JointGridWidget();
 
     HuboState::State* getStatePtr() const;
     void setStatePtr(HuboState::State* new_state_ptr);
@@ -71,7 +71,11 @@ public:
 
     JointGridWidget* grid;
 
-    HuboState::State state;
+    HuboState::State* state;
+
+public Q_SLOTS:
+
+    void initialize();
 
 };
 

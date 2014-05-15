@@ -14,6 +14,8 @@ HuboQtMainWindow::HuboQtMainWindow()
     JointWidget* joints = new JointWidget;
     LogRelayWidget* relay = new LogRelayWidget;
 
+    connect(mgr, SIGNAL(channels_opened()), joints, SLOT(initialize()));
+    connect(mgr, SIGNAL(channels_opened()), relay, SLOT(attempt_restart()));
 
     QTabWidget* tabs = new QTabWidget;
     tabs->addTab(mgr, "Manager");

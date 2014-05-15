@@ -16,6 +16,16 @@ namespace HuboQt {
 
 typedef QVector<AchdHandle*> AchdPtrArray;
 
+class LocalManager : public QThread
+{
+    Q_OBJECT
+
+public:
+
+    void run();
+
+};
+
 class ManagerWidget : public QWidget
 {
     Q_OBJECT
@@ -92,6 +102,10 @@ protected Q_SLOTS:
     void kill_proc();
     
     void inform_disconnect(int exit_code);
+
+Q_SIGNALS:
+
+    void channels_opened();
     
 private:
     
