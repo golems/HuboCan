@@ -21,6 +21,14 @@ ShowUsage()
     echo " pass in 'workstation'. Ex:"
     echo "   $ ./setup workstation"
     echo " "
+    echo " -- uninstall -- "
+    echo " This is for uninstalling any headers, binaries, and startup"
+    echo " scripts used by the HuboCan Package. Passing in the argument"
+    echo " 'clear' will also destroy the contents of /opt/hubo, which"
+    echo " will effectively clear all trace of HuboCan from your system."
+    echo " Ex:"
+    echo "   $ ./setup uninstall"
+    echo " "
 }
 
 MakeBuildDirectory()
@@ -182,6 +190,19 @@ HuboUninstall()
         sudo update-rc.d -f hubo-manager remove
         sudo rm -f /etc/init.d/hubo-manager
     fi
+
+    case "$2" in
+        'clear')
+            sudo rm -rf /opt/hubo
+        ;;
+
+        '')
+        ;;
+
+        '*')
+            echo 'WARNING: The only argument supported by uninstall is clear'
+        ;;
+    esac
 }
 
 case "$1" in
@@ -194,7 +215,7 @@ case "$1" in
     ;;
 
     'uninstall')
-        HuboUninstall
+        HuboUninstall $@
     ;;
 
     *)
