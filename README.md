@@ -51,6 +51,18 @@ You do not need to specify a version of the robot for a workstation install, bec
 inform you which version it is when you connect to it. So the same workstation can be used to
 operate a Hubo2Plus or a DrcHubo with no changes whatsoever necessary.
 
+#### Uninstall
+
+Simply run the setup script as follows:
+```bash
+$ ./setup uninstall
+```
+
+The script will automatically identify whether you originally did a 'robot' installation or a
+'workstation' installation and then remove libraries, headers, and startup scripts as appropriate.
+Adding the argument 'purge' will also remove the entire /opt/hubo directory, but this is not
+recommended unless you want to completely remove all HuboCan files from your computer.
+
 # Code Description
 
 This source code compiles into two libraries:

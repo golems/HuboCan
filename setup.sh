@@ -24,7 +24,7 @@ ShowUsage()
     echo " -- uninstall -- "
     echo " This is for uninstalling any headers, binaries, and startup"
     echo " scripts used by the HuboCan Package. Passing in the argument"
-    echo " 'clear' will also destroy the contents of /opt/hubo, which"
+    echo " 'purge' will also destroy the contents of /opt/hubo, which"
     echo " will effectively clear all trace of HuboCan from your system."
     echo " Ex:"
     echo "   $ ./setup uninstall"
@@ -192,7 +192,7 @@ HuboUninstall()
     fi
 
     case "$2" in
-        'clear')
+        'purge')
             sudo rm -rf /opt/hubo
         ;;
 
@@ -200,7 +200,7 @@ HuboUninstall()
         ;;
 
         '*')
-            echo 'WARNING: The only argument supported by uninstall is clear'
+            echo 'WARNING: The only argument supported by uninstall is purge'
         ;;
     esac
 }
