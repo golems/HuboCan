@@ -693,9 +693,16 @@ bool Manager::_load_config_raw(const std::string &name)
         if(components[0] == "proc" || components[0] == "chan")
         {
             std::ofstream output;
-            output.open( (manager_directory+"/"+components[0]).c_str() );
+            output.open( (manager_directory+"/"+components[0]+"/"+components[1]).c_str() );
+
+            if(!output.good())
+            {
+                std::cerr << "Could not open " << (manager_directory+"/"
+                                                   +components[0]+"/"+components[1])
+                          << " for registration!" << std::endl;
+            }
             
-            for(size_t i=1; i < components.size(); ++i)
+            for(size_t i=2; i < components.size(); ++i)
             {
                 output << components[i] << ":";
             }

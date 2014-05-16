@@ -27,7 +27,12 @@ protected:
     void _parse_channel_descriptions(const StringArray& descs);
     void _parse_proc_descriptions(const StringArray& descs);
     void _parse_descriptions(const StringArray& descs, QTableWidget* table, size_t expectation, const std::string& type);
+
     void _parse_configurations(const StringArray& configs);
+
+    void _quiet_update_chans();
+    void _quiet_update_procs();
+    void _quiet_update_configs();
 
 public Q_SLOTS:
 
