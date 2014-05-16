@@ -5,6 +5,8 @@
 #include <QTimer>
 #include <QColor>
 
+#include <stdio.h>
+
 #include "../ManagerWidget.h"
 #include "HuboRT/utils.hpp"
 #include "HuboRT/Manager.hpp"
@@ -519,6 +521,16 @@ void ManagerWidget::save_hostname(const QString& new_name)
 void LocalManager::run()
 {
     _okay = true;
+
+//    FILE* lfp = fopen("/opt/hubo/rt/lock/test_lockfile", "w");
+//    if( lfp == NULL )
+//    {
+//        std::cout << "Unable to create lock file" << std::endl;
+//        return;
+//    }
+
+//    fprintf(lfp, "%d", 100);
+//    fclose(lfp);
 
     HuboRT::Manager mgr;
     std::cout << "Starting local manager" << std::endl;

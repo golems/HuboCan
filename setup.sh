@@ -57,6 +57,34 @@ GetDependencies()
     sudo apt-get install libeigen3-dev
 }
 
+CopyDevices()
+{
+    echo 'Copying device files into /opt/hubo/devices'
+    cp -r ../HuboCan/devices /opt/hubo/
+}
+
+CopyConfigs()
+{
+    if [ -d "/opt/hubo/mgr/" ]
+    then
+        echo '/opt/hubo/mgr already exists'
+    else
+        sudo mkdir /opt/hubo/mgr
+        sudo chmod a+rwx /opt/hubo/mgr
+    fi
+
+#    if [ -d "/opt/hubo/mgr/configs/" ]
+#    then
+#        echo '/opt/hubo/mgr/configs already exists'
+#    else
+#        echo 'Creating /opt/hubo/mgr/configs'
+#        sudo mkdir /opt/hubo/mgr/configs
+#        sudo chmod a+rwx /opt/hubo/mgr/configs
+#    fi
+
+    cp -r ../misc/configs /opt/hubo/mgr/
+}
+
 CreateOptHubo()
 {
     if [ -d "/opt/hubo" ]
@@ -67,12 +95,9 @@ CreateOptHubo()
         sudo mkdir /opt/hubo
         sudo chmod a+rwx /opt/hubo
     fi
-}
 
-CopyDevices()
-{
-    echo 'Copying device files into /opt/hubo/devices'
-    cp -r ../HuboCan/devices /opt/hubo/
+    CopyDevices
+    CopyConfigs
 }
 
 AutostartManager()
@@ -104,10 +129,9 @@ RawRobotInstall()
     sudo make install
 
     CreateOptHubo
-    CopyDevices
     AutostartManager
 
-    /usr/bin/hubocan_setup_default_config "$2"
+    /usr/bin/hubocan_set_default_config "$2"
 
     echo 'robot' > /opt/hubo/install_type
 }
@@ -151,9 +175,8 @@ WorkstationInstall()
     sudo make install
 
     CreateOptHubo
-    CopyDevices
 
-    /usr/bin/hubocan_setup_default_config virtual
+    /usr/bin/hubocan_set_default_config virtual_Hubo2Plus
 
     echo 'workstation' > /opt/hubo/install_type
 }

@@ -204,8 +204,11 @@ int hubo_rt_daemonize(const char* daemon_name, const char* lock_directory,
 
     char lockfile[MAX_FILENAME_SIZE];
     sprintf(lockfile, "%s/%s", lock_directory, daemon_name);
-    int lfp = open(lockfile, O_RDWR|O_CREAT|O_EXCL, S_IRUSR | S_IRGRP | S_IROTH); // lockfile pointer
-    if( lfp < 0 )
+//    int lfp = open(lockfile, O_RDWR|O_CREAT|O_EXCL, S_IRUSR | S_IRGRP | S_IROTH); // lockfile pointer
+    FILE* lfp = fopen(lockfile, "w" /*O_RDWR|O_CREAT|O_EXCL, S_IRUSR | S_IRGRP | S_IROTH*/); // lockfile pointer
+    fprintf(stdout, "first lfp: %p\n", lfp); fflush(stdout);
+//    if( lfp < 0 )
+    if(lfp == NULL)
     {
         syslog( LOG_ERR, "Unable to create lock file '%s', code=%d (%s)",
                 lockfile, errno, strerror(errno));
@@ -213,27 +216,27 @@ int hubo_rt_daemonize(const char* daemon_name, const char* lock_directory,
     }
 
     // Drop the user if one exists
-    if( getuid()==0 || geteuid()==0 )
-    {
-        struct passwd *pw = getpwnam("root");
-        if( pw )
-        {
-            syslog( LOG_NOTICE, "Setting user to root");
-            if( setuid( pw->pw_uid ) != 0 )
-            {
-                syslog( LOG_ERR, "Could not set user to root. Error: '%s', code=%d."
-                        " Please run with sudo!", strerror(errno), errno);
-                hubo_rt_remove_lockfile(daemon_name, lock_directory);
-                return -3;
-            }
-        }
-        else
-        {
-            syslog( LOG_ERR, "Could not find root account. What??");
-            hubo_rt_remove_lockfile(daemon_name, lock_directory);
-            return -4;
-        }
-    }
+//    if( getuid()==0 || geteuid()==0 )
+//    {
+//        struct passwd *pw = getpwnam("root");
+//        if( pw )
+//        {
+//            syslog( LOG_NOTICE, "Setting user to root");
+//            if( setuid( pw->pw_uid ) != 0 )
+//            {
+//                syslog( LOG_ERR, "Could not set user to root. Error: '%s', code=%d."
+//                        " Please run with sudo!", strerror(errno), errno);
+//                hubo_rt_remove_lockfile(daemon_name, lock_directory);
+//                return -3;
+//            }
+//        }
+//        else
+//        {
+//            syslog( LOG_ERR, "Could not find root account. What??");
+//            hubo_rt_remove_lockfile(daemon_name, lock_directory);
+//            return -4;
+//        }
+//    }
 
     hubo_rt_daemon_fork();
     pid_t parent = getppid();
@@ -267,17 +270,29 @@ int hubo_rt_daemonize(const char* daemon_name, const char* lock_directory,
         return -6;
     }
     
-    FILE* fp;
-    fp = fopen(lockfile, "w");
-    if( fp == NULL )
+//    FILE* fp;
+//    fp = fopen(lockfile, "w");
+//    if( fp == NULL )
+//    {
+//        syslog( LOG_ERR, "Could not open lockfile! Error: %s, code=%d",
+//                strerror(errno), errno);
+//        hubo_rt_remove_lockfile(daemon_name, lock_directory);
+//        return -7;
+//    }
+//    fprintf(fp, "%d", sid);
+//    fclose(fp);
+
+//    lfp = fopen(lockfile, "w");
+    fprintf(stdout, "second lfp: %p\n", lfp); fflush(stdout);
+    if( lfp == NULL )
     {
         syslog( LOG_ERR, "Could not open lockfile! Error: %s, code=%d",
                 strerror(errno), errno);
         hubo_rt_remove_lockfile(daemon_name, lock_directory);
         return -7;
     }
-    fprintf(fp, "%d", sid);
-    fclose(fp);
+    fprintf(lfp, "%d", sid);
+    fclose(lfp);
     
     kill(parent, SIGUSR1); // Let the parent process know that we're okay
 
