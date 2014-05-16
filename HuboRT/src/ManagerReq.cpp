@@ -164,11 +164,9 @@ manager_err_t ManagerReq::shut_down()
     return _send_request(SHUT_DOWN);
 }
 
-StringArray ManagerReq::list_configs()
+manager_err_t ManagerReq::list_configs(StringArray& configs)
 {
-    StringArray reply;
-    _send_request(LIST_CONFIGS, reply);
-    return reply;
+    return _send_request(LIST_CONFIGS, configs);
 }
 
 manager_err_t ManagerReq::save_current_config(const std::string &config_name)
@@ -190,6 +188,7 @@ manager_err_t ManagerReq::_send_request(manager_cmd_t cmd, const std::string &de
 manager_err_t ManagerReq::_send_request(manager_cmd_t cmd, StringArray &reply, const std::string &desc)
 {
     ach_flush(&_reply_chan);
+    reply.clear();
     
     manager_req_t request;
     request.request_type = cmd;
@@ -220,7 +219,8 @@ manager_err_t ManagerReq::_send_request(manager_cmd_t cmd, StringArray &reply, c
         
         if( ACH_TIMEOUT == r )
         {
-            std::cerr << "The reply from the Manager timed out! (" << timeout << " sec)" << std::endl;
+            std::cerr << "The reply from the Manager timed out! ("
+                      << timeout << " sec)" << std::endl;
             return MGR_TIMEOUT;
         }
         
@@ -238,7 +238,8 @@ manager_err_t ManagerReq::_send_request(manager_cmd_t cmd, StringArray &reply, c
         
         if( raw_reply.original_req != cmd )
         {
-            std::cerr << "The reply from the Manager was not consistent with our request!" << std::endl;
+            std::cerr << "The reply from the Manager was not consistent with our request!"
+                      << std::endl;
             return MGR_RACE_CONDITION;
         }
         

@@ -2,29 +2,36 @@
 #include "../HuboQtMainWindow.h"
 //#include <QHBoxLayout>
 
-#include "../ManagerWidget.h"
-#include "../LogRelayWidget.h"
-#include "../JointWidget.h"
-#include "../ConfigWidget.h"
-
 using namespace HuboQt;
 
 HuboQtMainWindow::HuboQtMainWindow()
 {
-    ManagerWidget* mgr = new ManagerWidget;
-    JointWidget* joints = new JointWidget;
-    LogRelayWidget* relay = new LogRelayWidget;
-    ConfigWidget* configs = new ConfigWidget;
+    mgr = new ManagerWidget;
+    joints = new JointWidget;
+    relay = new LogRelayWidget;
+    configs = new ConfigWidget;
 
     connect(mgr, SIGNAL(channels_created()), joints, SLOT(initialize()));
     connect(mgr, SIGNAL(channels_created()), relay, SLOT(attempt_restart()));
-    connect(mgr, SIGNAL(manager_channels_created()), configs, SLOT(initialize()));
+    configs->initialize();
 
-    QTabWidget* tabs = new QTabWidget;
+    tabs = new QTabWidget;
     tabs->addTab(mgr, "Manager");
     tabs->addTab(joints, "Joints");
     tabs->addTab(relay, "Logs");
     tabs->addTab(configs, "Configs");
-    
+
+    connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(handle_tab_change(int)));
+    connect(this, SIGNAL(refresh_configs()), configs, SLOT(refresh_lists()));
+
     setCentralWidget(tabs);
 }
+
+void HuboQtMainWindow::handle_tab_change(int new_tab)
+{
+    if( tabs->widget(new_tab) == configs )
+    {
+        emit refresh_configs();
+    }
+}
+

@@ -274,7 +274,7 @@ public:
      * \brief Provides a list of the roster configurations which have been saved
      * \return 
      */
-    StringArray list_configs();
+    manager_err_t list_configs(StringArray& configs);
     
     /*!
      * \fn save_current_config()

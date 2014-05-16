@@ -3,6 +3,11 @@
 
 #include <QMainWindow>
 
+#include "ManagerWidget.h"
+#include "LogRelayWidget.h"
+#include "JointWidget.h"
+#include "ConfigWidget.h"
+
 namespace HuboQt {
 
 class HuboQtMainWindow : public QMainWindow
@@ -12,6 +17,21 @@ class HuboQtMainWindow : public QMainWindow
 public:
     
     HuboQtMainWindow();
+
+    ManagerWidget* mgr;
+    JointWidget* joints;
+    LogRelayWidget* relay;
+    ConfigWidget* configs;
+
+    QTabWidget* tabs;
+
+protected Q_SLOTS:
+
+    void handle_tab_change(int new_tab);
+
+Q_SIGNALS:
+
+    void refresh_configs();
     
 };
 
