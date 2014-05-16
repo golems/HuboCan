@@ -81,78 +81,83 @@ void Manager::launch()
         std::cerr << "Failed to daemonize! Check if a manager is already running!" << std::endl;
 }
 
-void Manager::run()
+void Manager::step(double quit_check)
 {
     manager_req_t incoming_msg;
+
+    size_t fs;
+    struct timespec wait_time;
+    clock_gettime( ACH_DEFAULT_CLOCK, &wait_time );
+    long nano_wait = wait_time.tv_nsec + (long)(quit_check*1E9);
+    wait_time.tv_sec += (long)(nano_wait/1E9);
+    wait_time.tv_nsec = (long)(nano_wait%((long)1E9));
+    ach_status_t r = ach_get(&_msg_chan, &incoming_msg, sizeof(manager_req_t),
+                             &fs, &wait_time, ACH_O_WAIT);
+    if( ACH_TIMEOUT == r )
+        return;
+
+    if( ACH_OK != r )
+    {
+        std::cerr << "Ach error: (" << (int)r << ")" << ach_result_to_string(r) << std::endl;
+        _report_ach_error(ach_result_to_string(r));
+        return;
+    }
+
+    if( sizeof(manager_req_t) != fs )
+    {
+        std::cerr << "Incoming message has a malformed size of " << fs
+                     << "\n -- Should be size " << sizeof(manager_req_t) << std::endl;
+        _report_malformed_error("");
+        return;
+    }
+
+    switch(incoming_msg.request_type)
+    {
+        case LIST_PROCS: list_processes();                                  break;
+        case LIST_LOCKED_PROCS: list_locked_processes();                    break;
+        case LIST_CHANS: list_channels();                                   break;
+//            case LIST_OPEN_CHANS: list_open_channels();                         break;
+
+        case RUN_PROC: run_process(incoming_msg.details);                      break;
+        case RUN_ALL_PROCS: run_all_processes();                            break;
+
+        case STOP_PROC: stop_process(incoming_msg.details);                    break;
+        case STOP_ALL_PROCS: stop_all_processes();                          break;
+
+        case KILL_PROC: kill_process(incoming_msg.details);                    break;
+        case KILL_ALL_PROCS: kill_all_processes();                          break;
+
+        case CREATE_ACH_CHAN: create_ach_chan(incoming_msg.details);           break;
+        case CREATE_ALL_ACH_CHANS: create_all_ach_chans();                  break;
+
+        case CLOSE_ACH_CHAN: close_ach_chan(incoming_msg.details);             break;
+        case CLOSE_ALL_ACH_CHANS: close_all_ach_chans();                    break;
+
+        case REGISTER_NEW_PROC: register_new_proc(incoming_msg.details);       break;
+        case UNREGISTER_OLD_PROC: unregister_old_proc(incoming_msg.details);   break;
+
+        case REGISTER_NEW_CHAN: register_new_chan(incoming_msg.details);       break;
+        case UNREGISTER_OLD_CHAN: unregister_old_chan(incoming_msg.details);   break;
+
+        case RESET_ROSTERS: reset_rosters();                                break;
+
+        case START_UP: start_up();                                          break;
+        case SHUT_DOWN: shut_down();                                        break;
+
+        case LIST_CONFIGS: list_configs();                                  break;
+        case SAVE_CONFIG: save_current_config(incoming_msg.details);           break;
+        case LOAD_CONFIG: load_config(incoming_msg.details);                   break;
+
+        default: _report_malformed_error("Unknown command type");           break;
+    }
+}
+
+void Manager::run()
+{
     std::cout << "Beginning Manager loop" << std::endl;
     while(_rt.good())
     {
-        size_t fs;
-        double quit_check = 1;
-        struct timespec wait_time;
-        clock_gettime( ACH_DEFAULT_CLOCK, &wait_time );
-        long nano_wait = wait_time.tv_nsec + (long)(quit_check*1E9);
-        wait_time.tv_sec += (long)(nano_wait/1E9);
-        wait_time.tv_nsec = (long)(nano_wait%((long)1E9));
-        ach_status_t r = ach_get(&_msg_chan, &incoming_msg, sizeof(manager_req_t),
-                                 &fs, &wait_time, ACH_O_WAIT);
-        if( ACH_TIMEOUT == r )
-            continue;
-        
-        if( ACH_OK != r )
-        {
-            std::cerr << "Ach error: (" << (int)r << ")" << ach_result_to_string(r) << std::endl;
-            _report_ach_error(ach_result_to_string(r));
-            continue;
-        }
-        
-        if( sizeof(manager_req_t) != fs )
-        {
-            std::cerr << "Incoming message has a malformed size of " << fs
-                         << "\n -- Should be size " << sizeof(manager_req_t) << std::endl;
-            _report_malformed_error("");
-            continue;
-        }
-        
-        switch(incoming_msg.request_type)
-        {
-            case LIST_PROCS: list_processes();                                  break;
-            case LIST_LOCKED_PROCS: list_locked_processes();                    break;
-            case LIST_CHANS: list_channels();                                   break;
-//            case LIST_OPEN_CHANS: list_open_channels();                         break;
-                
-            case RUN_PROC: run_process(incoming_msg.details);                      break;
-            case RUN_ALL_PROCS: run_all_processes();                            break;
-            
-            case STOP_PROC: stop_process(incoming_msg.details);                    break;
-            case STOP_ALL_PROCS: stop_all_processes();                          break;
-                
-            case KILL_PROC: kill_process(incoming_msg.details);                    break;
-            case KILL_ALL_PROCS: kill_all_processes();                          break;
-                
-            case CREATE_ACH_CHAN: create_ach_chan(incoming_msg.details);           break;
-            case CREATE_ALL_ACH_CHANS: create_all_ach_chans();                  break;
-            
-            case CLOSE_ACH_CHAN: close_ach_chan(incoming_msg.details);             break;
-            case CLOSE_ALL_ACH_CHANS: close_all_ach_chans();                    break;
-                
-            case REGISTER_NEW_PROC: register_new_proc(incoming_msg.details);       break;
-            case UNREGISTER_OLD_PROC: unregister_old_proc(incoming_msg.details);   break;
-                
-            case REGISTER_NEW_CHAN: register_new_chan(incoming_msg.details);       break;
-            case UNREGISTER_OLD_CHAN: unregister_old_chan(incoming_msg.details);   break;
-                
-            case RESET_ROSTERS: reset_rosters();                                break;
-                
-            case START_UP: start_up();                                          break;
-            case SHUT_DOWN: shut_down();                                        break;
-                
-            case LIST_CONFIGS: list_configs();                                  break;
-            case SAVE_CONFIG: save_current_config(incoming_msg.details);           break;
-            case LOAD_CONFIG: load_config(incoming_msg.details);                   break;
-                
-            default: _report_malformed_error("Unknown command type");           break;
-        }
+        step();
     }
 
     std::cout << "Exiting Manager" << std::endl;

@@ -42,17 +42,17 @@ ManagerWidget::ManagerWidget() :
     connect(&(handle->achd_process),
             SIGNAL(finished(int)),
             this, SLOT(inform_disconnect(int)), Qt::UniqueConnection);
-    _perm_achd_handles.push_back(handle);
+    _mngr_achd_handles.push_back(handle);
     
     handle = new AchdHandle;
     handle->parse_description("manager_reply:"+QString(hubo_rt_mgr_reply_chan)+":20:2048:PULL:");
     connect(&(handle->achd_process),
             SIGNAL(finished(int)),
             this, SLOT(inform_disconnect(int)), Qt::UniqueConnection);
-    _perm_achd_handles.push_back(handle);
+    _mngr_achd_handles.push_back(handle);
     
     if(_ui->hostname_edit->text().size() > 0)
-        _start_achds(_perm_achd_handles);
+        _start_achds(_mngr_achd_handles);
     
     _req = new HuboRT::ManagerReq;
     if(!_req->is_initialized())
@@ -61,6 +61,7 @@ ManagerWidget::ManagerWidget() :
                   << " The ManagerReq instance could not be initialized!!"
                   << std::endl;
     }
+    emit manager_channels_created();
     
     // ---- Connecting UI signals ----
     
@@ -92,6 +93,7 @@ ManagerWidget::ManagerWidget() :
     connect(_ui->localMgrLaunch, SIGNAL(clicked()), this, SLOT(local_mgr_launch()));
     connect(_ui->localMgrStop, SIGNAL(clicked()), this, SLOT(local_mgr_stop()));
 
+    connect(this, SIGNAL(stop_lmgr()), &_lmgr, SLOT(stop()));
 
     if(_ui->hostname_edit->text().size() > 0)
         QTimer::singleShot(2000, this, SLOT(create_all()));
@@ -130,7 +132,7 @@ void ManagerWidget::_set_status(manager_err_t incoming_status, const QString &st
 
 void ManagerWidget::disconnect_all_achds()
 {
-    _disconnect_achds(_perm_achd_handles);
+    _disconnect_achds(_mngr_achd_handles);
     _disconnect_achds(_main_achd_handles);
 }
 
@@ -192,7 +194,7 @@ void ManagerWidget::_display_channels()
 
         _ui->chan_list->addItem(new_chan);
     }
-    emit channels_opened();
+    emit channels_created();
 }
 
 void ManagerWidget::_display_registered_processes(const StringArray &procs)
@@ -421,7 +423,7 @@ void ManagerWidget::kill_proc()
 
 void ManagerWidget::inform_disconnect(int exit_code)
 {
-    _check_if_achds_running(_perm_achd_handles, exit_code);
+    _check_if_achds_running(_mngr_achd_handles, exit_code);
     _check_if_achds_running(_main_achd_handles, exit_code);
 }
 
@@ -456,13 +458,15 @@ void ManagerWidget::_start_achds(AchdPtrArray &achds)
 
 void ManagerWidget::start_all_achds()
 {
-    _start_achds(_perm_achd_handles);
+    _start_achds(_mngr_achd_handles);
     _start_achds(_main_achd_handles);
 }
 
 ManagerWidget::~ManagerWidget()
 {
-    _clear_achd_handles(_perm_achd_handles);
+    local_mgr_stop();
+
+    _clear_achd_handles(_mngr_achd_handles);
     _clear_achd_handles(_main_achd_handles);
     
     delete _req;
@@ -487,12 +491,14 @@ void ManagerWidget::load_hostname()
 
 void ManagerWidget::local_mgr_launch()
 {
+    disconnect_all_achds();
     _lmgr.start();
 }
 
 void ManagerWidget::local_mgr_stop()
 {
-    _lmgr.quit();
+    emit stop_lmgr();
+    _lmgr.wait(1000);
 }
 
 void ManagerWidget::save_hostname(const QString& new_name)
@@ -509,15 +515,25 @@ void ManagerWidget::save_hostname(const QString& new_name)
     hostname.close();
 }
 
+
 void LocalManager::run()
 {
-    HuboRT::Manager mgr;
+    _okay = true;
 
-    mgr.run();
+    HuboRT::Manager mgr;
+    std::cout << "Starting local manager" << std::endl;
+    while(_okay)
+    {
+        mgr.step(0.2);
+    }
+    std::cout << "Quitting local manager" << std::endl;
+
 }
 
-
-
+void LocalManager::stop()
+{
+    _okay = false;
+}
 
 
 

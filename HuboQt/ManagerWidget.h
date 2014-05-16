@@ -25,6 +25,14 @@ public:
 
     void run();
 
+protected:
+
+    bool _okay;
+
+protected Q_SLOTS:
+
+    void stop();
+
 };
 
 class ManagerWidget : public QWidget
@@ -52,7 +60,7 @@ protected:
     HuboRT::ManagerReq* _req;
     HuboCmd::AuxSender _init;
     
-    AchdPtrArray _perm_achd_handles;    // This is for the Manager's channels which will
+    AchdPtrArray _mngr_achd_handles;    // This is for the Manager's channels which will
                                         // always be exactly the same
     
     AchdPtrArray _main_achd_handles;    // This is for the rest of the channels which we
@@ -111,7 +119,10 @@ protected Q_SLOTS:
 
 Q_SIGNALS:
 
-    void channels_opened();
+    void channels_created();
+    void manager_channels_created();
+
+    void stop_lmgr();
     
 private:
     

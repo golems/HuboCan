@@ -92,7 +92,7 @@ const char ACHD_PUSH_STRING[] = "PUSH";
 
 typedef enum {
     
-    ACHD_NOTHING,
+    ACHD_NOTHING = 0,
     ACHD_PULL_FROM_ROBOT,
     ACHD_PUSH_TO_ROBOT,
     

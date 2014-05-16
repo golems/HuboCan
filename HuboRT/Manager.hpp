@@ -40,7 +40,7 @@ public:
     
     void launch();
     void run();
-    
+    void step(double quit_check=1);
     
     // Begin: Callback functions
     void list_processes();
