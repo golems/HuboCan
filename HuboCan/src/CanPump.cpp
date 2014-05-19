@@ -15,7 +15,7 @@ CanPump::CanPump(double nominal_frequency, double bitrate, size_t channels, size
     _can_initialized = false;
     _can_error = false;
     _first_tick = true;
-    _zero_clock(_deadline);
+    zero_clock(_deadline);
     
     _bitrate = bitrate;
     
@@ -78,23 +78,30 @@ void CanPump::add_frame(const can_frame_t &frame, size_t channel, size_t expecte
     }
 }
 
-void CanPump::_increment_clock(timespec_t& clock, double seconds)
+void CanPump::increment_clock(timespec_t& clock, double seconds)
 {
     long nano_dt = clock.tv_nsec + (long)(seconds*1E9);
     clock.tv_sec += (long)(nano_dt/1E9);
     clock.tv_nsec = (long)(nano_dt%((long)1E9));
 }
 
-void CanPump::_zero_clock(timespec_t &clock)
+void CanPump::zero_clock(timespec_t &clock)
 {
     clock.tv_sec = 0; clock.tv_nsec = 0;
 }
 
-double CanPump::_clock_diff(const timespec_t& last, const timespec_t& first)
+double CanPump::clock_diff(const timespec_t& last, const timespec_t& first)
 {
     double last_sec  = (double)(last.tv_sec)+(double)(last.tv_nsec)/1E9;
     double first_sec = (double)(first.tv_sec)+(double)(first.tv_nsec)/1E9;
     return last_sec - first_sec;
+}
+
+void CanPump::clock_add(timespec_t &value, const timespec_t &add)
+{
+    long nano_wait = value.tv_nsec + add.tv_nsec + add.tv_sec*(long)(1e9);
+    value.tv_sec += (long)(nano_wait/1e9);
+    value.tv_nsec = (long)(nano_wait%((long)1e9));
 }
 
 bool CanPump::pump()
@@ -120,11 +127,11 @@ bool CanPump::pump()
         _first_tick = false;
     }
     
-    _increment_clock(_deadline, _timestep);
+    increment_clock(_deadline, _timestep);
     
     timespec_t time;
     clock_gettime(CLOCK_MONOTONIC, &time);
-    double diff = _clock_diff(_deadline, time);
+    double diff = clock_diff(_deadline, time);
     
     if(fabs(_timestep-diff) > period_threshold)
     {
@@ -153,14 +160,14 @@ bool CanPump::pump()
     if(_get_max_frame_count() > 0)
     {
         double frame_dt = diff/(double)(_get_max_frame_count());
-        while(_clock_diff(_deadline, time) > 0)
+        while(clock_diff(_deadline, time) > 0)
         {
             _send_next_frames();
 
             if(_can_error)
                 return false;
 
-            _increment_clock(time, frame_dt);
+            increment_clock(time, frame_dt);
             _wait_on_next_frames(time);
 
             if(_can_error)
@@ -203,10 +210,10 @@ void CanPump::_wait_on_next_frames(const timespec_t &timeout)
     timespec_t current_time;
     clock_gettime(CLOCK_MONOTONIC, &current_time);
     timespec_t relative_timeout;
-    while(_clock_diff(timeout, current_time) > 0)
+    while(clock_diff(timeout, current_time) > 0)
     {
-        _zero_clock(relative_timeout);
-        _increment_clock(relative_timeout, _clock_diff(timeout, current_time));
+        zero_clock(relative_timeout);
+        increment_clock(relative_timeout, clock_diff(timeout, current_time));
         bool okay = _wait_on_frame(relative_timeout);
         if(!okay)
         {

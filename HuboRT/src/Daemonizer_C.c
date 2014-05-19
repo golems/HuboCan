@@ -109,7 +109,7 @@ static void hubo_rt_set_fork_signals()
 
 static int hubo_rt_make_directory_component(const char* subdirectory)
 {
-    struct stat st = {0};
+    struct stat st; memset(&st, 0, sizeof(st));
     if( stat(subdirectory, &st) == -1 )
     {
         if( mkdir(subdirectory, S_IRUSR | S_IXUSR | S_IWUSR |
@@ -205,7 +205,7 @@ int hubo_rt_daemonize(const char* daemon_name, const char* lock_directory,
     char lockfile[MAX_FILENAME_SIZE];
     sprintf(lockfile, "%s/%s", lock_directory, daemon_name);
 //    int lfp = open(lockfile, O_RDWR|O_CREAT|O_EXCL, S_IRUSR | S_IRGRP | S_IROTH); // lockfile pointer
-    FILE* lfp = fopen(lockfile, "w" /*O_RDWR|O_CREAT|O_EXCL, S_IRUSR | S_IRGRP | S_IROTH*/); // lockfile pointer
+    FILE* lfp = fopen(lockfile, "x" /*O_RDWR|O_CREAT|O_EXCL, S_IRUSR | S_IRGRP | S_IROTH*/); // lockfile pointer
     fprintf(stdout, "first lfp: %p\n", lfp); fflush(stdout);
 //    if( lfp < 0 )
     if(lfp == NULL)

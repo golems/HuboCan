@@ -93,6 +93,12 @@ public:
         }
     }
 
+    // TODO: Make these utility functions instead of CanPump functions
+    static void increment_clock(timespec_t& clock, double seconds);
+    static void zero_clock(timespec_t& clock);
+    static double clock_diff(const timespec_t& last, const timespec_t&first);
+    static void clock_add(timespec_t& value, const timespec_t& add);
+
 protected:
     
     bool _can_initialized;
@@ -115,10 +121,6 @@ protected:
     bool _first_tick;
     double _timestep;
     timespec_t _deadline;
-    
-    void _increment_clock(timespec_t& clock, double seconds);
-    void _zero_clock(timespec_t& clock);
-    double _clock_diff(const timespec_t& last, const timespec_t&first);
     
     int _get_max_frame_count();
     int _get_max_frame_expectation();
