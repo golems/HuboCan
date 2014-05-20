@@ -30,3 +30,6 @@ file(GLOB window_sources "window/*.cpp")
 
 add_executable(huboqt_window ${window_sources})
 target_link_libraries(huboqt_window ${QT_LIBRARIES} HuboQt HuboCan ach rt)
+
+install(TARGETS HuboQt DESTINATION ${LIBRARY_INSTALL_PATH})
+install(TARGETS huboqt_window DESTINATION ${EXECUTABLE_INSTALL_PATH})

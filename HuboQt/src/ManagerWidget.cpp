@@ -106,6 +106,19 @@ ManagerWidget::ManagerWidget() :
 //    refresh_locked_timer->start(5000);
 }
 
+ManagerWidget::~ManagerWidget()
+{
+    local_mgr_stop();
+
+    std::cout << "Clearing ach handles" << std::endl;
+    _clear_achd_handles(_mngr_achd_handles);
+    _clear_achd_handles(_main_achd_handles);
+    std::cout << "Achd handles cleared" << std::endl;
+
+    delete _req;
+    delete _ui;
+}
+
 bool ManagerWidget::_double_check_init()
 {
     if(!_init.ready())
@@ -158,6 +171,8 @@ void ManagerWidget::_clear_achd_handles(AchdPtrArray &achds)
     achds.clear();
     for(int i=0; i<backup.size(); ++i)
     {
+        std::cout << "Deleting next achd | " << QTime::currentTime().toString().toStdString()
+                  << std::endl;
         delete backup[i];
     }
 }
@@ -462,17 +477,6 @@ void ManagerWidget::start_all_achds()
 {
     _start_achds(_mngr_achd_handles);
     _start_achds(_main_achd_handles);
-}
-
-ManagerWidget::~ManagerWidget()
-{
-    local_mgr_stop();
-
-    _clear_achd_handles(_mngr_achd_handles);
-    _clear_achd_handles(_main_achd_handles);
-    
-    delete _req;
-    delete _ui;
 }
 
 void ManagerWidget::load_hostname()

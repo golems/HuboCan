@@ -3,6 +3,8 @@
 
 #include "HuboRT/utils.hpp"
 
+#include <QTime>
+
 #include <iostream>
 
 using namespace HuboQt;
@@ -10,7 +12,7 @@ using namespace HuboQt;
 AchdHandle::AchdHandle()
 {
     started = false;
-
+    achd_process.setParent(this);
 }
 
 bool AchdHandle::start(QString hostname)
@@ -58,12 +60,18 @@ void AchdHandle::stop()
     started = false;
     if(achd_process.state() != QProcess::NotRunning)
     {
+        std::cout << "About to kill " << nickname.toStdString()
+                  << " | " << QTime::currentTime().toString().toStdString() << std::endl;
         achd_process.kill();
-        if(!achd_process.waitForFinished(1000))
-        {
-            std::cout << "Achd is hung up on quitting for '"
-                      << nickname.toStdString() << "'!" << std::endl;
-        }
+//        if(!achd_process.waitForFinished(200))
+//        {
+//            std::cout << "Had to wait for " << nickname.toStdString()
+//                      << " | " << QTime::currentTime().toString().toStdString() << std::endl;
+//            if(achd_process.state() != QProcess::NotRunning)
+//                std::cout << "Achd is hung up on quitting for '"
+//                          << nickname.toStdString() << "'!"
+//                          << " | " << QTime::currentTime().toString().toStdString() << std::endl;
+//        }
     }
 }
 
