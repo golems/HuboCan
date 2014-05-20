@@ -12,7 +12,6 @@ using namespace HuboQt;
 AchdHandle::AchdHandle()
 {
     started = false;
-    achd_process.setParent(this);
 }
 
 bool AchdHandle::start(QString hostname)
