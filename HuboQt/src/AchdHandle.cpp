@@ -59,9 +59,10 @@ void AchdHandle::stop()
     if(achd_process.state() != QProcess::NotRunning)
     {
         achd_process.kill();
-        if(!achd_process.waitForFinished(5000))
+        if(!achd_process.waitForFinished(1000))
         {
-            std::cout << "Achd is hung up on quitting for '" << nickname.toStdString() << "'!" << std::endl;
+            std::cout << "Achd is hung up on quitting for '"
+                      << nickname.toStdString() << "'!" << std::endl;
         }
     }
 }
