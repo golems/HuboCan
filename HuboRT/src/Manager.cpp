@@ -118,26 +118,26 @@ void Manager::step(double quit_check)
         case LIST_CHANS: list_channels();                                   break;
 //            case LIST_OPEN_CHANS: list_open_channels();                         break;
 
-        case RUN_PROC: run_process(incoming_msg.details);                      break;
+        case RUN_PROC: run_process(incoming_msg.details);                   break;
         case RUN_ALL_PROCS: run_all_processes();                            break;
 
-        case STOP_PROC: stop_process(incoming_msg.details);                    break;
+        case STOP_PROC: stop_process(incoming_msg.details);                 break;
         case STOP_ALL_PROCS: stop_all_processes();                          break;
 
-        case KILL_PROC: kill_process(incoming_msg.details);                    break;
+        case KILL_PROC: kill_process(incoming_msg.details);                 break;
         case KILL_ALL_PROCS: kill_all_processes();                          break;
 
-        case CREATE_ACH_CHAN: create_ach_chan(incoming_msg.details);           break;
+        case CREATE_ACH_CHAN: create_ach_chan(incoming_msg.details);        break;
         case CREATE_ALL_ACH_CHANS: create_all_ach_chans();                  break;
 
-        case CLOSE_ACH_CHAN: close_ach_chan(incoming_msg.details);             break;
+        case CLOSE_ACH_CHAN: close_ach_chan(incoming_msg.details);          break;
         case CLOSE_ALL_ACH_CHANS: close_all_ach_chans();                    break;
 
-        case REGISTER_NEW_PROC: register_new_proc(incoming_msg.details);       break;
-        case UNREGISTER_OLD_PROC: unregister_old_proc(incoming_msg.details);   break;
+        case REGISTER_NEW_PROC: register_new_proc(incoming_msg.details);    break;
+        case UNREGISTER_OLD_PROC: unregister_old_proc(incoming_msg.details);break;
 
-        case REGISTER_NEW_CHAN: register_new_chan(incoming_msg.details);       break;
-        case UNREGISTER_OLD_CHAN: unregister_old_chan(incoming_msg.details);   break;
+        case REGISTER_NEW_CHAN: register_new_chan(incoming_msg.details);    break;
+        case UNREGISTER_OLD_CHAN: unregister_old_chan(incoming_msg.details);break;
 
         case RESET_ROSTERS: reset_rosters();                                break;
 
@@ -145,8 +145,9 @@ void Manager::step(double quit_check)
         case SHUT_DOWN: shut_down();                                        break;
 
         case LIST_CONFIGS: list_configs();                                  break;
-        case SAVE_CONFIG: save_current_config(incoming_msg.details);           break;
-        case LOAD_CONFIG: load_config(incoming_msg.details);                   break;
+        case SAVE_CONFIG: save_current_config(incoming_msg.details);        break;
+        case LOAD_CONFIG: load_config(incoming_msg.details);                break;
+        case DELETE_CONFIG: delete_config(incoming_msg.details);            break;
 
         default: _report_malformed_error("Unknown command type");           break;
     }
@@ -560,6 +561,7 @@ void Manager::_unregister(const std::string &directory, const std::string &name)
     {
         if( array[i] == name )
         {
+            std::cout << "Unregistering " << (directory+"/"+name) << std::endl;
             remove( (directory+"/"+name).c_str() );
         }
     }
@@ -669,6 +671,12 @@ void Manager::load_config(const std::string &name)
         _report_no_existence(LOAD_CONFIG);
     }
     
+}
+
+void Manager::delete_config(const std::string &name)
+{
+    _unregister(_config_roster, name);
+    _report_no_error(DELETE_CONFIG);
 }
 
 bool Manager::_load_config_raw(const std::string &name)

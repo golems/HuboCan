@@ -66,7 +66,8 @@ Daemonizer::~Daemonizer()
 
 bool Daemonizer::begin(std::string daemon_name, int priority)
 {
-    return daemonize(daemon_name) && prioritize(priority);
+    prioritize(priority);
+    return daemonize(daemon_name);
 }
 
 bool Daemonizer::daemonize(const std::string& daemon_name)
@@ -95,7 +96,7 @@ bool Daemonizer::daemonize(const std::string& daemon_name)
             case 17: std::cout << "Lockfile already exists!"; break;
         }
 
-        std::cout << "(" << _d_status << ")" << "\n -- Check syslog for details" << std::endl;
+        std::cout << " (" << _d_status << ")" << "\n -- Check syslog for details" << std::endl;
     }
 
     return _d_status == 1;

@@ -20,6 +20,7 @@ ConfigWidget::ConfigWidget() :
 
     connect(_ui->loadConfig, SIGNAL(clicked()), this, SLOT(load_config()));
     connect(_ui->saveConfig, SIGNAL(clicked()), this, SLOT(save_config()));
+    connect(_ui->deleteConfig, SIGNAL(clicked()), this, SLOT(delete_config()));
 
     _ui->chanTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     _ui->procTable->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -169,8 +170,21 @@ void ConfigWidget::save_config()
     if( NULL == _req )
         return;
 
+    if(_ui->saveConfigEdit->text().isEmpty())
+        return;
+
     _set_status(_req->save_current_config(_ui->saveConfigEdit->text().toStdString()),
                 "Save Configuration");
+    _quiet_update_configs();
+}
+
+void ConfigWidget::delete_config()
+{
+    if( NULL == _req )
+        return;
+
+    _set_status(_req->delete_config(_ui->configList->currentItem()->text().toStdString()),
+                "Delete Configuration");
     _quiet_update_configs();
 }
 

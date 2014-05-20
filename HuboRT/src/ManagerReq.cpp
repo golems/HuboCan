@@ -1,5 +1,5 @@
 
-#include "HuboRT/ManagerReq.hpp"
+#include "../ManagerReq.hpp"
 #include <sstream>
 #include <iostream>
 
@@ -140,6 +140,7 @@ manager_err_t ManagerReq::register_new_channel(const std::string &list_name,
         default:
             stream << "NOTHING"; break;
     }
+    stream << ":";
     
     return _send_request(REGISTER_NEW_CHAN, stream.str());
 }
@@ -177,6 +178,11 @@ manager_err_t ManagerReq::save_current_config(const std::string &config_name)
 manager_err_t ManagerReq::load_config(const std::string &config_name)
 {
     return _send_request(LOAD_CONFIG, config_name);
+}
+
+manager_err_t ManagerReq::delete_config(const std::string &config_name)
+{
+    return _send_request(DELETE_CONFIG, config_name);
 }
 
 manager_err_t ManagerReq::_send_request(manager_cmd_t cmd, const std::string &desc)

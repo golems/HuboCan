@@ -204,11 +204,9 @@ int hubo_rt_daemonize(const char* daemon_name, const char* lock_directory,
 
     char lockfile[MAX_FILENAME_SIZE];
     sprintf(lockfile, "%s/%s", lock_directory, daemon_name);
-//    int lfp = open(lockfile, O_RDWR|O_CREAT|O_EXCL, S_IRUSR | S_IRGRP | S_IROTH); // lockfile pointer
-    FILE* lfp = fopen(lockfile, "x" /*O_RDWR|O_CREAT|O_EXCL, S_IRUSR | S_IRGRP | S_IROTH*/); // lockfile pointer
-    fprintf(stdout, "first lfp: %p\n", lfp); fflush(stdout);
-//    if( lfp < 0 )
-    if(lfp == NULL)
+    int lfp = open(lockfile, O_RDWR|O_CREAT|O_EXCL , S_IRUSR | S_IRGRP | S_IROTH
+                                                   | S_IWUSR | S_IWGRP | S_IWOTH ); // lockfile pointer
+    if( lfp < 0 )
     {
         syslog( LOG_ERR, "Unable to create lock file '%s', code=%d (%s)",
                 lockfile, errno, strerror(errno));
@@ -270,29 +268,17 @@ int hubo_rt_daemonize(const char* daemon_name, const char* lock_directory,
         return -6;
     }
     
-//    FILE* fp;
-//    fp = fopen(lockfile, "w");
-//    if( fp == NULL )
-//    {
-//        syslog( LOG_ERR, "Could not open lockfile! Error: %s, code=%d",
-//                strerror(errno), errno);
-//        hubo_rt_remove_lockfile(daemon_name, lock_directory);
-//        return -7;
-//    }
-//    fprintf(fp, "%d", sid);
-//    fclose(fp);
-
-//    lfp = fopen(lockfile, "w");
-    fprintf(stdout, "second lfp: %p\n", lfp); fflush(stdout);
-    if( lfp == NULL )
+    FILE* fp;
+    fp = fopen(lockfile, "w");
+    if( fp == NULL )
     {
         syslog( LOG_ERR, "Could not open lockfile! Error: %s, code=%d",
                 strerror(errno), errno);
         hubo_rt_remove_lockfile(daemon_name, lock_directory);
         return -7;
     }
-    fprintf(lfp, "%d", sid);
-    fclose(lfp);
+    fprintf(fp, "%d", sid);
+    fclose(fp);
     
     kill(parent, SIGUSR1); // Let the parent process know that we're okay
 

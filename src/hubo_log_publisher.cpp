@@ -2,6 +2,8 @@
 #include "HuboRT/Daemonizer.hpp"
 #include "HuboRT/LogRelay.hpp"
 
+#include <iostream>
+
 int main(int, char* [])
 {
     HuboRT::Daemonizer rt;
@@ -15,6 +17,11 @@ int main(int, char* [])
     while(relay.send() && rt.good())
     {
 
+    }
+
+    if(!rt.good())
+    {
+        std::cout << "RT IS NOT GOOD" << std::endl;
     }
 
     return 0;

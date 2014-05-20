@@ -46,6 +46,7 @@ public Q_SLOTS:
 
     void load_config();
     void save_config();
+    void delete_config();
 
     void refresh_lists();
 

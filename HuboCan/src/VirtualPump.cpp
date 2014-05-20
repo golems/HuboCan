@@ -36,6 +36,7 @@ bool VirtualPump::open_channels()
         _channels_opened = false;
     }
 
+    _can_initialized = _channels_opened;
     return _channels_opened;
 }
 

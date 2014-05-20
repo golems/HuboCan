@@ -8,5 +8,7 @@ int main(int, char* [])
     
     rt.daemonize("bogus_daemon");
 
+    sleep(10);
+
     return 0;
 }

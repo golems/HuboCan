@@ -46,7 +46,8 @@ typedef enum manager_cmd {
     
     LIST_CONFIGS,           /*!< Lists all existing management configurations */
     SAVE_CONFIG,            /*!< Saved the current management configuration to a file */
-    LOAD_CONFIG             /*!< Loads the specified management configuration */
+    LOAD_CONFIG,            /*!< Loads the specified management configuration */
+    DELETE_CONFIG,          /*!< Deletes the specified management configuration */
 
 } manager_cmd_t;
 

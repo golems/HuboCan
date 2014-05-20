@@ -79,6 +79,7 @@ public:
     void list_configs();
     void save_current_config(const std::string& name);
     void load_config(const std::string& name);
+    void delete_config(const std::string& name);
     // End: Callback functions
     
     

@@ -291,6 +291,15 @@ public:
      * \return 
      */
     manager_err_t load_config(const std::string& config_name);
+
+
+    /*!
+     * \fn delete_config()
+     * \brief Deletes the specified roster configuration
+     * \param config_name
+     * \return
+     */
+    manager_err_t delete_config(const std::string& config_name);
     
 protected:
     

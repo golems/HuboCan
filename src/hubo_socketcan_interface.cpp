@@ -50,15 +50,18 @@ int main(int argc, char* argv[])
     }
 
     HuboDescription desc;
-    if(!desc.parseFile("/opt/hubo/devices/"+robot_name+".dd"))
+    std::string file_name = "/opt/hubo/devices/" + robot_name + ".dd";
+    if(!desc.parseFile(file_name))
     {
-        std::cout << "Description could not be correctly parsed! Quitting!" << std::endl;
+        std::cout << "Description for '" << robot_name << "' (" << file_name << ") "
+                  << "could not be correctly parsed! Quitting!" << std::endl;
         return 2;
     }
-    desc.broadcastInfo();
 
     if(frequency_override > 0)
         desc.params.frequency = frequency_override;
+
+    desc.broadcastInfo();
 
 
     SocketCanPump can(desc.params.frequency, 1e6, desc.params.can_bus_count, 1000, virtual_can);
