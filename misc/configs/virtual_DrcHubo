@@ -1,0 +1,18 @@
+proc:log_publisher:/usr/bin/hubo_log_publisher::
+proc:virtual_interface:/usr/bin/hubo_virtual_interface:robot DrcHubo:
+proc:player:/usr/bin/huboplayer::
+chan:info:hubo_info_data:10:4096:PULL:
+chan:instruction:hubo_path_instruction:5:64:PUSH:
+chan:aggregate:hubo_agg:20:4096:INTERNAL:
+chan:meta:hubo_info_meta:10:4096:PULL:
+chan:vpump_write:hubo_vpump_write:10:4096:PULL:
+chan:log:log_relay:10:4608:PULL:
+chan:vpump_read:hubo_vpump_read:10:4096:PUSH:
+chan:joint_state:hubo_joint_sensors:10:4096:PULL:
+chan:auxiliary:hubo_aux_cmd:100:64:PUSH:
+chan:trajectory:hubo_path_input:3:65536:PUSH:
+chan:command:hubo_cmd:10:4096:INTERNAL:
+chan:traj_rx_feedback:hubo_path_feedback:5:64:PULL:
+chan:player:hubo_path_player_state:5:64:PULL:
+chan:ft_state:hubo_ft_sensors:10:4096:PULL:
+chan:imu_state:hubo_imu_sensors:10:4096:PULL:
