@@ -258,11 +258,13 @@ bool HuboPath::Trajectory::_optimal_interpolation(const Eigen::VectorXd& velocit
 
     double dt = 1.0/frequency;
     size_t traj_count = optimal_traj.getDuration()*frequency;
+    std::vector<hubo_path_element_t> savedElements = elements;
     elements.clear();
     elements.resize(traj_count);
     for(size_t i=0; i<traj_count; ++i)
     {
         next_point = optimal_traj.getPosition(i*dt);
+        elements[i] = savedElements[optimal_traj.getPathSegmentIndex(i*dt)];
 
         for(size_t j=0; j<joint_mapping.size(); ++j)
         {

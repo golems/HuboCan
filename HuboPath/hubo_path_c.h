@@ -87,6 +87,8 @@ typedef struct hubo_player_state {
 typedef struct hubo_path_element {
     
     double references[HUBO_PATH_JOINT_MAX_SIZE];
+
+    uint64_t phase_index;
     
     // TODO: Add controller-related parameters in here
     
