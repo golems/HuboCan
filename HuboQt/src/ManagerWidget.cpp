@@ -171,8 +171,8 @@ void ManagerWidget::_clear_achd_handles(AchdPtrArray &achds)
     achds.clear();
     for(int i=0; i<backup.size(); ++i)
     {
-        std::cout << "Deleting next achd | " << QTime::currentTime().toString().toStdString()
-                  << std::endl;
+//        std::cout << "Deleting next achd | " << QTime::currentTime().toString().toStdString()
+//                  << std::endl;
         delete backup[i];
     }
 }
@@ -180,14 +180,18 @@ void ManagerWidget::_clear_achd_handles(AchdPtrArray &achds)
 void ManagerWidget::_parse_channel_descriptions(const StringArray &descs)
 {
     _clear_achd_handles(_main_achd_handles);
+
     for(size_t i=0; i<descs.size(); ++i)
     {
         AchdHandle* handle = new AchdHandle;
         connect(&(handle->achd_process),
                 SIGNAL(finished(int)),
                 this, SLOT(inform_disconnect(int)), Qt::UniqueConnection);
-        handle->start(_ui->hostname_edit->text(), QString::fromStdString(descs[i]));
+        handle->parse_description(QString::fromStdString(descs[i]));
         _main_achd_handles.push_back(handle);
+
+        if(!_lmgr.isRunning())
+            handle->start(_ui->hostname_edit->text());
     }
     
     _display_channels();
@@ -465,6 +469,9 @@ void ManagerWidget::_check_if_achds_running(AchdPtrArray &achds, int exit_code)
 
 void ManagerWidget::_start_achds(AchdPtrArray &achds)
 {
+    if(_lmgr.isRunning())
+        return;
+
     _ui->network_status->setText("Connected");
     _connected = true;
     for(int i=0; i<achds.size(); ++i)
@@ -495,8 +502,19 @@ void ManagerWidget::load_hostname()
     hostname.close();
 }
 
+void ManagerWidget::deactivate_network()
+{
+    _ui->AchNetworking->setEnabled(false);
+}
+
+void ManagerWidget::activate_network()
+{
+    _ui->AchNetworking->setEnabled(true);
+}
+
 void ManagerWidget::local_mgr_launch()
 {
+    deactivate_network();
     disconnect_all_achds();
     _lmgr.start();
 }
@@ -505,6 +523,7 @@ void ManagerWidget::local_mgr_stop()
 {
     emit stop_lmgr();
     _lmgr.wait(1000);
+    activate_network();
 }
 
 void ManagerWidget::save_hostname(const QString& new_name)

@@ -12,7 +12,7 @@ using namespace HuboCan;
 int main(int argc, char* argv[])
 {
     HuboRT::Daemonizer rt;
-    if(!rt.begin("virtual_interface", 45))
+    if(!rt.daemonize("virtual_interface"))
     {
         return 1;
     }

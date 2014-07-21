@@ -32,7 +32,7 @@ public:
     
     void stop();
     
-    bool parse_description(QString description);   
+    bool parse_description(QString description);
 };
 
 

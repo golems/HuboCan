@@ -54,6 +54,7 @@ protected:
     
     bool _displaying_locked_procs;
     bool _connected;
+
     
     Ui::ManagerWidget* _ui;
     
@@ -114,6 +115,9 @@ protected Q_SLOTS:
     void launch_proc();
     void stop_proc();
     void kill_proc();
+
+    void deactivate_network();
+    void activate_network();
     
     void inform_disconnect(int exit_code);
 

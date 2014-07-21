@@ -189,6 +189,9 @@ QGroupBox::title {
             <height>0</height>
            </size>
           </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;STILL IN BETA&lt;/p&gt;&lt;p&gt;Starts up a thread to emulate Hubo's process manager. It will launch processes on the local computer instead of on Hubo. You cannot be connected to Hubo while running the Local Process Manager.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>Launch</string>
           </property>
