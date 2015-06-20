@@ -106,7 +106,7 @@ public:
      * depending on whether your system is running physically or in simulation.
      */
     virtual HuboCan::error_result_t publish();
-    
+
     HuboData<hubo_joint_state_t>    joints;
     HuboData<hubo_imu_state_t>      imus;
     HuboData<hubo_ft_state_t>       force_torques;

@@ -186,12 +186,12 @@ template<class DataClass>
 class HuboData
 {
 public:
-    
+
     HuboData()
     {
         _construction();
     }
-    
+
     HuboData(const HuboData& copy)
     {
         _construction();
@@ -201,7 +201,7 @@ public:
             _deep_copy_data(copy);
         }
     }
-    
+
     HuboData& operator=(const HuboData& copy)
     {
         if(copy.is_initialized())
@@ -209,14 +209,14 @@ public:
             _deep_copy_data(copy);
         }
     }
-    
+
     DataClass& operator[](size_t index)
     {
         if(!_check_initialized("[] array member access"))
         {
             return _dummy_member;
         }
-        
+
         DataClass* result = get_data_component<DataClass>(_raw_data, index);
         if(NULL == result)
         {
@@ -234,7 +234,7 @@ public:
                          << ", Data Count: " << get_data_component_count(_raw_data) << std::endl;
             }
         }
-        
+
         return *result;
     }
 
@@ -279,7 +279,7 @@ public:
 
         return (*this)[it->second];
     }
-    
+
     bool initialize(const std::vector<std::string>& names, const std::string& channel_name)
     {
         free(_raw_data);
@@ -304,7 +304,7 @@ public:
             }
         }
         _names = names;
-        
+
         _channel_name = channel_name;
         ach_status_t r = ach_open(&_channel, channel_name.c_str(), NULL);
         if( ACH_OK == r )
@@ -312,20 +312,20 @@ public:
             _initialized = true;
             return true;
         }
-        
+
         _initialized = false;
-        
+
         std::cout << "Failed to open channel '" << _channel_name << "': "
                      << ach_result_to_string(r) << std::endl;
-        
+
         return false;
     }
-    
+
     HuboCan::error_result_t receive_data(double timeout_seconds = 0)
     {
         if(!_check_initialized("receive_data"))
             return HuboCan::ACH_ERROR;
-        
+
         size_t fs;
         struct timespec wait_time;
         clock_gettime( ACH_DEFAULT_CLOCK, &wait_time );
@@ -344,13 +344,13 @@ public:
             }
             return HuboCan::TIMEOUT;
         }
-        
+
         if(fs != get_data_size<DataClass>(_raw_data))
         {
             std::cout << "Framesize mismatch: " << fs << " received, "
                       << get_data_size<DataClass>(_raw_data) << " expected!" << std::endl;
         }
-        
+
         if( ACH_OK == r || ACH_STALE_FRAMES == r || ACH_MISSED_FRAME == r )
         {
             if(verbose)
@@ -369,7 +369,7 @@ public:
         
         return HuboCan::UNDEFINED_ERROR;
     }
-    
+
     bool send_data(double timestamp)
     {
         if(!_check_initialized("send_data"))
@@ -386,7 +386,7 @@ public:
                      << ach_result_to_string(r) << std::endl;
         return false;
     }
-    
+
     std::vector<DataClass> get_data(bool refresh = false)
     {
         if(!_check_initialized("get_data"))
@@ -413,12 +413,12 @@ public:
     {
         return get_data_timestamp(_raw_data);
     }
-    
+
     bool set_data(const std::vector<DataClass>& copy)
     {
         if(!_check_initialized("set_data"))
             return false;
-        
+
         if(copy.size() != get_data_component_count(_raw_data))
         {
             std::cout << "set_data mismatch for channel '" << _channel_name
@@ -426,12 +426,12 @@ public:
                       << get_data_component_count(_raw_data) << std::endl;
             return false;
         }
-        
+
         for(size_t i=0; i<copy.size(); ++i)
         {
             (*this)[i] = copy[i];
         }
-        
+
         return true;
     }
 
@@ -439,7 +439,7 @@ public:
     {
         free(_raw_data);
     }
-    
+
     std::string get_channel_name() const { return _channel_name; }
     bool is_initialized() const { return _initialized; }
     
@@ -450,7 +450,7 @@ public:
     
     bool verbose;
     hubo_data* _raw_data;
-    
+
 protected:
     
     void _construction()
@@ -462,15 +462,14 @@ protected:
         memset(&_dummy_member, 0, sizeof(DataClass));
         _dummy_string = "dummy";
     }
-    
+
     void _deep_copy_data(const HuboData& copy)
     {
         initialize(get_data_size<DataClass>(copy._raw_data),
                    copy._channel_name);
         memcpy(_raw_data, copy._raw_data, get_data_size<DataClass>(copy._raw_data));
     }
-    
-    bool _initialized;
+
     bool _check_initialized(std::string operation = "an operation") const
     {
         if(_initialized)
@@ -482,7 +481,8 @@ protected:
             return false;
         }
     }
-    
+
+    bool _initialized;
     StringMap _mapping;
     std::vector<std::string> _names;
     std::string _channel_name;

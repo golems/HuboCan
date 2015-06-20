@@ -76,9 +76,3 @@ std::ostream& operator<<(std::ostream& stream, const hubo_ft_state_t& ft)
 
     return stream;
 }
-
-
-
-
-
-
