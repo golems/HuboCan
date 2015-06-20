@@ -18,3 +18,6 @@ bin/*
 # Text editor backups
 *~
 *.user
+
+# Build directory
+build/*
