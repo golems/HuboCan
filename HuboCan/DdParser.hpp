@@ -78,7 +78,6 @@ protected:
     StringArray _filename_list;
     bool _push_back_file(const std::string& filename, bool inclusion, const std::string& parent_filename="");
     bool _inclusion_check(StringArray& line, std::string parent_filename);
-    void _destroy_comments();
 
 };
 

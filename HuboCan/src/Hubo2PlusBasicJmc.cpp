@@ -28,7 +28,6 @@ void Hubo2PlusBasicJmc::update()
 
     if(_aux_commands.size() > 0)
     {
-//        std::cout << "AUX COMMAND" << std::endl;
         _process_auxiliary_commands();
         // If there are auxiliary commands that need to be handled, we put off requesting
         // encoder readings and sending position commands in order to reduce the load on
@@ -75,7 +74,7 @@ void Hubo2PlusBasicJmc::_send_reference_commands()
 {
     for(size_t i=0; i<joints.size(); ++i)
     {
-        hubo_joint_cmd_t& cmd = _agg->joint(joints[i]->info.software_index);
+        const hubo_joint_cmd_t& cmd = _agg->joint(joints[i]->info.software_index);
         if(cmd.mode == HUBO_CMD_RIGID)
         {
             _handle_rigid_reference_cmd();
@@ -150,7 +149,6 @@ bool Hubo2PlusBasicJmc::decode(const can_frame_t& frame, size_t channel)
         return _decode_status_reading(frame);
     }
 
-
     return false;
 }
 
@@ -167,6 +165,7 @@ bool Hubo2PlusBasicJmc::_decode_encoder_reading(const can_frame_t& frame)
             }
 
             size_t joint_index = joints[i]->info.software_index;
+
             _state->joints[joint_index].position =
                         joints[i]->encoder2radian(encoder);
 
@@ -229,29 +228,35 @@ void Hubo2PlusBasicJmc::_process_auxiliary_commands()
 
 void Hubo2PlusBasicJmc::_handle_auxiliary_command(const hubo_aux_cmd_t& cmd)
 {
-    switch(cmd.id)
+    switch(cmd.cmd_id)
     {
         case HOME_JOINT:
-            _handle_home_joint(cmd); break;
+            _handle_home_joint(cmd);
+            break;
+
         case HOME_ALL_JOINTS:
-            _handle_home_all_joints(); break;
+            _handle_home_all_joints();
+            break;
 
         default:
-            std::cerr << "Unknown/Unsupported auxiliary command type: " << cmd.id << std::endl;
+            std::cerr << "[Hubo2PlusBasicJmc] Unknown/Unsupported auxiliary command type: "
+                      << cmd.cmd_id << std::endl;
             break;
     }
 }
 
 void Hubo2PlusBasicJmc::_handle_home_joint(const hubo_aux_cmd_t& cmd)
 {
-    if(cmd.joint >= joints.size())
+    if(cmd.component_id >= joints.size())
     {
         std::cerr << "Requested homing for invalid joint on " << info.name << " ("
-                  << cmd.joint << ". Max joint size is " << joints.size() << std::endl;
+                  << cmd.component_id << ". Max joint size is " << joints.size() << std::endl;
         return;
     }
-    std::cout << "Sending home command for joint " << joints[cmd.joint]->info.name
-    << " (" << joints[cmd.joint]->info.software_index << ") " << " on board " << info.name
+
+    // Log the homing so we know that the command arrived
+    std::cout << "Sending home command for joint " << joints[cmd.component_id]->info.name
+    << " (" << joints[cmd.component_id]->info.software_index << ") " << " on board " << info.name
     << " (" << info.hardware_index << ")" << std::endl;
 
     memset(&_frame, 0, sizeof(_frame));
@@ -260,7 +265,7 @@ void Hubo2PlusBasicJmc::_handle_home_joint(const hubo_aux_cmd_t& cmd)
 
     _frame.data[0]  = info.hardware_index;
     _frame.data[1]  = GOTO_HOME;
-    _frame.data[2]  = ((cmd.joint+1) << 4) | ( 0x01 << 1 );
+    _frame.data[2]  = ((cmd.component_id+1) << 4) | ( 0x01 << 1 );
     // Why do we add 1 to the joint index? This does not seem necessary according to
     // the CAN documentation. Does the firmware index the joints starting at 1 instead
     // of 0? According to experimental observation, IT DOES!

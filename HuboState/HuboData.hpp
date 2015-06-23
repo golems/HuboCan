@@ -238,33 +238,9 @@ public:
         return *result;
     }
 
-    const DataClass& const_entry(size_t index) const
+    const DataClass& operator[](size_t index) const
     {
-        if(!_check_initialized("const_entry member access"))
-        {
-            return _dummy_member;
-        }
-
-        DataClass* result = get_data_component<DataClass>(_raw_data, index);
-        if(NULL == result)
-        {
-            if(index == (size_t)(-1))
-            {
-                std::cout << "You have requested an InvalidIndex for channel '"
-                          << _channel_name << "'.\n"
-                          << "(Data Count: " << get_data_component_count(_raw_data)
-                          << ")" << std::endl;
-            }
-            else
-            {
-                std::cout << "You have requested an out of bounds data member for channel '"
-                         << _channel_name << "'.\n Requested: " << index
-                         << ", Data Count: " << get_data_component_count(_raw_data) << std::endl;
-            }
-            return _dummy_member;
-        }
-
-        return *result;
+        return const_cast<HuboData<DataClass>&>(*this)[index];
     }
 
     DataClass& operator[](const std::string& name)
@@ -278,6 +254,11 @@ public:
         }
 
         return (*this)[it->second];
+    }
+
+    const DataClass& operator[](const std::string& name) const
+    {
+        return const_cast<HuboData<DataClass>&>(*this)[name];
     }
 
     bool initialize(const std::vector<std::string>& names, const std::string& channel_name)
@@ -518,7 +499,7 @@ std::ostream& operator<<(std::ostream& stream, const HuboState::HuboData<DataCla
     for(size_t i=0; i<data.size(); ++i)
     {
         stream.width(s);
-        stream << data.get_entry_name(i) << " | " << data.const_entry(i) << "\n";
+        stream << data.get_entry_name(i) << " | " << data[i] << "\n";
     }
 
     return stream;

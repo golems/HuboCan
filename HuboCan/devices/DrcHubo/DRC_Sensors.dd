@@ -5,7 +5,7 @@
 begin IMU
 
 name    IMU0
-type    H2P_IMU
+type    DRC_IMU
 
 can_channel     0
 hardware_index  0x03

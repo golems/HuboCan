@@ -54,18 +54,13 @@ void State::_create_memory()
 
     std::vector<std::string> imu_names;
     std::vector<std::string> ft_names;
-    for(size_t i=0; i < _desc.sensors.size(); ++i)
+    for(size_t i=0; i<_desc.sensors.size(); ++i)
     {
-        std::string type(_desc.sensors[i]->info.type);
-
-        if(type == imu_sensor_type_string)
-        {
-            imu_names.push_back(_desc.sensors[i]->info.name);
-        }
-        else if(type == ft_sensor_type_string)
-        {
-            ft_names.push_back(_desc.sensors[i]->info.name);
-        }
+        const hubo_sensor_info_t& info = _desc.sensors[i]->info;
+        if(info.sensor == imu_sensor_string)
+            imu_names.push_back(info.name);
+        else if(info.sensor == ft_sensor_string)
+            ft_names.push_back(info.name);
     }
 
     imus.initialize(imu_names, HUBO_IMU_SENSOR_CHANNEL);

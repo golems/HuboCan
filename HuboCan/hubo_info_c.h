@@ -101,6 +101,7 @@ typedef struct hubo_jmc_info {
 typedef struct hubo_sensor_info {
 
     char name[HUBO_COMPONENT_NAME_MAX_LENGTH];
+    char sensor[HUBO_COMPONENT_TYPE_MAX_LENGTH];
     char type[HUBO_COMPONENT_TYPE_MAX_LENGTH];
 
     uint16_t hardware_index;

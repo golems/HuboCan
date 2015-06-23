@@ -4,6 +4,19 @@
 
 using namespace HuboCan;
 
+HuboJmc::HuboJmc()
+    : _agg(NULL),
+      _state(NULL)
+{
+    memset(&_frame, 0, sizeof(_frame));
+}
+
+void HuboJmc::assign_pointers(HuboCmd::Aggregator* agg, HuboState::State* state)
+{
+    _agg = agg;
+    _state = state;
+}
+
 bool HuboJmc::addJoint(HuboJoint *joint, std::string &error_report)
 {
     joints.clear();
@@ -47,7 +60,7 @@ bool HuboJmc::sortJoints(std::string& error_report)
     return true;
 }
 
-void HuboJmc::auxiliary_command(const hubo_aux_cmd_t &command)
+void HuboJmc::auxiliary_command(const hubo_aux_cmd_t& command)
 {
     _aux_commands.push_back(command);
 }
@@ -87,5 +100,3 @@ std::string HuboJmc::table() const
 
     return str.str();
 }
-
-

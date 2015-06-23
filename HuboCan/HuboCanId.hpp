@@ -3,13 +3,22 @@
 
 namespace HuboCan {
 
+// Values used in the CAN protocol by can_id
 typedef enum {
     
-    CMD_BYTE        = 0x01,
-    REFERENCE_CMD   = 0x10
-    
+    CMD_BYTE            = 0x01,
+    SENSOR_REQUEST      = 0x02,
+    REFERENCE_CMD       = 0x10,
+    SENSOR_INSTRUCTION  = 0x2F,
+
+    FT_REPLY            = 0x40,
+    IMU_REPLY           = 0x50,
+    ENCODER_REPLY       = 0x60,
+    STATUS_REPORT       = 0x150
+
 } can_base_id_t;
 
+// Values used in the CAN protocol by data[] entries
 typedef enum {
     
     GET_BOARD_INFO      = 0x01,
@@ -45,7 +54,25 @@ typedef enum {
     SET_BOARD_NUM       = 0xF0,
     SET_JAM_SAT_LIM     = 0xF2, // set the "jam" saturation limit
     SET_ERR_BOUND       = 0xF3,
-    INITIALIZE_BOARD    = 0xFA
+    INITIALIZE_BOARD    = 0xFA,
+
+    // Sensor commands
+    NULL_SENSOR         = 0x81,
+    NULL_FT             = 0x00,
+    NULL_TILT           = 0x04,
+
+    GET_FT_ACC_DIGITAL        = 0x00,
+    GET_FT_ACC_SCALED         = 0x02,
+    GET_FT_SCALED_ACC_DIGITAL = 0x03, // Get scaled force-torques and digital accelerations
+    GET_FT_DIGITAL_ACC_SCALED = 0x04, // Get digital force-torques and scaled accelerations
+
+    GET_FT_DIGITAL      = 0x11,
+    GET_FT_SCALED       = 0x12,
+
+    GET_ACC_DIGITAL     = 0x21,
+    GET_ACC_SCALED      = 0x22,
+
+    GET_GYRO_TEMP       = 0x13
     
 } can_cmd_id_t;
 
@@ -63,13 +90,6 @@ typedef enum {
     PARAM_I = 22
     
 } can_param_type_t;
-
-typedef enum {
-    
-    ENCODER_REPLY       = 0x60,
-    STATUS_REPORT       = 0x150
-    
-} can_reply_id_t;
 
 inline uint8_t long_to_bytes(unsigned long value, size_t index)
 {

@@ -13,7 +13,12 @@ typedef enum {
 
     // TODO: Put in all the different kinds of board commands
     HOME_JOINT,
-    HOME_ALL_JOINTS
+    HOME_ALL_JOINTS,
+
+    INIT_ALL_SENSORS,
+    INIT_ALL_IMUS,
+    INIT_ALL_FTS,
+    INIT_SENSOR
 
 } hubo_aux_cmd_id_t;
 
@@ -37,9 +42,9 @@ typedef enum {
 typedef struct hubo_aux_cmd {
 
     char code[HUBO_AUX_CMD_HEADER_CODE_SIZE];
-    hubo_aux_cmd_id_t id;
-    uint32_t jmc;
-    uint32_t joint;
+    hubo_aux_cmd_id_t cmd_id;
+    uint32_t device_id;
+    uint32_t component_id;
     hubo_aux_cmd_param_t params[8];
     double values[8];
 

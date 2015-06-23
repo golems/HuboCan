@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.6)
 
 get_filename_component(dir_name ${CMAKE_CURRENT_LIST_DIR} NAME)
 
-file(GLOB dir_source "src/*.cpp" "src/*.c" "*.hpp" "*.h")
+file(GLOB dir_source "src/*.cpp" "src/*.hpp" "src/*.c" "*.hpp" "*.h" "internal/*.hpp")
 list(SORT dir_source)
 
 set(lib_source ${lib_source} ${dir_source} PARENT_SCOPE)

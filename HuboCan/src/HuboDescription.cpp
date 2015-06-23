@@ -12,9 +12,11 @@
 using namespace HuboCan;
 
 HuboDescription::HuboDescription()
+    : _okay(false),
+      _numImus(0),
+      _numFts(0),
+      _data(NULL)
 {
-    _okay = false;
-    _data = NULL;
     memset(&params, 0, sizeof(params));
 }
 
@@ -118,9 +120,7 @@ error_result_t HuboDescription::receiveInfo(double timeout_sec)
     size_t sensor_count = hubo_info_get_sensor_count(_data);
     for(size_t i=0; i < sensor_count; ++i)
     {
-        HuboSensor* newSensor = new HuboSensor;
-        newSensor->info = *hubo_info_get_sensor_info(_data, i);
-        sensors.push_back(newSensor);
+        _constructSensor(*hubo_info_get_sensor_info(_data, i));
     }
 
     memcpy(&params, hubo_info_get_params_info(_data), sizeof(params));
@@ -197,7 +197,7 @@ std::string HuboDescription::getJmcTable() const
     return table.str();
 }
 
-bool HuboDescription::parseFile(const std::string &filename)
+bool HuboDescription::parseFile(const std::string& filename)
 {
     _okay = false;
     if(!_parser.load_file(filename))
@@ -217,7 +217,7 @@ bool HuboDescription::parseFile(const std::string &filename)
     return _postParseProcessing();
 }
 
-bool HuboDescription::_parseDevice(const std::string &device_type)
+bool HuboDescription::_parseDevice(const std::string& device_type)
 {
     if("Joint" == device_type)
     {
@@ -440,9 +440,9 @@ bool HuboDescription::_parseJMC(bool strict)
         }
         else if("type" == components[0])
         {
-            if(components[1].size() > HUBO_COMPONENT_NAME_MAX_LENGTH)
+            if(components[1].size() > HUBO_COMPONENT_TYPE_MAX_LENGTH)
             {
-                _parser.error() << "Component type string overflow! max size is "
+                _parser.error() << "Component type string overflow! Max size is "
                                 << HUBO_COMPONENT_TYPE_MAX_LENGTH;
                 _parser.report_error();
             }
@@ -485,53 +485,204 @@ bool HuboDescription::_parseJMC(bool strict)
     if(_parser.status() == DD_ERROR)
         return false;
 
+    return true;
+}
+
+bool HuboDescription::_constructJMC(const hubo_jmc_info_t& jmc_info)
+{
     HuboJmc* new_jmc = NULL;
-    std::string type_string(new_jmc_info.type);
-    if(     type_string == hubo2plus_1ch_code ||
-            type_string == hubo2plus_2ch_code)
+    const std::string type_string(jmc_info.type);
+    if(     type_string == hubo2plus_1ch_type_string ||
+            type_string == hubo2plus_2ch_type_string)
     {
         new_jmc = new Hubo2Plus2chJmc;
     }
-    else if(type_string == hubo2plus_nck_code)
+    else if(type_string == hubo2plus_nck_type_string)
     {
         new_jmc = new Hubo2PlusNckJmc;
     }
-    else if(type_string == hubo2plus_5ch_code)
+    else if(type_string == hubo2plus_5ch_type_string)
     {
         new_jmc = new Hubo2Plus5chJmc;
     }
-    else if(type_string == drchubo_2ch_code)
+    else if(type_string == drchubo_2ch_type_string)
     {
         new_jmc = new DrcHubo2chJmc;
     }
-    else if(type_string == drchubo_3ch_code)
+    else if(type_string == drchubo_3ch_type_string)
     {
         new_jmc = new DrcHubo3chJmc;
     }
 
     if( NULL == new_jmc )
     {
-        _parser.error() << "Invalid JMC type: " << new_jmc_info.type;
+        _parser.error() << "Invalid JMC type: " << jmc_info.type;
         _parser.report_error();
         return false;
     }
 
-    new_jmc->info = new_jmc_info;
+    new_jmc->info = jmc_info;
     jmcs.push_back(new_jmc);
 
     return true;
 }
 
-bool HuboDescription::_parseIMU(bool )
+bool HuboDescription::_parseSensor(hubo_sensor_info_t& info, bool strict)
 {
+    memset(&info, 0, sizeof(hubo_sensor_info_t));
 
+    StringArray components;
+    while(_parser.next_line(components) == HuboCan::DD_OKAY)
+    {
+        if(components.size() < 2)
+        {
+            _parser.error() << "Every component must have at least one argument!";
+            _parser.report_error();
+        }
 
+        if(     "name" == components[0])
+        {
+            if(components[1].size() > HUBO_COMPONENT_NAME_MAX_LENGTH)
+            {
+                _parser.error() << "Component name string overflow! Max size is "
+                                << HUBO_COMPONENT_NAME_MAX_LENGTH;
+                _parser.report_error();
+            }
+            else
+            {
+                strcpy(info.name, components[1].c_str());
+            }
+        }
+        else if("type" == components[0])
+        {
+            if(components[1].size() > HUBO_COMPONENT_TYPE_MAX_LENGTH)
+            {
+                _parser.error() << "Component type string overflow! Max size is "
+                                << HUBO_COMPONENT_TYPE_MAX_LENGTH;
+                _parser.report_error();
+            }
+            else
+            {
+                strcpy(info.type, components[1].c_str());
+            }
+        }
+        else if("can_channel" == components[0])
+        {
+            info.can_channel = atoi(components[1].c_str());
+        }
+        else if("hardware_index" == components[0])
+        {
+            info.hardware_index = strtol(components[1].c_str(), NULL, 0);
+        }
+        else
+        {
+            if(strict)
+            {
+                _parser.error() << "Invalid component: " << components[0];
+                _parser.report_error();
+            }
+        }
+
+        if(_parser.status() == DD_ERROR)
+            return false;
+    }
+
+    for(size_t i=0; i<sensors.size(); ++i)
+    {
+        if(strcmp(info.name, sensors[i]->info.name) == 0)
+        {
+            _parser.error() << "Repeated sensor name: " << info.name;
+            _parser.report_error();
+            return false;
+        }
+    }
 
     return true;
 }
 
-bool HuboDescription::_parseForceTorque(bool )
+bool HuboDescription::_constructSensor(const hubo_sensor_info_t& sensor_info)
 {
+    if(     sensor_info.sensor == imu_sensor_string)
+        return _constructIMU(sensor_info);
+
+    else if(sensor_info.sensor == ft_sensor_string)
+        return _constructForceTorque(sensor_info);
+
+    return false;
+}
+
+bool HuboDescription::_parseIMU(bool strict)
+{
+    hubo_sensor_info_t new_imu_info;
+    if(!_parseSensor(new_imu_info, strict))
+        return false;
+
+    strcpy(new_imu_info.sensor, imu_sensor_string.c_str());
+
+    return _constructIMU(new_imu_info);
+}
+
+bool HuboDescription::_constructIMU(const hubo_sensor_info_t& imu_info)
+{
+    HuboImu* new_imu = NULL;
+    const std::string type_string(imu_info.type);
+    if(     type_string == hubo2plus_imu_sensor_type_string)
+    {
+        new_imu = new Hubo2PlusImu(_numImus);
+    }
+    else if(type_string == drchubo_imu_sensor_type_string)
+    {
+        new_imu = new DrcHuboImu(_numImus);
+    }
+
+    if( NULL == new_imu )
+    {
+        _parser.error() << "Invalid IMU type: " << imu_info.type;
+        _parser.report_error();
+        return false;
+    }
+
+    new_imu->info = imu_info;
+    sensors.push_back(new_imu);
+    ++_numImus;
+
+    return true;
+}
+
+bool HuboDescription::_parseForceTorque(bool strict)
+{
+    hubo_sensor_info_t new_ft_info;
+    if(!_parseSensor(new_ft_info, strict))
+        return false;
+
+    strcpy(new_ft_info.sensor, ft_sensor_string.c_str());
+
+    return _constructForceTorque(new_ft_info);
+}
+
+bool HuboDescription::_constructForceTorque(const hubo_sensor_info_t& ft_info)
+{
+    HuboFt* new_ft = NULL;
+    const std::string type_string(ft_info.type);
+    if(     type_string == hubo2plus_ft_sensor_type_string)
+    {
+        new_ft = new Hubo2PlusFt(_numFts);
+    }
+    else if(type_string == drchubo_ft_sensor_type_string)
+    {
+        new_ft = new DrcHuboFt(_numFts);
+    }
+
+    if( NULL == new_ft )
+    {
+        _parser.error() << "Invalid FT type: " << ft_info.type;
+        _parser.report_error();
+        return false;
+    }
+
+    new_ft->info = ft_info;
+    sensors.push_back(new_ft);
+    ++_numFts;
 
     return true;
 }
@@ -694,10 +845,10 @@ hubo_joint_info_t HuboDescription::getJointInfo(size_t joint_index) const
     return joints[joint_index]->info;
 }
 
-
-size_t HuboDescription::getJmcIndex(const std::string &jmc_name) const
+size_t HuboDescription::getJmcIndex(const std::string& jmc_name) const
 {
     size_t result = InvalidIndex;
+    // TODO: Replace this with a map
     for(size_t i=0; i < jmcs.size(); ++i)
     {
         if(jmc_name.compare(jmcs[i]->info.name)==0)

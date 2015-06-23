@@ -12,19 +12,16 @@ extern "C" {
 #include <string>
 #include <string.h>
 
-const char hubo2plus_1ch_code[] = "H2P_1CH";
-const char hubo2plus_2ch_code[] = "H2P_2CH";
-const char hubo2plus_nck_code[] = "H2P_NCK"; // Hubo2Plus neck board
-const char hubo2plus_5ch_code[] = "H2P_5CH";
+const std::string hubo2plus_1ch_type_string = "H2P_1CH";
+const std::string hubo2plus_2ch_type_string = "H2P_2CH";
+const std::string hubo2plus_nck_type_string = "H2P_NCK"; // Hubo2Plus neck board
+const std::string hubo2plus_5ch_type_string = "H2P_5CH";
 
-const char drchubo_2ch_code[] = "DRC_2CH";
-const char drchubo_3ch_code[] = "DRC_3CH";
+const std::string drchubo_2ch_type_string = "DRC_2CH";
+const std::string drchubo_3ch_type_string = "DRC_3CH";
 
 namespace HuboCmd {
-
 class Aggregator;
-typedef std::vector<hubo_aux_cmd_t> HuboAuxArray;
-
 } // namespace HuboCmd
 
 namespace HuboState {
@@ -38,12 +35,10 @@ namespace HuboCan {
 class HuboJmc : public CanDevice
 {
 public:
+
+    HuboJmc();
     
-    inline void assign_pointers(HuboCmd::Aggregator* agg, HuboState::State* state)
-    {
-        _agg = agg;
-        _state = state;
-    }
+    void assign_pointers(HuboCmd::Aggregator* agg, HuboState::State* state);
 
     hubo_jmc_info_t info;
     HuboJointPtrArray joints;
@@ -59,7 +54,7 @@ public:
 
 protected:
 
-    HuboCmd::HuboAuxArray _aux_commands;
+    std::vector<hubo_aux_cmd_t>  _aux_commands;
 
     HuboCmd::Aggregator* _agg;
     HuboState::State* _state;
@@ -79,7 +74,7 @@ public:
 
     Hubo2PlusBasicJmc();
     virtual void update();
-    virtual bool decode(const can_frame_t &frame, size_t channel);
+    virtual bool decode(const can_frame_t& frame, size_t channel);
 
     virtual unsigned long sign_convention_converter(int encoder_value);
 

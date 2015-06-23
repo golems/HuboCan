@@ -116,9 +116,14 @@ public:
 
     size_t getJmcIndex(const std::string& jmc_name) const;
 
+
     hubo_params_info_t params;
     HuboJointPtrArray joints;
+
+    /// Joint motor controllers
     HuboJmcPtrArray jmcs;
+
+    /// Inertia measurement units
     HuboSensorPtrArray sensors;
 
     HuboDescription& operator=(const HuboDescription& desc);
@@ -135,9 +140,19 @@ protected:
     virtual bool _parseDevice(const std::string& device_type);
 
     virtual bool _parseJoint(bool strict=true);
+
     virtual bool _parseJMC(bool strict=true);
+    virtual bool _constructJMC(const hubo_jmc_info_t& jmc_info);
+
+    virtual bool _parseSensor(hubo_sensor_info_t& info, bool strict=true);
+    virtual bool _constructSensor(const hubo_sensor_info_t& sensor_info);
+
     virtual bool _parseIMU(bool strict=true);
+    virtual bool _constructIMU(const hubo_sensor_info_t& imu_info);
+
     virtual bool _parseForceTorque(bool strict=true);
+    virtual bool _constructForceTorque(const hubo_sensor_info_t& ft_info);
+
     virtual bool _parseMeta(bool strict=true);
 
     virtual bool _postParseProcessing();
@@ -145,6 +160,9 @@ protected:
     void _clear_memory();
 
     DdParser _parser;
+
+    size_t _numImus;
+    size_t _numFts;
 
     hubo_info_data* _data;
 

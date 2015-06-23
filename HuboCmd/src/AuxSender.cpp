@@ -110,14 +110,14 @@ size_t AuxSender::_hw_index(size_t joint)
 
 void AuxSender::_set_jmc_info(size_t joint)
 {
-    _cmd.jmc = _jmc(joint);
-    _cmd.joint = _hw_index(joint);
+    _cmd.device_id = _jmc(joint);
+    _cmd.component_id = _hw_index(joint);
 }
 
 void AuxSender::home_joint(size_t joint)
 {
     _clear_command();
-    _cmd.id = HOME_JOINT;
+    _cmd.cmd_id = HOME_JOINT;
     _set_jmc_info(joint);
     _send_command();
 }
@@ -125,7 +125,7 @@ void AuxSender::home_joint(size_t joint)
 void AuxSender::home_all_joints()
 {
     _clear_command();
-    _cmd.id = HOME_ALL_JOINTS;
+    _cmd.cmd_id = HOME_ALL_JOINTS;
     _send_command();
 }
 

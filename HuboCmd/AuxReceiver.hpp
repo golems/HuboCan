@@ -9,6 +9,7 @@ extern "C" {
 
 namespace HuboCmd {
 
+/// AuxReceiver
 class AuxReceiver
 {
 public:
@@ -23,8 +24,20 @@ public:
 
 protected:
 
+    void _organize_sensors();
+
     void _register_command();
+
     void _register_with_all_jmcs();
+
+    void _register_with_all_sensors();
+
+    void _register_with_all_imus();
+
+    void _register_with_all_fts();
+
+    std::vector<HuboCan::HuboImu*> _imus;
+    std::vector<HuboCan::HuboFt*> _fts;
 
     bool _channels_opened;
     ach_channel_t _aux_cmd_chan;
