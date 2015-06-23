@@ -119,8 +119,14 @@ RawRobotInstall()
 {
     echo "Performing robot installation for $2"
 
-    SetupAptList
-    GetDependencies
+    if [ "$3" = 'offline' ]
+    then
+        echo 'Offline -- not checking dependencies'
+    else
+        SetupAptList
+        GetDependencies
+    fi
+
     MakeBuildDirectory
 
     cd build
@@ -163,9 +169,14 @@ RobotInstall()
 
 WorkstationInstall()
 {
-    SetupAptList
-    GetDependencies
-    sudo apt-get install libqt4-dev
+    if [ "$2" = 'offline' ]
+    then
+        echo 'Offline -- not checking dependencies'
+    else
+        SetupAptList
+        GetDependencies
+        sudo apt-get install libqt4-dev
+    fi
 
     MakeBuildDirectory
 
