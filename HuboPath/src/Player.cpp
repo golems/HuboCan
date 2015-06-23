@@ -200,7 +200,7 @@ bool Player::_receive_incoming_trajectory()
 
 bool Player::step()
 {
-    HuboCan::error_result_t update_result = update();
+    HuboCan::error_result_t update_result = update(10);
 
     if(update_result != HuboCan::OKAY)
     {
