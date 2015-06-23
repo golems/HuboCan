@@ -31,12 +31,14 @@ public:
     std::string filename;
     long int read_so_far;
     char last_stamp[LOG_STAMP_SIZE];
+    bool header_errored;
 
     inline FileHandle()
     {
         fd = -1;
         read_so_far = 0;
         memset(last_stamp, 0, LOG_STAMP_SIZE);
+        header_errored = false;
     }
 };
 

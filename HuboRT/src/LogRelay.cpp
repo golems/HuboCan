@@ -180,22 +180,31 @@ void LogRelay::_check_for_log_reset()
     {
         FileHandle& handle = _handles[i];
 
+        // Get the header and check that it's the correct size
         lseek(handle.fd, 0, SEEK_SET);
         ssize_t bytes_read = read(handle.fd, stamp_test, LOG_STAMP_SIZE);
         if( bytes_read != LOG_STAMP_SIZE )
         {
-            std::cerr << "Error checking the stamp of log '" << handle.filename
-                      << "' (" << bytes_read << ")";
-            if( bytes_read < 0 )
+            if(!handle.header_errored)
             {
-                std::cerr << " " << strerror(errno);
+                std::cerr << "Error checking the stamp of log '" << handle.filename
+                          << "'. Bytes read was " << bytes_read << " when it should be"
+                          << LOG_STAMP_SIZE;
+                if( bytes_read < 0 )
+                {
+                    std::cerr << ". Error: " << strerror(errno);
+                }
+                std::cerr << std::endl;
+                handle.header_errored = true;
             }
-            std::cerr << std::endl;
             continue;
         }
 
+        handle.header_errored = false;
+
         if( strncmp(stamp_test, handle.last_stamp, LOG_STAMP_SIZE) != 0 )
         {
+            // If the header has changed, start over from the beginning of the file
             strncpy(handle.last_stamp, stamp_test, LOG_STAMP_SIZE);
 
             strcpy(_buffer.log_name, handle.filename.c_str());
@@ -208,6 +217,7 @@ void LogRelay::_check_for_log_reset()
         }
         else
         {
+            // If the header is unchanged, continue reading where we left off
             lseek(handle.fd, handle.read_so_far, SEEK_SET);
         }
     }
