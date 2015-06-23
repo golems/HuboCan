@@ -17,7 +17,7 @@ start_hubomgr()
 
 stop_hubomgr()
 {
-    pkill --signal SIGTERM hubomgr
+    pkill -SIGTERM hubomgr
     if [ -e "/opt/hubo/mgr/lock/hubo-manager" ]
     then
         rm -f /opt/hubo/mgr/lock/hubo-manager
