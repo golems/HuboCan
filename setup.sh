@@ -29,6 +29,15 @@ ShowUsage()
     echo " Ex:"
     echo "   $ ./setup uninstall"
     echo " "
+    echo " -- offline -- "
+    echo " Pass in 'offline' (without quotes) when performing a robot or "
+    echo " workstation install in order to run the script without checking "
+    echo " for dependencies online. If the dependencies are missing, this "
+    echo " will make the installation fail, but otherwise all other setup "
+    echo " can be performed."
+    echo " Ex:"
+    echo "   $ ./setup workstation offline"
+    echo " "
 }
 
 MakeBuildDirectory()
