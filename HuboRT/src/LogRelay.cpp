@@ -188,7 +188,7 @@ void LogRelay::_check_for_log_reset()
             if(!handle.header_errored)
             {
                 std::cerr << "Error checking the stamp of log '" << handle.filename
-                          << "'. Bytes read was " << bytes_read << " when it should be"
+                          << "'. Bytes read was " << bytes_read << " when it should be "
                           << LOG_STAMP_SIZE;
                 if( bytes_read < 0 )
                 {
