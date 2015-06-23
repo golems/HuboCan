@@ -51,6 +51,7 @@ typedef enum manager_cmd {
 
 } manager_cmd_t;
 
+std::string manager_cmd_to_string(manager_cmd_t cmd);
 
 typedef struct manager_msg {
     

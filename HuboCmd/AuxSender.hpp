@@ -15,7 +15,7 @@ class AuxSender
 {
 public:
     
-    AuxSender(bool initialize=true, double timeout_sec=1 );
+    AuxSender(bool initialize=true, double timeout_sec=1);
     AuxSender(const HuboCan::HuboDescription& description);
     
     bool initialize(double timeout_sec=1);
@@ -27,6 +27,11 @@ public:
 
     void home_joint(size_t joint);
     void home_all_joints();
+
+    void initialize_sensor(size_t sensor);
+    void initialize_all_imus();
+    void initialize_all_fts();
+    void initialize_all_sensors();
 
     bool ready();
 

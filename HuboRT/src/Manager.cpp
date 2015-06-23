@@ -53,9 +53,11 @@ void Manager::_initialize()
     _rt.check(ACH_OK == r, "Could not open the Hubo Manager reply channel ("
               + std::string(hubo_rt_mgr_reply_chan) + ")", true);
     ach_flush(&_reply_chan);
+
+    std::cout << "Finished initialization" << std::endl;
 }
 
-void Manager::_create_channel(const std::string &channel_name,
+void Manager::_create_channel(const std::string& channel_name,
                               size_t message_count,
                               size_t nominal_size)
 {
@@ -111,6 +113,9 @@ void Manager::step(double quit_check)
         return;
     }
 
+    std::cout << "Received command: " << manager_cmd_to_string(incoming_msg.request_type)
+              << " -- details: " << incoming_msg.details << std::endl;
+
     switch(incoming_msg.request_type)
     {
         case LIST_PROCS: list_processes();                                  break;
@@ -151,6 +156,8 @@ void Manager::step(double quit_check)
 
         default: _report_malformed_error("Unknown command type");           break;
     }
+
+    std::cout << " -- Finished command" << std::endl;
 }
 
 void Manager::run()

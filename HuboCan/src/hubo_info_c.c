@@ -95,6 +95,7 @@ hubo_info_data* hubo_info_receive_data(double timeout)
                 " -- Ach Error: %s (%d)\n"
                 " -- Make sure you are using the Manager correctly\n",
                 HUBO_INFO_META_CHANNEL, ach_result_to_string(r), (int)r);
+        fflush(stderr);
         return NULL;
     }
 
@@ -115,6 +116,7 @@ hubo_info_data* hubo_info_receive_data(double timeout)
     {
         fprintf(stderr, "Hubo Meta Info has not been published within the time limit\n"
                 " -- We are giving up and returning a NULL pointer\n");
+        fflush(stderr);
         return NULL;
     }
 
@@ -123,6 +125,7 @@ hubo_info_data* hubo_info_receive_data(double timeout)
         fprintf(stderr, "Unexpected ach result on Hubo's meta info channel \"%s\":\n"
                 " -- Ach Error: %s (%d)\n",
                 HUBO_INFO_META_CHANNEL, ach_result_to_string(r), (int)r);
+        fflush(stderr);
         return NULL;
     }
 
@@ -138,6 +141,7 @@ hubo_info_data* hubo_info_receive_data(double timeout)
                 " -- Ach Error: %s (%d)\n"
                 " -- Make sure you are using the Manager correctly\n",
                 HUBO_INFO_META_CHANNEL, ach_result_to_string(r), (int)r);
+        fflush(stderr);
         return NULL;
     }
 
@@ -158,6 +162,7 @@ hubo_info_data* hubo_info_receive_data(double timeout)
     {
         fprintf(stderr, "Hubo Info Data has not been published within the time limit\n"
                 " -- The contents of the hubo_info_data_t will be left blank\n");
+        fflush(stderr);
         return data;
     }
 
@@ -165,18 +170,21 @@ hubo_info_data* hubo_info_receive_data(double timeout)
     {
         fprintf(stderr, "Ach Overflow! Mismatch between predicted data size (%zu) and the size of the message in the channel (%zu)!\n",
                 info_data_size, fs);
+        fflush(stderr);
     }
     else if( ACH_OK != r && ACH_STALE_FRAMES != r  && ACH_MISSED_FRAME != r )
     {
         fprintf(stderr, "Unexpected ach result on Hubo's info data channel \"%s\":\n"
                 " -- Ach Error: %s (%d)\n",
                 HUBO_INFO_META_CHANNEL, ach_result_to_string(r), (int)r);
+        fflush(stderr);
     }
 
     if( hubo_info_get_data_size(data) != info_data_size )
     {
         fprintf(stderr, "Mismatch between predicted data size (%zu) and believed data size (%zu) for Hubo Info Data!\n",
                 info_data_size, hubo_info_get_data_size(data));
+        fflush(stderr);
     }
 
     return data;
@@ -194,6 +202,7 @@ int hubo_info_send_data(const hubo_info_data *data)
                 " -- Ach Error: %s (%d)\n"
                 " -- The Manager should open this channel if you are using it correctly\n",
                 HUBO_INFO_META_CHANNEL, ach_result_to_string(r), (int)r);
+        fflush(stderr);
         return -1;
     }
 
@@ -209,6 +218,7 @@ int hubo_info_send_data(const hubo_info_data *data)
                 " -- Ach Error: %s (%d)\n"
                 " -- The Manager should open this channel if you are using it correctly\n",
                 HUBO_INFO_META_CHANNEL, ach_result_to_string(r), (int)r);
+        fflush(stderr);
         return -2;
     }
 
@@ -235,6 +245,7 @@ hubo_joint_info_t* hubo_info_get_joint_info(hubo_info_data *data, size_t joint_i
     {
         fprintf(stderr, "Error: requested joint info (index %zu) which is out of bounds (%zu)!\n",
                 joint_index, hubo_info_get_joint_count(data));
+        fflush(stderr);
         return NULL;
     }
 
@@ -247,6 +258,7 @@ hubo_jmc_info_t* hubo_info_get_jmc_info(const hubo_info_data *data, size_t jmc_i
     {
         fprintf(stderr, "Error: requested jmc info (index %zu) which is out of bounds (%zu)!\n",
                 jmc_index, hubo_info_get_jmc_count(data));
+        fflush(stderr);
         return NULL;
     }
 
@@ -259,6 +271,7 @@ hubo_sensor_info_t* hubo_info_get_sensor_info(const hubo_info_data *data, size_t
     {
         fprintf(stderr, "Error: requesting sensor info (index %zu) which is out of bounds (%zu)!\n",
                 sensor_index, hubo_info_get_sensor_count(data));
+        fflush(stderr);
         return NULL;
     }
 

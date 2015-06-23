@@ -35,8 +35,6 @@ bool AuxSender::initialize(double timeout_sec)
     return ready();
 }
 
-bool AuxSender::ready() { return _description_loaded && _channels_opened; }
-
 bool AuxSender::receive_description(double timeout_sec)
 {
     HuboCan::error_result_t result = _desc.receiveInfo(timeout_sec);
@@ -129,11 +127,33 @@ void AuxSender::home_all_joints()
     _send_command();
 }
 
+void AuxSender::initialize_sensor(size_t sensor)
+{
+    _clear_command();
+    _cmd.cmd_id = INIT_SENSOR;
+    _cmd.device_id = sensor;
+    _send_command();
+}
 
+void AuxSender::initialize_all_imus()
+{
+    _clear_command();
+    _cmd.cmd_id = INIT_ALL_IMUS;
+    _send_command();
+}
 
+void AuxSender::initialize_all_fts()
+{
+    _clear_command();
+    _cmd.cmd_id = INIT_ALL_FTS;
+    _send_command();
+}
 
+void AuxSender::initialize_all_sensors()
+{
+    _clear_command();
+    _cmd.cmd_id = INIT_ALL_SENSORS;
+    _send_command();
+}
 
-
-
-
-
+bool AuxSender::ready() { return _description_loaded && _channels_opened; }
