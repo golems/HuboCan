@@ -42,8 +42,8 @@ void Manager::_initialize()
     _config_roster = config_directory;
     hubo_rt_safe_make_directory(_config_roster.c_str());
     
-    _create_channel(hubo_rt_mgr_req_chan, 20, 2048);
-    _create_channel(hubo_rt_mgr_reply_chan, 20, 2048);
+    create_channel(hubo_rt_mgr_req_chan, 20, 2048);
+    create_channel(hubo_rt_mgr_reply_chan, 20, 2048);
     
     ach_status_t r = ach_open(&_msg_chan, hubo_rt_mgr_req_chan, NULL);
     _rt.check(ACH_OK == r, "Could not open the Hubo Manager request channel ("
@@ -57,7 +57,7 @@ void Manager::_initialize()
     std::cout << "Finished initialization" << std::endl;
 }
 
-void Manager::_create_channel(const std::string& channel_name,
+void Manager::create_channel(const std::string& channel_name,
                               size_t message_count,
                               size_t nominal_size)
 {
@@ -171,12 +171,12 @@ void Manager::run()
     std::cout << "Exiting Manager" << std::endl;
 }
 
-StringArray Manager::_grab_files_in_dir(const std::string &directory)
+StringArray Manager::_grab_files_in_dir(const std::string& directory)
 {
     return grab_files_in_dir(directory);
 }
 
-void Manager::_relay_directory_contents(manager_cmd_t original_req, const std::string &directory)
+void Manager::_relay_directory_contents(manager_cmd_t original_req, const std::string& directory)
 {
     StringArray reply;
     StringArray files = _grab_files_in_dir(directory);
@@ -200,7 +200,7 @@ void Manager::_relay_directory_contents(manager_cmd_t original_req, const std::s
     _relay_string_array(original_req, reply);
 }
 
-void Manager::_relay_string_array(manager_cmd_t original_req, const StringArray &array)
+void Manager::_relay_string_array(manager_cmd_t original_req, const StringArray& array)
 {
     if(array.size() == 0)
     {
@@ -250,7 +250,7 @@ void Manager::list_channels()
     _relay_directory_contents(LIST_CHANS, _chan_roster);
 }
 
-void Manager::run_process(const std::string &name)
+void Manager::run_process(const std::string& name)
 {
     StringArray components;
     if(split_components(name,components) >= 2)
@@ -276,7 +276,7 @@ void Manager::run_all_processes(bool report)
         _report_no_error(RUN_ALL_PROCS);
 }
 
-void Manager::_stop_process_raw(const std::string &name)
+void Manager::_stop_process_raw(const std::string& name)
 {
     int id = 0;
     std::ifstream str;
@@ -294,7 +294,7 @@ void Manager::_stop_process_raw(const std::string &name)
     //          But how to do this in a decent way???
 }
 
-void Manager::_kill_process_raw(const std::string &name)
+void Manager::_kill_process_raw(const std::string& name)
 {
     int id = 0;
     std::ifstream str;
@@ -311,7 +311,7 @@ void Manager::_kill_process_raw(const std::string &name)
     }
 }
 
-void Manager::stop_process(const std::string &name)
+void Manager::stop_process(const std::string& name)
 {
     StringArray procs = _grab_files_in_dir(_rt_lock_dir);
     bool exists = false;
@@ -347,7 +347,7 @@ void Manager::stop_all_processes(bool report)
         _report_no_error(STOP_ALL_PROCS);
 }
 
-void Manager::kill_process(const std::string &name)
+void Manager::kill_process(const std::string& name)
 {
     StringArray procs = _grab_files_in_dir(_rt_lock_dir);
     bool exists = false;
@@ -382,7 +382,7 @@ void Manager::kill_all_processes()
     _report_no_error(KILL_ALL_PROCS);
 }
 
-std::string Manager::_create_ach_channel_raw(const std::string &name)
+std::string Manager::_create_ach_channel_raw(const std::string& name)
 {
     std::ifstream chan_file;
     chan_file.open( (_chan_roster+"/"+name).c_str() );
@@ -399,7 +399,7 @@ std::string Manager::_create_ach_channel_raw(const std::string &name)
             chan_name = components[0];
             count = atoi(components[1].c_str());
             fs = atoi(components[2].c_str());
-            _create_channel(chan_name, count, fs);
+            create_channel(chan_name, count, fs);
             return name+":"+chan_desc;
         }
         else
@@ -415,7 +415,7 @@ std::string Manager::_create_ach_channel_raw(const std::string &name)
     }
 }
 
-bool Manager::_close_ach_channel_raw(const std::string &name)
+bool Manager::_close_ach_channel_raw(const std::string& name)
 {
     std::ifstream chan_file;
     chan_file.open( (_chan_roster+"/"+name).c_str() );
@@ -449,7 +449,7 @@ bool Manager::_close_ach_channel_raw(const std::string &name)
     }
 }
 
-void Manager::create_ach_chan(const std::string &name)
+void Manager::create_ach_chan(const std::string& name)
 {
     StringArray achd_types;
     achd_types.push_back(_create_ach_channel_raw(name));
@@ -471,7 +471,7 @@ StringArray Manager::create_all_ach_chans(bool report)
     return achd_types;
 }
 
-void Manager::close_ach_chan(const std::string &name)
+void Manager::close_ach_chan(const std::string& name)
 {
     if(_close_ach_channel_raw(name))
     {
@@ -496,7 +496,7 @@ void Manager::close_all_ach_chans(bool report)
         _report_no_error(CLOSE_ALL_ACH_CHANS);
 }
 
-void Manager::register_new_proc(const std::string &name)
+void Manager::register_new_proc(const std::string& name)
 {   
     if(_register(_proc_roster, name, 3))
     {
@@ -508,13 +508,13 @@ void Manager::register_new_proc(const std::string &name)
     }
 }
 
-void Manager::unregister_old_proc(const std::string &name)
+void Manager::unregister_old_proc(const std::string& name)
 {
     _unregister(_proc_roster, name);
     _report_no_error(UNREGISTER_OLD_PROC);
 }
 
-void Manager::register_new_chan(const std::string &name)
+void Manager::register_new_chan(const std::string& name)
 {
     if(_register(_chan_roster, name, 4))
     {
@@ -526,8 +526,8 @@ void Manager::register_new_chan(const std::string &name)
     }
 }
 
-bool Manager::_register(const std::string &directory,
-                        const std::string &description,
+bool Manager::_register(const std::string& directory,
+                        const std::string& description,
                         size_t minimum_size)
 {
     StringArray components;
@@ -554,13 +554,13 @@ bool Manager::_register(const std::string &directory,
     return true;
 }
 
-void Manager::unregister_old_chan(const std::string &name)
+void Manager::unregister_old_chan(const std::string& name)
 {
     _unregister(_chan_roster, name);
     _report_no_error(UNREGISTER_OLD_CHAN);
 }
 
-void Manager::_unregister(const std::string &directory, const std::string &name)
+void Manager::_unregister(const std::string& directory, const std::string& name)
 {
     StringArray array = _grab_files_in_dir(directory);
     
@@ -604,14 +604,14 @@ void Manager::list_configs()
     _relay_string_array(LIST_CONFIGS, _grab_files_in_dir(_config_roster));
 }
 
-void Manager::save_current_config(const std::string &name)
+void Manager::save_current_config(const std::string& name)
 {
     _save_config_raw(name);
     
     _report_no_error(SAVE_CONFIG);
 }
 
-void Manager::_save_config_raw(const std::string &name)
+void Manager::_save_config_raw(const std::string& name)
 {
     std::ofstream output;
     output.open( (_config_roster+"/"+name).c_str() );
@@ -631,7 +631,7 @@ void Manager::_save_config_raw(const std::string &name)
     output.close();
 }
 
-std::string Manager::_stringify_contents(const std::string &directory, const std::string &name)
+std::string Manager::_stringify_contents(const std::string& directory, const std::string& name)
 {
     std::ifstream input;
     input.open( (directory+"/"+name).c_str() );
@@ -648,7 +648,7 @@ std::string Manager::_stringify_contents(const std::string &directory, const std
     return result;
 }
 
-void Manager::load_config(const std::string &name)
+void Manager::load_config(const std::string& name)
 {
     std::cout << "Loading config '" << name << "'... "; fflush(stdout);
     StringArray configs = _grab_files_in_dir(_config_roster);
@@ -680,13 +680,13 @@ void Manager::load_config(const std::string &name)
     
 }
 
-void Manager::delete_config(const std::string &name)
+void Manager::delete_config(const std::string& name)
 {
     _unregister(_config_roster, name);
     _report_no_error(DELETE_CONFIG);
 }
 
-bool Manager::_load_config_raw(const std::string &name)
+bool Manager::_load_config_raw(const std::string& name)
 {
     _clear_current_config();
     
@@ -761,7 +761,7 @@ void Manager::_report_no_error(manager_cmd_t original_req)
     ach_put(&_reply_chan, &reply, sizeof(manager_reply_t));
 }
 
-void Manager::_report_error(manager_err_t error, const std::string &description)
+void Manager::_report_error(manager_err_t error, const std::string& description)
 {
     std::cerr << "Failed request (" << (int)error << "): " << description << std::endl;
     
@@ -777,12 +777,12 @@ void Manager::_report_error(manager_err_t error, const std::string &description)
     ach_put(&_reply_chan, &reply, sizeof(manager_reply_t));
 }
 
-void Manager::_report_ach_error(const std::string &error_description)
+void Manager::_report_ach_error(const std::string& error_description)
 {
     _report_error(ACH_ERROR, error_description);
 }
 
-void Manager::_report_malformed_error(const std::string &error_description)
+void Manager::_report_malformed_error(const std::string& error_description)
 {
     _report_error(MALFORMED_REQUEST, error_description);
 }
@@ -792,7 +792,7 @@ void Manager::_report_no_existence(manager_cmd_t /*original_req*/)
     _report_error(NONEXISTENT_ENTRY, "");
 }
 
-bool Manager::_fork_process(const std::string &proc_name, const std::string &args)
+bool Manager::_fork_process(const std::string& proc_name, const std::string& args)
 {
     StringArray procs = _grab_files_in_dir(_proc_roster);
     
@@ -810,7 +810,7 @@ bool Manager::_fork_process(const std::string &proc_name, const std::string &arg
     return existed;
 }
 
-void Manager::_fork_process_raw(const std::string &proc_name, std::string args)
+void Manager::_fork_process_raw(const std::string& proc_name, std::string args)
 {
     std::ifstream proc_file;
     proc_file.open( (_proc_roster+"/"+proc_name).c_str() );

@@ -49,7 +49,6 @@ protected Q_SLOTS:
     void handle_new_log_message(const QString& log, const QString& message);
     void clear_content_notice(int index);
 
-
 };
 
 class RelayWorker : public QThread

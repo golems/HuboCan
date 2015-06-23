@@ -81,15 +81,15 @@ public:
     void load_config(const std::string& name);
     void delete_config(const std::string& name);
     // End: Callback functions
-    
-    
+
+    static void create_channel(const std::string& channel_name,
+                               size_t message_count,
+                               size_t nominal_size);
 protected:
     
     // Begin: Utility functions
     virtual void _initialize();
-    virtual void _create_channel(const std::string& channel_name,
-                                 size_t message_count,
-                                 size_t nominal_size);
+
 //    size_t _split_components(const std::string& name, StringArray& array);
     StringArray _grab_files_in_dir(const std::string& directory);
     void _relay_directory_contents(manager_cmd_t original_req, const std::string& directory);

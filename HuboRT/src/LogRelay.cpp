@@ -9,6 +9,8 @@
 #include <unistd.h>
 #include <stdio.h>
 
+#include "../Manager.hpp"
+
 using namespace HuboRT;
 
 LogRelay::LogRelay()
