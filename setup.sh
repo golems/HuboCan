@@ -2,7 +2,7 @@
 
 ShowUsage()
 {
-    echo "There are two modes of installation:"
+    echo "There are two modes of installation: robot and workstation"
     echo " "
     echo " -- robot -- "
     echo " This is for installing HuboCan on the physical Hubo itself."
