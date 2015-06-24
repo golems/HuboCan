@@ -7,8 +7,6 @@
 #include "HuboSensor.hpp"
 #include "DdParser.hpp"
 
-const std::string meta_device_string = "meta";
-
 namespace HuboCan {
 
 class HuboDescription

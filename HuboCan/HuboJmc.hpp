@@ -12,17 +12,6 @@ extern "C" {
 #include <string>
 #include <string.h>
 
-const std::string jmc_device_string = "JMC";
-const std::string joint_device_string = "Joint";
-
-const std::string hubo2plus_1ch_type_string = "H2P_1CH";
-const std::string hubo2plus_2ch_type_string = "H2P_2CH";
-const std::string hubo2plus_nck_type_string = "H2P_NCK"; // Hubo2Plus neck board
-const std::string hubo2plus_5ch_type_string = "H2P_5CH";
-
-const std::string drchubo_2ch_type_string = "DRC_2CH";
-const std::string drchubo_3ch_type_string = "DRC_3CH";
-
 namespace HuboCmd {
 class Aggregator;
 } // namespace HuboCmd

@@ -11,15 +11,6 @@ extern "C" {
 
 #include "CanDevice.hpp"
 
-const std::string imu_sensor_string = "IMU";
-const std::string hubo2plus_imu_sensor_type_string = "H2P_IMU";
-const std::string hubo2plus_tilt_sensor_type_string = "H2P_TILT";
-const std::string drchubo_imu_sensor_type_string = "DRC_IMU";
-
-const std::string ft_sensor_string = "FT";
-const std::string hubo2plus_ft_sensor_type_string = "H2P_FT";
-const std::string drchubo_ft_sensor_type_string = "DRC_FT";
-
 namespace HuboCmd {
 class Aggregator;
 } // namespace HuboCmd

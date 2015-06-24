@@ -1,12 +1,12 @@
 
 #include "../State.hpp"
+#include "HuboCan/DeviceStrings.hpp"
 
 extern "C"{
 #include <stdlib.h>
 }
 
 using namespace HuboState;
-
 
 State::State(double timeout)
 {
@@ -57,9 +57,9 @@ void State::_create_memory()
     for(size_t i=0; i<_desc.sensors.size(); ++i)
     {
         const hubo_sensor_info_t& info = _desc.sensors[i]->info;
-        if(info.sensor == imu_sensor_string)
+        if(info.sensor == HuboCan::imu_sensor_string)
             imu_names.push_back(info.name);
-        else if(info.sensor == ft_sensor_string)
+        else if(info.sensor == HuboCan::ft_sensor_string)
             ft_names.push_back(info.name);
     }
 

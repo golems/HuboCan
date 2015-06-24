@@ -8,8 +8,9 @@
 #include <iostream>
 
 #include "HuboCan/HuboJoint.hpp"
+#include "HuboCan/DeviceStrings.hpp"
 
-using namespace HuboCan;
+namespace HuboCan {
 
 HuboDescription::HuboDescription()
     : _okay(false),
@@ -894,3 +895,5 @@ size_t HuboDescription::getJmcIndex(const std::string& jmc_name) const
     }
     return result;
 }
+
+} // namespace HuboCan

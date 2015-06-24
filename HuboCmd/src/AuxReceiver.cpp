@@ -1,9 +1,11 @@
 
-#include "../AuxReceiver.hpp"
 #include <stdio.h>
 #include <iostream>
 
-using namespace HuboCmd;
+#include "../AuxReceiver.hpp"
+#include "HuboCan/DeviceStrings.hpp"
+
+namespace HuboCmd {
 
 AuxReceiver::AuxReceiver(HuboCan::HuboDescription* description)
 {
@@ -93,7 +95,7 @@ void AuxReceiver::_organize_sensors()
     for(size_t i=0; i<_desc->sensors.size(); ++i)
     {
         HuboCan::HuboSensor* sensor = _desc->sensors[i];
-        if(     imu_sensor_string == sensor->info.sensor)
+        if(     HuboCan::imu_sensor_string == sensor->info.sensor)
         {
             if(HuboCan::HuboImu* imu = dynamic_cast<HuboCan::HuboImu*>(sensor))
             {
@@ -107,7 +109,7 @@ void AuxReceiver::_organize_sensors()
                           << "a bug!" << std::endl;
             }
         }
-        else if(ft_sensor_string == sensor->info.sensor)
+        else if(HuboCan::ft_sensor_string == sensor->info.sensor)
         {
             if(HuboCan::HuboFt* ft = dynamic_cast<HuboCan::HuboFt*>(sensor))
             {
@@ -191,3 +193,5 @@ void AuxReceiver::_register_with_all_fts()
         _fts[i]->auxiliary_command(_cmd);
     }
 }
+
+} // namespace HuboCmd
