@@ -1,27 +1,23 @@
 /*
- * Copyright (c) 2014, Georgia Tech Research Corporation
+ * Copyright (c) 2015-2015, Georgia Tech Research Corporation
  * All rights reserved.
  *
- * Author: Michael X. Grey <mxgrey@gatech.edu>
- * Date: Jan 2014
+ * Author(s): Michael X. Grey <greyxmike@gmail.com>
  *
- * Humanoid Robotics Lab      Georgia Institute of Technology
- * Director: Mike Stilman     http://www.golems.org
+ * Humanoid Robotics Lab
  *
+ * Directed by Prof. Mike Stilman <mstilman@cc.gatech.edu>
  *
  * This file is provided under the following "BSD-style" License:
  *   Redistribution and use in source and binary forms, with or
  *   without modification, are permitted provided that the following
  *   conditions are met:
- *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
- *
  *   * Redistributions in binary form must reproduce the above
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
  *     with the distribution.
- *
  *   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
  *   CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
  *   INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
@@ -37,8 +33,8 @@
  *   POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef HUBORT_C_H
-#define HUBORT_C_H
+#ifndef HUBORT_DAEMONIZER_C_H
+#define HUBORT_DAEMONIZER_C_H
 
 #include <stddef.h>
 
@@ -68,4 +64,4 @@ void hubo_rt_daemon_close(const char* daemon_name, const char *lock_directory);
 
 int hubo_rt_safe_make_directory(const char* directory_name);
 
-#endif // HUBORT_C_H
+#endif // HUBORT_DAEMONIZER_C_H
