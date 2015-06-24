@@ -69,7 +69,7 @@ GetDependencies()
 CopyDevices()
 {
     echo 'Copying device files into /opt/hubo/devices'
-    cp -r ../HuboCan/devices /opt/hubo/
+    cp -r ../devices /opt/hubo/
 }
 
 CopyConfigs()
