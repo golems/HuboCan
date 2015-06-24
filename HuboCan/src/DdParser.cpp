@@ -252,7 +252,9 @@ void DdParser::report_error()
         (*error_output_stream) << "Error! " << _contents[_next_index-1];
     }
     else
+    {
         (*error_output_stream) << "next_index: " << _next_index-1 << ", size: " << _contents.size() << std::endl;
+    }
     
     (*error_output_stream) << error().str() << std::endl;
     error().str("");

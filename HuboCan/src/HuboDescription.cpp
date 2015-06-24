@@ -120,7 +120,7 @@ error_result_t HuboDescription::receiveInfo(double timeout_sec)
     size_t sensor_count = hubo_info_get_sensor_count(_data);
     for(size_t i=0; i < sensor_count; ++i)
     {
-        _constructSensor(*hubo_info_get_sensor_info(_data, i));
+        _constructSensor(*hubo_info_get_sensor_info(_data, i), false);
     }
 
     memcpy(&params, hubo_info_get_params_info(_data), sizeof(params));
@@ -153,7 +153,7 @@ error_result_t HuboDescription::broadcastInfo()
     for(size_t i=0; i < sensors.size(); ++i)
     {
         size_t loc = hubo_info_get_sensor_location(_data, i);
-        memcpy(_data+loc, &(sensors[i]->info), sizeof(hubo_jmc_info_t));
+        memcpy(_data+loc, &(sensors[i]->info), sizeof(hubo_sensor_info_t));
     }
 
     memcpy(hubo_info_get_params_info(_data), &params, sizeof(params));
@@ -219,27 +219,27 @@ bool HuboDescription::parseFile(const std::string& filename)
 
 bool HuboDescription::_parseDevice(const std::string& device_type)
 {
-    if("Joint" == device_type)
+    if(joint_device_string == device_type)
     {
         if(!_parseJoint())
             return false;
     }
-    else if("JMC" == device_type)
+    else if(jmc_device_string == device_type)
     {
         if(!_parseJMC())
             return false;
     }
-    else if("IMU" == device_type)
+    else if(imu_sensor_string == device_type)
     {
         if(!_parseIMU())
             return false;
     }
-    else if("ForceTorque" == device_type)
+    else if(ft_sensor_string == device_type)
     {
         if(!_parseForceTorque())
             return false;
     }
-    else if("meta" == device_type)
+    else if(meta_device_string == device_type)
     {
         if(!_parseMeta())
             return false;
@@ -485,10 +485,12 @@ bool HuboDescription::_parseJMC(bool strict)
     if(_parser.status() == DD_ERROR)
         return false;
 
+    _constructJMC(new_jmc_info, true);
+
     return true;
 }
 
-bool HuboDescription::_constructJMC(const hubo_jmc_info_t& jmc_info)
+bool HuboDescription::_constructJMC(const hubo_jmc_info_t& jmc_info, bool parsed)
 {
     HuboJmc* new_jmc = NULL;
     const std::string type_string(jmc_info.type);
@@ -516,8 +518,15 @@ bool HuboDescription::_constructJMC(const hubo_jmc_info_t& jmc_info)
 
     if( NULL == new_jmc )
     {
-        _parser.error() << "Invalid JMC type: " << jmc_info.type;
-        _parser.report_error();
+        if(parsed)
+        {
+            _parser.error() << "Invalid JMC type: " << jmc_info.type;
+            _parser.report_error();
+        }
+        else
+        {
+            std::cerr << "Received invalid JMC type: " << jmc_info.type << std::endl;
+        }
         return false;
     }
 
@@ -600,13 +609,13 @@ bool HuboDescription::_parseSensor(hubo_sensor_info_t& info, bool strict)
     return true;
 }
 
-bool HuboDescription::_constructSensor(const hubo_sensor_info_t& sensor_info)
+bool HuboDescription::_constructSensor(const hubo_sensor_info_t& sensor_info, bool parsed)
 {
     if(     sensor_info.sensor == imu_sensor_string)
-        return _constructIMU(sensor_info);
+        return _constructIMU(sensor_info, parsed);
 
     else if(sensor_info.sensor == ft_sensor_string)
-        return _constructForceTorque(sensor_info);
+        return _constructForceTorque(sensor_info, parsed);
 
     return false;
 }
@@ -619,10 +628,10 @@ bool HuboDescription::_parseIMU(bool strict)
 
     strcpy(new_imu_info.sensor, imu_sensor_string.c_str());
 
-    return _constructIMU(new_imu_info);
+    return _constructIMU(new_imu_info, true);
 }
 
-bool HuboDescription::_constructIMU(const hubo_sensor_info_t& imu_info)
+bool HuboDescription::_constructIMU(const hubo_sensor_info_t& imu_info, bool parsed)
 {
     HuboImu* new_imu = NULL;
     const std::string type_string(imu_info.type);
@@ -634,11 +643,22 @@ bool HuboDescription::_constructIMU(const hubo_sensor_info_t& imu_info)
     {
         new_imu = new DrcHuboImu(_numImus);
     }
+    else if(type_string == hubo2plus_tilt_sensor_type_string)
+    {
+        new_imu = new Hubo2PlusTilt(_numImus);
+    }
 
     if( NULL == new_imu )
     {
-        _parser.error() << "Invalid IMU type: " << imu_info.type;
-        _parser.report_error();
+        if(parsed)
+        {
+            _parser.error() << "Invalid IMU type: " << imu_info.type;
+            _parser.report_error();
+        }
+        else
+        {
+            std::cerr << "Received invalid IMU type: " << imu_info.type << std::endl;
+        }
         return false;
     }
 
@@ -657,10 +677,10 @@ bool HuboDescription::_parseForceTorque(bool strict)
 
     strcpy(new_ft_info.sensor, ft_sensor_string.c_str());
 
-    return _constructForceTorque(new_ft_info);
+    return _constructForceTorque(new_ft_info, true);
 }
 
-bool HuboDescription::_constructForceTorque(const hubo_sensor_info_t& ft_info)
+bool HuboDescription::_constructForceTorque(const hubo_sensor_info_t& ft_info, bool parsed)
 {
     HuboFt* new_ft = NULL;
     const std::string type_string(ft_info.type);
@@ -675,8 +695,15 @@ bool HuboDescription::_constructForceTorque(const hubo_sensor_info_t& ft_info)
 
     if( NULL == new_ft )
     {
-        _parser.error() << "Invalid FT type: " << ft_info.type;
-        _parser.report_error();
+        if(parsed)
+        {
+            _parser.error() << "Invalid FT type: " << ft_info.type;
+            _parser.report_error();
+        }
+        else
+        {
+            std::cerr << "Received invalid FT type: " << ft_info.type << std::endl;
+        }
         return false;
     }
 
@@ -754,6 +781,15 @@ bool HuboDescription::_postParseProcessing()
         joints.push_back(it->second);
 
         size_t jmc_index = getJmcIndex(joints[i]->info.jmc_name);
+
+        if(InvalidIndex == jmc_index)
+        {
+            std::cerr << "Could not find JMC named '" << joints[i]->info.jmc_name
+                      << "' needed by Joint named '" << joints[i]->info.name << "'.\n"
+                      << " -- Your Hubo Description is invalid!"
+                      << std::endl;
+            return false;
+        }
 
         if(!jmcs[jmc_index]->addJoint(joints[i], report))
         {

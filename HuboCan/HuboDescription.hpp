@@ -7,6 +7,8 @@
 #include "HuboSensor.hpp"
 #include "DdParser.hpp"
 
+const std::string meta_device_string = "meta";
+
 namespace HuboCan {
 
 class HuboDescription
@@ -142,16 +144,16 @@ protected:
     virtual bool _parseJoint(bool strict=true);
 
     virtual bool _parseJMC(bool strict=true);
-    virtual bool _constructJMC(const hubo_jmc_info_t& jmc_info);
+    virtual bool _constructJMC(const hubo_jmc_info_t& jmc_info, bool parsed);
 
     virtual bool _parseSensor(hubo_sensor_info_t& info, bool strict=true);
-    virtual bool _constructSensor(const hubo_sensor_info_t& sensor_info);
+    virtual bool _constructSensor(const hubo_sensor_info_t& sensor_info, bool parsed);
 
     virtual bool _parseIMU(bool strict=true);
-    virtual bool _constructIMU(const hubo_sensor_info_t& imu_info);
+    virtual bool _constructIMU(const hubo_sensor_info_t& imu_info, bool parsed);
 
     virtual bool _parseForceTorque(bool strict=true);
-    virtual bool _constructForceTorque(const hubo_sensor_info_t& ft_info);
+    virtual bool _constructForceTorque(const hubo_sensor_info_t& ft_info, bool parsed);
 
     virtual bool _parseMeta(bool strict=true);
 

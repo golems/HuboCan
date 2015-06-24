@@ -45,7 +45,7 @@ std::ostream& operator<<(std::ostream& stream, const hubo_imu_state_t& imu)
     stream.width(width);
     stream << imu.angular_position[2];
 
-    stream << "Velocities x:";
+    stream << " | Velocities x:";
     stream.width(width);
     stream << imu.angular_velocity[0];
     stream << "  y:";
@@ -73,6 +73,16 @@ std::ostream& operator<<(std::ostream& stream, const hubo_ft_state_t& ft)
     stream << "  z:";
     stream.width(width);
     stream << ft.force[2];
+
+    stream << " | Torques x:";
+    stream.width(width);
+    stream << ft.torque[0];
+    stream << "  y:";
+    stream.width(width);
+    stream << ft.torque[1];
+    stream << "  z:";
+    stream.width(width);
+    stream << ft.torque[2];
 
     return stream;
 }

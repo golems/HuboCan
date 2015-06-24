@@ -328,7 +328,7 @@ public:
 
         if(fs != get_data_size<DataClass>(_raw_data))
         {
-            std::cout << "Framesize mismatch: " << fs << " received, "
+            std::cout << "Framesize mismatch for '" << _channel_name << "': " << fs << " received, "
                       << get_data_size<DataClass>(_raw_data) << " expected!" << std::endl;
         }
 

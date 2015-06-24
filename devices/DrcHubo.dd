@@ -11,7 +11,7 @@ include     DrcHubo/DRC_LeftHand.dd     # Joint range: 19 - 20
 include     DrcHubo/DRC_RightArm.dd     # Joint range: 21 - 26
 include     DrcHubo/DRC_RightHand.dd    # Joint range: 27 - 29
 
-
+include     DrcHubo/DRC_Sensors.dd      # IMU, Tilt, and Force-Torque sensors
 
 # TODO: Decide if the neck should be included
 

@@ -11,3 +11,5 @@ include     Hubo2Plus/H2P_LeftArm.dd        # Joint range: 16 - 21
 include     Hubo2Plus/H2P_RightArm.dd       # Joint range: 22 - 27
 include     Hubo2Plus/H2P_LeftHand.dd       # Joint range: 28 - 32
 include     Hubo2Plus/H2P_RightHand.dd      # Joint range: 33 - 37
+
+include     Hubo2Plus/H2P_Sensors.dd        # IMU, Tilt, and Force-Torque sensors
