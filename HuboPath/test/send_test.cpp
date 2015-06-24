@@ -38,7 +38,7 @@ int main(int, char* [])
         std::cout << "Feedback channel Ach error: " << ach_result_to_string(result) << std::endl;
         return 2;
     }
-    ach_flush(&feedback_chan);
+    report_ach_errors(ach_flush(&feedback_chan), "main", "ach_flush", HUBO_PATH_FEEDBACK_CHANNEL);
 
     HuboCan::error_result_t sent = HuboPath::send_trajectory(output_chan,
                                                              feedback_chan,

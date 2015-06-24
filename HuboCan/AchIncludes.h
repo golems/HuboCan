@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Georgia Tech Research Corporation
+ * Copyright (c) 2014-2015, Georgia Tech Research Corporation
  * All rights reserved.
  *
  * Author: Michael X. Grey <mxgrey@gatech.edu>
@@ -49,5 +49,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <ach.h>
+
+void report_ach_errors(ach_status_t status, const char* functionName,
+                       const char* achOperation, const char* channelName);
 
 #endif // ACHINCLUDES_H

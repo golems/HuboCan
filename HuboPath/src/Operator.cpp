@@ -61,7 +61,8 @@ bool Operator::open_channels()
                   << ach_result_to_string(result) << std::endl;
         _channels_opened = false;
     }
-    ach_flush(&_instruction_chan);
+    report_ach_errors(ach_flush(&_instruction_chan), "Operator::open_channels",
+                      "ach_flush", HUBO_PATH_INSTRUCTION_CHANNEL);
 
     result = ach_open(&_output_chan, HUBO_PATH_INPUT_CHANNEL, NULL);
     if( ACH_OK != result )
@@ -70,7 +71,8 @@ bool Operator::open_channels()
                   << ach_result_to_string(result) << std::endl;
         _channels_opened = false;
     }
-    ach_flush(&_output_chan);
+    report_ach_errors(ach_flush(&_output_chan), "Operator::open_channels",
+                      "ach_flush", HUBO_PATH_INPUT_CHANNEL);
 
     result = ach_open(&_feedback_chan, HUBO_PATH_FEEDBACK_CHANNEL, NULL);
     if( ACH_OK != result )
@@ -79,7 +81,8 @@ bool Operator::open_channels()
                   << ach_result_to_string(result) << std::endl;
         _channels_opened = false;
     }
-    ach_flush(&_feedback_chan);
+    report_ach_errors(ach_flush(&_feedback_chan), "Operator::open_channels",
+                      "ach_flush", HUBO_PATH_FEEDBACK_CHANNEL);
 
     result = ach_open(&_state_chan, HUBO_PATH_PLAYER_STATE_CHANNEL, NULL);
     if( ACH_OK != result )
@@ -88,7 +91,8 @@ bool Operator::open_channels()
                   << ach_result_to_string(result) << std::endl;
         _channels_opened = false;
     }
-    ach_flush(&_state_chan);
+    report_ach_errors(ach_flush(&_state_chan), "Operator::open_channels",
+                      "ach_flush", HUBO_PATH_PLAYER_STATE_CHANNEL);
 
     return _channels_opened;
 }
@@ -283,7 +287,8 @@ void Operator::clearWaypoints()
 void Operator::_update_state()
 {
     size_t fs;
-    ach_get(&_state_chan, &_state, sizeof(_state), &fs, NULL, ACH_O_LAST);
+    report_ach_errors(ach_get(&_state_chan, &_state, sizeof(_state), &fs, NULL, ACH_O_LAST),
+                      "Operator::_update_state", "ach_get", HUBO_PATH_PLAYER_STATE_CHANNEL);
 }
 
 const hubo_player_state_t& Operator::getPlayerState()
@@ -405,7 +410,8 @@ HuboCan::error_result_t Operator::sendNewTrajectory(const Trajectory &premade_tr
         return HuboCan::INDEX_OUT_OF_BOUNDS;
     }
 
-    ach_flush(&_feedback_chan);
+    report_ach_errors(ach_flush(&_feedback_chan), "Operator::sendNewTrajectory",
+                      "ach_flush", HUBO_PATH_FEEDBACK_CHANNEL);
     sendInstruction(instruction);
 
     return send_trajectory(_output_chan, _feedback_chan, premade_trajectory, timeout_sec);

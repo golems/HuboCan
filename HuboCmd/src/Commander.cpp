@@ -48,7 +48,8 @@ bool Commander::open_channels()
                 ach_result_to_string(result), (int)result);
         _channels_opened = false;
     }
-    ach_flush(&_cmd_chan);
+    report_ach_errors(ach_flush(&_cmd_chan), "Commander::open_channels",
+                      "ach_flush", HUBO_CMD_CHANNEL);
 
     return _channels_opened;
 }
@@ -85,7 +86,8 @@ Commander::~Commander()
     release_joints();
     send_commands();
 
-    ach_close(&_cmd_chan);
+    report_ach_errors(ach_close(&_cmd_chan), "Commander::~Commander",
+                      "ach_close", HUBO_CMD_CHANNEL);
     free(cmd_data);
     free(_compressed_data);
 }

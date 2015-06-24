@@ -33,7 +33,8 @@ bool AuxReceiver::open_channels()
     }
     else
     {
-        ach_flush(&_aux_cmd_chan);
+        report_ach_errors(ach_flush(&_aux_cmd_chan), "AuxReceiver::open_channels",
+                          "ach_flush", HUBO_AUX_CMD_CHANNEL);
     }
 
     return _channels_opened;

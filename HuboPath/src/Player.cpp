@@ -65,7 +65,8 @@ bool Player::open_channels()
                   << ach_result_to_string(result) << std::endl;
         _channels_opened = false;
     }
-    ach_flush(&_instruction_chan);
+    report_ach_errors(ach_flush(&_instruction_chan), "Player::open_channels",
+                      "ach_flush", HUBO_PATH_INSTRUCTION_CHANNEL);
 
     result = ach_open(&_input_chan, HUBO_PATH_INPUT_CHANNEL, NULL);
     if( ACH_OK != result )
@@ -74,7 +75,8 @@ bool Player::open_channels()
                   << ach_result_to_string(result) << std::endl;
         _channels_opened = false;
     }
-    ach_flush(&_input_chan);
+    report_ach_errors(ach_flush(&_input_chan), "Player::open_channels",
+                      "ach_flush", HUBO_PATH_INPUT_CHANNEL);
 
     result = ach_open(&_feedback_chan, HUBO_PATH_FEEDBACK_CHANNEL, NULL);
     if( ACH_OK != result )
@@ -83,7 +85,8 @@ bool Player::open_channels()
                   << ach_result_to_string(result) << std::endl;
         _channels_opened = false;
     }
-    ach_flush(&_feedback_chan);
+    report_ach_errors(ach_flush(&_feedback_chan), "Player::open_channels",
+                      "ach_flush", HUBO_PATH_FEEDBACK_CHANNEL);
 
     result = ach_open(&_state_chan, HUBO_PATH_PLAYER_STATE_CHANNEL, NULL);
     if( ACH_OK != result )
@@ -92,7 +95,8 @@ bool Player::open_channels()
                   << ach_result_to_string(result) << std::endl;
         _channels_opened = false;
     }
-    ach_flush(&_state_chan);
+    report_ach_errors(ach_flush(&_state_chan), "Player::open_channels",
+                      "ach_flush", HUBO_PATH_PLAYER_STATE_CHANNEL);
 
     _channels_opened = _channels_opened && HuboCmd::Commander::open_channels();
 
@@ -131,7 +135,8 @@ void Player::_check_for_instructions()
 
 bool Player::_receive_incoming_trajectory()
 {
-    ach_flush(&_input_chan);
+    report_ach_errors(ach_flush(&_input_chan), "Player::_receive_incoming_trajectory",
+                      "ach_flush", HUBO_PATH_INPUT_CHANNEL);
     HuboCan::error_result_t result = receive_trajectory(_input_chan, _feedback_chan,
                                                         _trajectory, 10);
     if(result != HuboCan::OKAY)

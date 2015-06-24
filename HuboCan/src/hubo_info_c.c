@@ -110,7 +110,8 @@ hubo_info_data* hubo_info_receive_data(double timeout)
     r = ach_get(&meta_channel, &meta_info, sizeof(hubo_meta_info_t),
                 &fs, &wait_time, ACH_O_LAST | ACH_O_WAIT);
 
-    ach_close(&meta_channel);
+    report_ach_errors(ach_close(&meta_channel), "hubo_info_receive_data",
+                      "ach_close", HUBO_INFO_META_CHANNEL);
 
     if( ACH_TIMEOUT == r )
     {
@@ -156,7 +157,8 @@ hubo_info_data* hubo_info_receive_data(double timeout)
     r = ach_get(&info_channel, data, info_data_size,
                 &fs, &wait_time, ACH_O_LAST | ACH_O_WAIT);
 
-    ach_close(&info_channel);
+    report_ach_errors(ach_close(&info_channel), "hubo_info_receive_data",
+                      "ach_close", HUBO_INFO_DATA_CHANNEL);
 
     if( ACH_TIMEOUT == r )
     {
@@ -208,7 +210,8 @@ int hubo_info_send_data(const hubo_info_data *data)
 
     ach_put(&meta_channel, meta_info, sizeof(hubo_meta_info_t));
 
-    ach_close(&meta_channel);
+    report_ach_errors(ach_close(&meta_channel), "hubo_info_send_data",
+                      "ach_close", HUBO_INFO_META_CHANNEL);
 
     ach_channel_t info_channel;
     r = ach_open(&info_channel, HUBO_INFO_DATA_CHANNEL, NULL);
@@ -224,7 +227,8 @@ int hubo_info_send_data(const hubo_info_data *data)
 
     ach_put(&info_channel, data, meta_info->data_size);
 
-    ach_close(&info_channel);
+    report_ach_errors(ach_close(&info_channel), "hubo_info_send_data",
+                      "ach_close", HUBO_INFO_DATA_CHANNEL);
 
     return 0;
 }

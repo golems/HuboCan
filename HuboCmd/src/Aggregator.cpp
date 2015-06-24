@@ -60,20 +60,27 @@ bool Aggregator::open_channels()
                 ach_result_to_string(result), (int)result);
         _channels_opened = false;
 
-        ach_close(&_cmd_chan);
+        report_ach_errors(ach_close(&_cmd_chan), "Aggregator::open_channels",
+                          "ach_close", HUBO_CMD_CHANNEL);
         return false;
     }
 
-    ach_flush(&_cmd_chan);
-    ach_flush(&_agg_chan);
+    report_ach_errors(ach_flush(&_cmd_chan), "Aggregator::open_channels",
+                      "ach_flush", HUBO_CMD_CHANNEL);
+
+    report_ach_errors(ach_flush(&_agg_chan), "Aggregator::open_channels",
+                      "ach_flush", HUBO_AGG_CHANNEL);
 
     return true;
 }
 
 void Aggregator::close_channels()
 {
-    ach_close(&_cmd_chan);
-    ach_close(&_agg_chan);
+    report_ach_errors(ach_close(&_cmd_chan), "Aggregator::close_channels",
+                      "ach_close", HUBO_CMD_CHANNEL);
+
+    report_ach_errors(ach_close(&_agg_chan), "Aggregator::close_channels",
+                      "ach_close", HUBO_AGG_CHANNEL);
 }
 
 void Aggregator::_create_memory()

@@ -22,7 +22,8 @@ bool ManagerReq::initialize()
         _initialized = false;
         return false;
     }
-    ach_flush(&_req_chan);
+    report_ach_errors(ach_flush(&_req_chan), "ManagerReq::initialize",
+                      "ach_flush", hubo_rt_mgr_req_chan);
     
     r = ach_open(&_reply_chan, hubo_rt_mgr_reply_chan, NULL);
     if( ACH_OK != r )
@@ -32,7 +33,8 @@ bool ManagerReq::initialize()
         _initialized = false;
         return false;
     }
-    ach_flush(&_reply_chan);
+    report_ach_errors(ach_flush(&_reply_chan), "ManagerReq::initialize",
+                      "ach_flush", hubo_rt_mgr_reply_chan);
     
     _initialized = true;
     return true;
@@ -193,7 +195,8 @@ manager_err_t ManagerReq::_send_request(manager_cmd_t cmd, const std::string &de
 
 manager_err_t ManagerReq::_send_request(manager_cmd_t cmd, StringArray &reply, const std::string &desc)
 {
-    ach_flush(&_reply_chan);
+    report_ach_errors(ach_flush(&_reply_chan), "ManagerReq::_send_request",
+                      "ach_flush", hubo_rt_mgr_reply_chan);
     reply.clear();
     
     manager_req_t request;
