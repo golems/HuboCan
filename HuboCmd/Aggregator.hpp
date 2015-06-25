@@ -59,7 +59,7 @@ class Aggregator
 {
 public:
 
-    Aggregator(const HuboCan::HuboDescription& description);
+    Aggregator(HuboCan::HuboDescription& description);
     ~Aggregator();
 
     void load_description(const HuboCan::HuboDescription& desc);

@@ -48,9 +48,13 @@ HuboSensor::HuboSensor()
     memset(&_frame, 0, sizeof(_frame));
 }
 
-void HuboSensor::assign_pointers(HuboCmd::Aggregator* agg, HuboState::State* state)
+void HuboSensor::assignAggregator(HuboCmd::Aggregator* agg)
 {
     _agg = agg;
+}
+
+void HuboSensor::assignState(HuboState::State* state)
+{
     _state = state;
 }
 

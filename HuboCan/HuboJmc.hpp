@@ -65,7 +65,9 @@ public:
 
     HuboJmc();
     
-    void assign_pointers(HuboCmd::Aggregator* agg, HuboState::State* state);
+    void assignAggregator(HuboCmd::Aggregator* agg);
+
+    void assignState(HuboState::State* state);
 
     hubo_jmc_info_t info;
     HuboJointPtrArray joints;

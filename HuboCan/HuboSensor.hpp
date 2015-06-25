@@ -62,7 +62,9 @@ public:
 
     HuboSensor();
 
-    void assign_pointers(HuboCmd::Aggregator* agg, HuboState::State* state);
+    void assignAggregator(HuboCmd::Aggregator* agg);
+
+    void assignState(HuboState::State* state);
 
     hubo_sensor_info_t info;
 

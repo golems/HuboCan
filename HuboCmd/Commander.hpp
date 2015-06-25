@@ -47,7 +47,7 @@ class Commander : public HuboState::State
 public:
 
     Commander(double timeout=1);
-    Commander(const HuboCan::HuboDescription& description);
+    Commander(HuboCan::HuboDescription& description);
     virtual ~Commander();
 
     HuboCan::error_result_t set_mode(size_t joint_index, hubo_cmd_mode_t mode);

@@ -45,10 +45,11 @@ using namespace HuboCan;
 
 namespace HuboCmd {
 
-Aggregator::Aggregator(const HuboDescription& description)
+Aggregator::Aggregator(HuboDescription& description)
 {
     _initialize();
     load_description(description);
+    description.assignAggregator(this);
 }
 
 Aggregator::~Aggregator()

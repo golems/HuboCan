@@ -49,7 +49,7 @@ class Operator : public HuboState::State
 public:
     
     Operator(double timeout=1);
-    Operator(const HuboCan::HuboDescription& description);
+    Operator(HuboCan::HuboDescription& description);
 
     virtual bool open_channels();
 

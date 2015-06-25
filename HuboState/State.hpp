@@ -80,7 +80,7 @@ public:
      * to grab the HuboDescription which has been broadcasted. This constructor is for use in
      * special cases where you do not want to use the broadcasted description for some reason.
      */
-    State(const HuboCan::HuboDescription& description);
+    State(HuboCan::HuboDescription& description);
     virtual ~State();
 
     /*!

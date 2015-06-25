@@ -45,7 +45,7 @@ Player::Player(double timeout) :
     _initialize_player();
 }
 
-Player::Player(const HuboCan::HuboDescription &description) :
+Player::Player(HuboCan::HuboDescription& description) :
     HuboCmd::Commander(description)
 {
     _initialize_player();

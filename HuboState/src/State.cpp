@@ -48,10 +48,11 @@ State::State(double timeout)
     receive_description(timeout);
 }
 
-State::State(const HuboCan::HuboDescription &description)
+State::State(HuboCan::HuboDescription& description)
 {
     _initialize();
     load_description(description);
+    description.assignState(this);
 }
 
 State::~State()

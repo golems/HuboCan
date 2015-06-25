@@ -45,7 +45,7 @@ class Player : public HuboCmd::Commander
 {
 public:
     Player(double timeout=5);
-    Player(const HuboCan::HuboDescription& description);
+    Player(HuboCan::HuboDescription& description);
 
     virtual bool receive_description(double timeout_sec);
     virtual void load_description(const HuboCan::HuboDescription& description);

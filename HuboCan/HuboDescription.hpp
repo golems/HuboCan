@@ -166,6 +166,10 @@ public:
 
     inline bool okay() const { return _okay; }
 
+    void assignAggregator(HuboCmd::Aggregator* agg);
+
+    void assignState(HuboState::State* state);
+
 protected:
 
     bool _okay;

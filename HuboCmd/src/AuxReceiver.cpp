@@ -169,7 +169,6 @@ void AuxReceiver::_register_command()
 
         case INIT_ALL_SENSORS:
 
-            std::cout << "received INIT_ALL_SENSORS command!" << std::endl;
             _register_with_all_sensors();
             break;
 

@@ -255,6 +255,24 @@ bool HuboDescription::parseFile(const std::string& filename)
     return _postParseProcessing();
 }
 
+void HuboDescription::assignAggregator(HuboCmd::Aggregator* agg)
+{
+    for(size_t i=0; i<jmcs.size(); ++i)
+        jmcs[i]->assignAggregator(agg);
+
+    for(size_t i=0; i<sensors.size(); ++i)
+        sensors[i]->assignAggregator(agg);
+}
+
+void HuboDescription::assignState(HuboState::State* state)
+{
+    for(size_t i=0; i<jmcs.size(); ++i)
+        jmcs[i]->assignState(state);
+
+    for(size_t i=0; i<sensors.size(); ++i)
+        sensors[i]->assignState(state);
+}
+
 bool HuboDescription::_parseDevice(const std::string& device_type)
 {
     if(joint_device_string == device_type)

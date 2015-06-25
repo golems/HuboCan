@@ -76,11 +76,6 @@ int main(int argc, char* argv[])
 
     std::cout << state.joints << "\n\n" << std::endl;
 
-    for(size_t i=0; i<desc.jmcs.size(); ++i)
-    {
-        desc.jmcs[i]->assign_pointers(&agg, &state);
-    }
-
     if(!state.initialized())
     {
         std::cout << "State was not initialized correctly, so we are quitting.\n"

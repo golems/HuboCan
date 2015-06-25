@@ -43,7 +43,7 @@ Operator::Operator(double timeout) :
     _initialize_operator();
 }
 
-Operator::Operator(const HuboCan::HuboDescription &description) :
+Operator::Operator(HuboCan::HuboDescription& description) :
     HuboState::State(description)
 {
     _initialize_operator();

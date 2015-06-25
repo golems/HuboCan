@@ -46,9 +46,13 @@ HuboJmc::HuboJmc()
     memset(&_frame, 0, sizeof(_frame));
 }
 
-void HuboJmc::assign_pointers(HuboCmd::Aggregator* agg, HuboState::State* state)
+void HuboJmc::assignAggregator(HuboCmd::Aggregator* agg)
 {
     _agg = agg;
+}
+
+void HuboJmc::assignState(HuboState::State* state)
+{
     _state = state;
 }
 

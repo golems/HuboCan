@@ -49,7 +49,7 @@ Commander::Commander(double timeout) :
     _create_memory();
 }
 
-Commander::Commander(const HuboCan::HuboDescription& description) :
+Commander::Commander(HuboCan::HuboDescription& description) :
     HuboState::State(description)
 {
     _initialize();
