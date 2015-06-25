@@ -219,7 +219,7 @@ HuboState::State* JointGridWidget::getStatePtr() const
     return _sptr;
 }
 
-void JointGridWidget::setStatePtr(HuboState::State *new_state_ptr)
+void JointGridWidget::setStatePtr(HuboState::State* new_state_ptr)
 {
     _sptr = new_state_ptr;
 

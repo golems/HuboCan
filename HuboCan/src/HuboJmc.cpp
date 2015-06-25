@@ -56,7 +56,7 @@ void HuboJmc::assignState(HuboState::State* state)
     _state = state;
 }
 
-bool HuboJmc::addJoint(HuboJoint *joint, std::string &error_report)
+bool HuboJmc::addJoint(HuboJoint* joint, std::string &error_report)
 {
     joints.clear();
 
