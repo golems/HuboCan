@@ -128,5 +128,5 @@ int main(int argc, char* argv[])
         agg.update();
     }
 
-    return 0;
+    std::cout << "Shutting down Socket CAN Pump" << std::endl;
 }

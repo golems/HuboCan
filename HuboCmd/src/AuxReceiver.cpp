@@ -105,17 +105,7 @@ bool AuxReceiver::update()
                 continue;
             }
 
-            if(_cmd.device_id < _desc->getJmcCount())
-            {
-                _register_command();
-            }
-            else
-            {
-                std::cout << "Requested an auxiliary command on an out-of-bounds JMC: "
-                          << _cmd.device_id << " (max JMC index is " << _desc->getJmcCount()-1
-                          << ")" << std::endl;
-                continue;
-            }
+            _register_command();
         }
     }
 
@@ -177,6 +167,7 @@ void AuxReceiver::_register_command()
 
         case INIT_ALL_SENSORS:
 
+            std::cout << "received INIT_ALL_SENSORS command!" << std::endl;
             _register_with_all_sensors();
             break;
 
@@ -205,11 +196,55 @@ void AuxReceiver::_register_with_all_jmcs()
     }
 }
 
+void AuxReceiver::_register_with_jmc(size_t index)
+{
+    if(index < _desc->jmcs.size())
+    {
+        _desc->jmcs[index]->auxiliary_command(_cmd);
+    }
+    else
+    {
+        if(_desc->getJmcCount() > 0)
+        {
+            std::cerr << "Requested an auxiliary command on an out-of-bounds JMC: "
+                      << _cmd.device_id << " (max JMC index is " << _desc->getJmcCount()-1
+                      << ")" << std::endl;
+        }
+        else
+        {
+            std::cerr << "Requested an auxiliary command on a JMC (" << _cmd.device_id
+                      << "), but there are not any JMCs available!" << std::endl;
+        }
+    }
+}
+
 void AuxReceiver::_register_with_all_sensors()
 {
     for(size_t i=0; i<_desc->sensors.size(); ++i)
     {
         _desc->sensors[i]->auxiliary_command(_cmd);
+    }
+}
+
+void AuxReceiver::_register_with_sensor(size_t index)
+{
+    if(index < _desc->sensors.size())
+    {
+        _desc->sensors[index]->auxiliary_command(_cmd);
+    }
+    else
+    {
+        if(_desc->sensors.size() > 0)
+        {
+            std::cerr << "Requested an auxiliary command on an out-of-bounds Sensor: "
+                      << _cmd.device_id << " (max Sensor index is " << _desc->sensors.size() - 1
+                      << ")" << std::endl;
+        }
+        else
+        {
+            std::cerr << "Requested an auxiliary command on a Sensor (" << _cmd.device_id
+                      << "), but there are not any Sensors available!" << std::endl;
+        }
     }
 }
 

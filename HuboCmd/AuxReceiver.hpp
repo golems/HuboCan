@@ -65,7 +65,11 @@ protected:
 
     void _register_with_all_jmcs();
 
+    void _register_with_jmc(size_t index);
+
     void _register_with_all_sensors();
+
+    void _register_with_sensor(size_t index);
 
     void _register_with_all_imus();
 
