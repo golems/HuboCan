@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
     }
 
     HuboRT::Daemonizer rt;
-    if(terminal)
+    if(!terminal)
     {
         if(!rt.begin("socketcan_interface", 49))
         {
