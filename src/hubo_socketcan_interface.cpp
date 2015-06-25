@@ -124,6 +124,11 @@ int main(int argc, char* argv[])
         desc.jmcs[i]->assign_pointers(&agg, &state);
     }
 
+    for(size_t i=0; i<desc.sensors.size(); ++i)
+    {
+        desc.sensors[i]->assign_pointers(&agg, &state);
+    }
+
     if(!state.initialized())
     {
         std::cout << "State was not initialized correctly, so we are quitting.\n"

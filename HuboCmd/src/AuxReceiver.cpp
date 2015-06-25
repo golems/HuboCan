@@ -45,7 +45,9 @@ AuxReceiver::AuxReceiver(HuboCan::HuboDescription* description)
 {
     _desc = description;
     _channels_opened = false;
+    std::cout << "[AuxReceiver] Opening channels" << std::endl;
     open_channels();
+    std::cout << "[AuxReceiver] Organizing sensors" << std::endl;
     _organize_sensors();
 }
 
