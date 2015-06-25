@@ -62,7 +62,7 @@ public:
     virtual bool parseFile(const std::string& filename);
 
     /*!
-     * \fn receiveInfo(double timeout=2)
+     * \fn receiveInfo(double timeout)
      * \brief Attempts to receive the published information about what kind of Hubo is running
      * \param timeout
      * \return

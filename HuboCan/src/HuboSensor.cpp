@@ -93,7 +93,7 @@ bool Hubo2PlusImu::decode(const can_frame_t& frame, size_t channel)
     if( channel != info.can_channel )
         return false;
 
-    if( static_cast<int>(frame.can_id) == info.hardware_index - IMU_REPLY )
+    if( info.hardware_index + IMU_REPLY == static_cast<int>(frame.can_id) )
     {
         hubo_imu_state_t& data = _state->imus[_index];
 
@@ -186,7 +186,7 @@ bool Hubo2PlusTilt::decode(const can_frame_t& frame, size_t channel)
     if( channel != info.can_channel )
         return false;
 
-    if( static_cast<int>(frame.can_id) == info.hardware_index - IMU_REPLY )
+    if( info.hardware_index + IMU_REPLY == static_cast<int>(frame.can_id) )
     {
         hubo_imu_state_t& state = _state->imus[_index];
 
@@ -335,7 +335,7 @@ bool Hubo2PlusFt::decode(const can_frame_t& frame, size_t channel)
     if( channel != info.can_channel )
         return false;
 
-    if( static_cast<int>(frame.can_id) == info.hardware_index - FT_REPLY )
+    if( info.hardware_index + FT_REPLY == static_cast<int>(frame.can_id) )
     {
         hubo_ft_state_t& state = _state->force_torques[_index];
 
@@ -346,6 +346,8 @@ bool Hubo2PlusFt::decode(const can_frame_t& frame, size_t channel)
         state.force[0] = 0.0;
         state.force[0] = 0.0;
         state.force[2] = doubleFromBytePair(frame.data[5], frame.data[4])/10.0;
+
+        return true;
     }
 
     return false;

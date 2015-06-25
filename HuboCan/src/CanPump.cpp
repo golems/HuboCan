@@ -265,6 +265,8 @@ void CanPump::_decode_frame(const can_frame_t& frame, size_t channel)
     for(size_t i=0; i<_devices.size(); ++i)
     {
         decoded |= _devices[i]->decode(frame, channel);
+        if(decoded)
+            break;
     }
     --_channels[channel].reply_expectation;
 
