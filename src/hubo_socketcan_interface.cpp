@@ -43,10 +43,23 @@ using namespace HuboCan;
 
 int main(int argc, char* argv[])
 {
-    HuboRT::Daemonizer rt;
-    if(!rt.begin("socketcan_interface", 49))
+    bool terminal = false;
+    for(int i=1; i<argc; ++i)
     {
-        return 1;
+        if(strcmp(argv[i], "terminal") == 0)
+        {
+            std::cout << "terminal flag noticed -- will run in terminal mode" << std::endl;
+            terminal = true;
+        }
+    }
+
+    HuboRT::Daemonizer rt;
+    if(terminal)
+    {
+        if(!rt.begin("socketcan_interface", 49))
+        {
+            return 1;
+        }
     }
 
     bool virtual_can = false;
@@ -121,6 +134,7 @@ int main(int argc, char* argv[])
 
     agg.run();
 
+    std::cout << "Beginning control loop" << std::endl;
     while(can.pump() && rt.good())
     {
         state.publish();

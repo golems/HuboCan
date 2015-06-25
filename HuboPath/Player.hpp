@@ -44,7 +44,7 @@ namespace HuboPath {
 class Player : public HuboCmd::Commander
 {
 public:
-    Player(double timeout=1);
+    Player(double timeout=5);
     Player(const HuboCan::HuboDescription& description);
 
     virtual bool receive_description(double timeout_sec);
