@@ -77,7 +77,7 @@ typedef enum hubo_path_interp {
                             coming to a stop at each waypoint                               */
     HUBO_PATH_OPTIMAL,  /*! Minimize the time spent travelling along the path, but without
                             violating the joints' nominal speed and acceleration settings   */
-    HUBO_PATH_DENSIFY,  /*! Add points based on input frequency                             */
+    HUBO_PATH_DENSIFY,  /*! NOT YET IMPLEMENTED. Add points based on input frequency        */
     HUBO_PATH_RAW       /*! Use the waypoints exactly as they are given                     */
     
 } hubo_path_interp_t;

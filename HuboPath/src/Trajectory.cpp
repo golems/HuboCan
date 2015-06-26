@@ -359,6 +359,6 @@ bool HuboPath::Trajectory::_spline_interpolation(const Eigen::VectorXd& velociti
 
 bool HuboPath::Trajectory::_densify()
 {
-    // TODO
+    // FIXME TODO
     return false;
 }
