@@ -151,6 +151,7 @@ protected:
 
     virtual void _send_reference_commands();
     virtual bool _decode_encoder_reading(const can_frame_t& frame);
+    virtual bool _decode_status_reading(const can_frame_t& frame);
 
 };
 
@@ -188,6 +189,7 @@ protected:
     void _send_reference_commands();
 
     bool _decode_encoder_reading(const can_frame_t& frame);
+    bool _decode_status_reading(const can_frame_t& frame);
 
 };
 

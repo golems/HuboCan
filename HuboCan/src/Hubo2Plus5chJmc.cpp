@@ -97,7 +97,7 @@ bool Hubo2Plus5chJmc::_decode_encoder_reading(const can_frame_t &frame)
     return true;
 }
 
-bool Hubo2Plus5chJmc::_decode_status_reading(const can_frame_t &frame)
+bool Hubo2Plus5chJmc::_decode_status_reading(const can_frame_t& frame)
 {
     for(size_t i=0; i<joints.size(); ++i)
     {

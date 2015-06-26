@@ -71,4 +71,26 @@ bool DrcHubo3chJmc::_decode_encoder_reading(const can_frame_t& frame)
     return true;
 }
 
+bool DrcHubo3chJmc::_decode_status_reading(const can_frame_t& frame)
+{
+    for(size_t i=0; i<joints.size(); ++i)
+    {
+        size_t jnt = joints[i]->info.software_index;
+        hubo_joint_status_t& status = _state->joints[jnt].status;
+
+        uint8_t byte = frame.data[i];
+        status.driver_on    = (byte >> 0) & 0x01;
+        status.control_on   = (byte >> 1) & 0x01;
+        status.control_mode = (byte >> 2) & 0x01;
+        status.limit_switch = (byte >> 3) & 0x01;
+
+        status.error.jam            = (byte >> 4) & 0x01;
+        status.error.pwm_saturated  = (byte >> 5) & 0x01;
+        status.error.big            = (byte >> 6) & 0x01;
+        status.error.encoder        = (byte >> 7) & 0x01;
+    }
+
+    return true;
+}
+
 } // namespace HuboCan
