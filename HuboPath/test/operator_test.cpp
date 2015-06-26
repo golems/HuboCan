@@ -84,19 +84,6 @@ int main(int argc, char* argv[])
     }
     else if(test_number == 3)
     {
-//        mapping.clear();
-//        mapping.push_back("RWY");
-//        op.setJointIndices(mapping);
-//        vec.resize(1);
-
-//        vec[0] = 45*M_PI/180.0;
-//        op.addWaypoint(vec);
-
-//        vec[0] = 0;
-//        op.addWaypoint(vec);
-    }
-    else if(test_number == 4)
-    {
         vec << 0, 0, 0, 0, 0, 0;
         op.addWaypoint(vec);
         vec << -0.0503237, -0.0178896, 0.0301651, -0.0681551, 0, 0; 
@@ -124,7 +111,7 @@ int main(int argc, char* argv[])
         vec << -0.603884, -0.214675, 0.361981, -0.817861, 0, 0; 
         op.addWaypoint(vec);
     }
-    else if(test_number == 5)
+    else if(test_number == 4)
     {
         vec << 0, 0, 0, 0, 0, 0; 
         vec << -0.0355226, -0.0461691, -0.0185826, -0.0743613, 0, 0; 
@@ -162,7 +149,7 @@ int main(int argc, char* argv[])
         vec << -0.603884, -0.784875, -0.315905, -1.26414, 0, 0; 
         op.addWaypoint(vec);
     }
-    else if(test_number == 6)
+    else if(test_number == 5)
     {
         vec << -0.603884, -0.784875, -0.315905, -1.26414, 0, 0 ;
         op.addWaypoint(vec);
@@ -212,27 +199,5 @@ int main(int argc, char* argv[])
     
     traj.check_limits();
     
-    
-    
-//    for(size_t i=0; i<traj.size(); ++i)
-//    {
-//        bool hit_first = false;
-//        for(size_t j=0; j<HUBO_PATH_JOINT_MAX_SIZE; ++j)
-//        {
-//            if( ((traj.params.bitmap>>j) & 0x01) == 1 )
-//            {
-//                if(hit_first)
-//                    std::cout << ", ";
-//                else
-//                    hit_first = true;
-                
-//                std::cout << traj.elements[i].references[j];
-//            }
-//        }
-//        std::cout << ";" << std::endl;
-//    }
-    
-//    op.sendNewTrajectory();
-
-    return 0;
+    op.sendNewTrajectory();
 }
