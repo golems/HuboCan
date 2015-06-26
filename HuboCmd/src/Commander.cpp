@@ -437,11 +437,11 @@ IndexArray Commander::get_indices(const StringArray& joint_names)
     return _desc.getJointIndices(joint_names);
 }
 
-HuboCan::error_result_t Commander::update(double timeout_sec)
+HuboCan::error_result_t Commander::update(double timeout_sec, bool report_sync)
 {
     _has_been_updated = true;
 
-    return HuboState::State::update(timeout_sec);
+    return HuboState::State::update(timeout_sec, report_sync);
 }
 
 HuboCan::error_result_t Commander::send_commands()

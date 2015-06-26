@@ -257,16 +257,16 @@ public:
         {
             if(index == (size_t)(-1))
             {
-                std::cout << "You have requested an InvalidIndex for channel '"
-                          << _channel_name << "'.\n"
-                          << "(Data Count: " << get_data_component_count(_raw_data)
-                          << ")" << std::endl;
+                std::cout << "[HuboData::oeprator[]] You have requested an InvalidIndex for "
+                          << "channel '" << _channel_name << "'.\n" << "(Data Count: "
+                          << get_data_component_count(_raw_data) << ")" << std::endl;
             }
             else
             {
-                std::cout << "You have requested an out of bounds data member for channel '"
-                         << _channel_name << "'.\n Requested: " << index
-                         << ", Data Count: " << get_data_component_count(_raw_data) << std::endl;
+                std::cout << "[HuboData::operator[]] You have requested an out of bounds "
+                          << "data member for channel '" << _channel_name << "'.\n Requested: "
+                          << index << ", Data Count: " << get_data_component_count(_raw_data)
+                          << std::endl;
             }
         }
 
@@ -283,8 +283,9 @@ public:
         StringMap::iterator it = _mapping.find(name);
         if(it == _mapping.end())
         {
-            std::cout << "You have requested a data member which does not exist for channel '"
-                         << "', Requested: '" << name << "'" << std::endl;
+            std::cout << "[HuboData::operator[]] You have requested a data member which does "
+                      << "not exist for channel '" << _channel_name
+                      << "', Requested: '" << name << "'" << std::endl;
             return _dummy_member;
         }
 
@@ -312,9 +313,10 @@ public:
             }
             else
             {
-                std::cout << "You have a repeated data member name ('" << names[i] << "')\n"
-                            << " -- Already exists as entry #" << it->second << "\n"
-                            << " -- Attempted to assign it to entry #" << i << std::endl;
+                std::cout << "[HuboData::initialize] You have a repeated data member name ('"
+                          << names[i] << "')\n"
+                          << " -- Already exists as entry #" << it->second << "\n"
+                          << " -- Attempted to assign it to entry #" << i << std::endl;
                 _mapping.clear();
                 return false;
             }
@@ -331,7 +333,7 @@ public:
 
         _initialized = false;
 
-        std::cout << "Failed to open channel '" << _channel_name << "': "
+        std::cout << "[HuboData::initialize] Failed to open channel '" << _channel_name << "': "
                      << ach_result_to_string(r) << std::endl;
 
         return false;
@@ -342,10 +344,10 @@ public:
         if(!_check_initialized("receive_data"))
             return HuboCan::ACH_ERROR;
 
-        size_t fs;
+        size_t fs = 0;
         struct timespec wait_time;
         clock_gettime( ACH_DEFAULT_CLOCK, &wait_time );
-        int nano_wait = wait_time.tv_nsec + (int)(timeout_seconds*1E9);
+        long long nano_wait = wait_time.tv_nsec + (long long)(timeout_seconds*1E9);
         wait_time.tv_sec += (int)(nano_wait/1E9);
         wait_time.tv_nsec = (int)(nano_wait%((int)1E9));
         ach_status_t r = ach_get(&_channel, _raw_data,
@@ -356,30 +358,33 @@ public:
         {
             if(verbose)
             {
-                std::cout << "Ach channel '" << _channel_name << "' timed out!" << std::endl;
+                std::cout << "[HuboData::receive_data] Ach channel '" << _channel_name
+                          << "' timed out!" << std::endl;
             }
             return HuboCan::TIMEOUT;
         }
 
         if(fs != get_data_size<DataClass>(_raw_data))
         {
-            std::cout << "Framesize mismatch for '" << _channel_name << "': " << fs << " received, "
-                      << get_data_size<DataClass>(_raw_data) << " expected!" << std::endl;
+            std::cout << "[HuboData::receive_data] Framesize mismatch for '" << _channel_name
+                      << "': " << fs << " received, " << get_data_size<DataClass>(_raw_data)
+                      << " expected!" << std::endl;
         }
 
         if( ACH_OK == r || ACH_STALE_FRAMES == r || ACH_MISSED_FRAME == r )
         {
             if(verbose)
             {
-                std::cout << "Ach result for channel '" << _channel_name << "': "
-                             << ach_result_to_string(r) << std::endl;
+                std::cout << "[HuboData::receive_data] Ach result for channel '"
+                          << _channel_name << "': " << ach_result_to_string(r) << std::endl;
             }
             return HuboCan::OKAY;
         }
         else
         {
-            std::cout << "Unexpected ach_get result for channel '" << _channel_name <<"': "
-                      << ach_result_to_string(r) << std::endl;
+            std::cout << "[HuboData::receive_data] Unexpected ach result for channel '"
+                      << _channel_name << "'. Check error log for more info" << std::endl;
+            report_ach_errors(r, "HuboData::receive_data", "ach_get", _channel_name.c_str());
             return HuboCan::ACH_ERROR;
         }
         
@@ -398,8 +403,9 @@ public:
         if(ACH_OK == r)
             return true;
         
-        std::cout << "Unexpected ach_put result for channel '" << _channel_name << "': "
-                     << ach_result_to_string(r) << std::endl;
+        std::cout << "[HuboData::send_data] Unexpected ach_put result for channel '"
+                  << _channel_name << "'. Check error log for more info" << std::endl;
+        report_ach_errors(r, "HuboData::send_data", "ach_put", _channel_name.c_str());
         return false;
     }
 
@@ -437,7 +443,7 @@ public:
 
         if(copy.size() != get_data_component_count(_raw_data))
         {
-            std::cout << "set_data mismatch for channel '" << _channel_name
+            std::cout << "[HuboData::set_data] mismatch for channel '" << _channel_name
                       << "'! Input size: " << copy.size() << ", Actual data size: "
                       << get_data_component_count(_raw_data) << std::endl;
             return false;
@@ -492,8 +498,8 @@ protected:
             return true;
         else
         {
-            std::cout << "Illegal: Attempting to perform '" << operation << "' on a HuboData object "
-                         << "before it has been initialized!" << std::endl;
+            std::cout << "Illegal: Attempting to perform '" << operation
+                      << "' on a HuboData object before it has been initialized!" << std::endl;
             return false;
         }
     }
@@ -505,7 +511,7 @@ protected:
     ach_channel_t _channel;
     DataClass _dummy_member;
     std::string _dummy_string;
-    
+
 };
 
 

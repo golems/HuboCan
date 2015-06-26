@@ -240,8 +240,6 @@ void JointGridWidget::setStatePtr(HuboState::State* new_state_ptr)
     {
         if(!_sptr->receive_description(0))
         {
-            std::cerr << "Cannot generate joint grid, because HuboState::State could not initialize"
-                      << std::endl;
             _initialized = false;
             return;
         }
@@ -308,7 +306,6 @@ JointWidget::JointWidget()
     layout()->addWidget(_createBottomBar());
 
     connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-    timer->start(100*period->value(), false);
 }
 
 void JointWidget::initialize()
@@ -328,6 +325,9 @@ void JointWidget::reinitialize()
     grid->setStatePtr(state);
 
     sender = new HuboCmd::AuxSender;
+
+    if(state->initialized() && !timer->isActive())
+        timer->start(100*period->value(), false);
 }
 
 #define CREATE_CMD_BUTTON( X ) QRadioButton* X ## _button = new QRadioButton( X ); \

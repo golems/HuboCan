@@ -239,12 +239,11 @@ bool Player::_receive_incoming_trajectory()
 
 bool Player::step()
 {
-    HuboCan::error_result_t update_result = update(10);
+    HuboCan::error_result_t update_result = update();
 
     if(update_result != HuboCan::OKAY)
     {
         std::cout << "Player failed to update its states: " << update_result << std::endl;
-//        report_state();
         return false;
     }
 
@@ -257,7 +256,6 @@ bool Player::step()
     double dt = get_time() - _last_time;
     if( dt <= 0 )
     {
-//        report_state();
         return true;
     }
 
@@ -292,7 +290,6 @@ bool Player::step()
                 _incoming_cmd.instruction = HUBO_PATH_QUIT;
             }
         }
-//        report_state();
         return true;
     }
 
@@ -303,7 +300,6 @@ bool Player::step()
         _trajectory.clear();
         _current_cmd = _incoming_cmd;
 
-//        report_state();
         return true;
     }
 
@@ -325,7 +321,6 @@ bool Player::step()
             std::cout << "Quit command received -- but we do not have an active trajectory anyway!"
                       << std::endl;
         }
-//        report_state();
         return true;
     }
 
@@ -333,7 +328,6 @@ bool Player::step()
 
     if(_trajectory.size() == 0)
     {
-//        report_state();
         return true;
     }
 
@@ -369,7 +363,6 @@ bool Player::step()
     _send_element_commands(_current_elem);
 
     _last_elem = _current_elem;
-//    report_state();
     return true;
 }
 

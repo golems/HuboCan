@@ -33,8 +33,10 @@
  *   POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "HuboCan/AchIncludes.h"
 #include <stdio.h>
+#include <errno.h>
+
+#include "HuboCan/AchIncludes.h"
 
 void report_ach_errors(ach_status_t status, const char* functionName,
                        const char* achOperation, const char* channelName)
@@ -43,6 +45,11 @@ void report_ach_errors(ach_status_t status, const char* functionName,
     {
         fprintf(stderr, "[%s] Ach error: %s during [%s] operation with channel '%s'\n",
                 functionName, ach_result_to_string(status), achOperation, channelName);
+        if(ACH_FAILED_SYSCALL == status)
+        {
+            int err = errno;
+            fprintf(stderr, " -- syscall error (%d): %s", err, strerror(err));
+        }
         fflush(stderr);
     }
 }

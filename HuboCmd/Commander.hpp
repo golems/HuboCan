@@ -89,7 +89,7 @@ public:
         return _desc.getJointCount();
     }
 
-    virtual HuboCan::error_result_t update(double timeout_sec=1);
+    virtual HuboCan::error_result_t update(double timeout_sec=1, bool report_sync = true);
     HuboCan::error_result_t send_commands();
 
     HuboCan::error_result_t release_joint(size_t joint_index);

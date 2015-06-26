@@ -45,6 +45,7 @@ int main(int, char* [])
     }
     
     HuboPath::Player player;
+    player.update(10);
     
     std::cout << "Beginning execution loop" << std::endl;
     while( player.step() && rt.good() )
@@ -55,6 +56,4 @@ int main(int, char* [])
     std::cout << "Exiting" << std::endl;
     
     player.report_state();
-    
-    return 0;
 }
