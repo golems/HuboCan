@@ -66,6 +66,8 @@ int main(int argc, char* argv[])
     }
     else if(test_number == 1)
     {
+        op.setInterpolationMode(HUBO_PATH_OPTIMAL);
+
         for(size_t i=0; i<30; ++i)
         {
             vec[2] = i*M_PI/180.0;
@@ -84,6 +86,8 @@ int main(int argc, char* argv[])
     }
     else if(test_number == 3)
     {
+        op.setInterpolationMode(HUBO_PATH_OPTIMAL);
+
         vec << 0, 0, 0, 0, 0, 0;
         op.addWaypoint(vec);
         vec << -0.0503237, -0.0178896, 0.0301651, -0.0681551, 0, 0; 
@@ -113,6 +117,8 @@ int main(int argc, char* argv[])
     }
     else if(test_number == 4)
     {
+        op.setInterpolationMode(HUBO_PATH_OPTIMAL);
+
         vec << 0, 0, 0, 0, 0, 0; 
         vec << -0.0355226, -0.0461691, -0.0185826, -0.0743613, 0, 0; 
         op.addWaypoint(vec);
@@ -151,6 +157,8 @@ int main(int argc, char* argv[])
     }
     else if(test_number == 5)
     {
+        op.setInterpolationMode(HUBO_PATH_OPTIMAL);
+
         vec << -0.603884, -0.784875, -0.315905, -1.26414, 0, 0 ;
         op.addWaypoint(vec);
         vec << -0.53947, -0.735028, -0.315905, -1.26414, -0.0379551, 0.0418414 ;
@@ -190,14 +198,9 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-//    op.setInterpolationMode(HUBO_PATH_OPTIMAL);
-    op.interpolate();
     const HuboPath::Trajectory& traj = op.getCurrentTrajectory();
-    
-    
-    std::cout << op.getCurrentTrajectory() << "\n" << std::endl;
-    
-    traj.check_limits();
+        
+    std::cout << traj << "\n" << std::endl;
     
     op.sendNewTrajectory();
 }
