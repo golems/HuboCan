@@ -63,6 +63,12 @@ public:
     void home_joint(size_t joint);
     void home_all_joints();
 
+    void joint_ctrl_on(size_t joint);
+    void all_joint_ctrl_on();
+
+    void joint_ctrl_off(size_t joint);
+    void all_joint_ctrl_off();
+
     void initialize_sensor(size_t sensor);
     void initialize_all_imus();
     void initialize_all_fts();
@@ -85,6 +91,10 @@ protected:
     void _set_jmc_info(size_t joint);
     size_t _jmc(size_t joint);
     size_t _hw_index(size_t joint);
+
+    void _set_all();
+    void _set_all_imu();
+    void _set_all_ft();
 };
 
 } // namespace HuboCmd

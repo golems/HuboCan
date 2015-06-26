@@ -164,8 +164,19 @@ LogRelayWidget::LogRelayWidget()
 
 void LogRelayWidget::attempt_restart()
 {
-    worker->quit();
-    worker->start();
+    if(worker->isRunning())
+    {
+        worker->terminate();
+        worker->wait(500);
+        if(worker->isFinished())
+            worker->start();
+        else
+            std::cerr << "Log Relay is refusing to restart!" << std::endl;
+    }
+    else
+    {
+        worker->start();
+    }
 }
 
 

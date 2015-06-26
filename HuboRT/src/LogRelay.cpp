@@ -77,11 +77,11 @@ bool LogRelay::open_channels()
     return _channels_opened;
 }
 
-bool LogRelay::receive(std::string &log_name, std::string &contents, int timeout)
+bool LogRelay::receive(std::string& log_name, std::string& contents, int timeout)
 {
     if(!_channels_opened)
     {
-        std::cout << "ERROR: Attempting to receive log data before Ach channels are opened!"
+        std::cerr << "[LogRelay::receive] Attempting to receive log data before Ach channels are opened!"
                   << std::endl;
         return false;
     }
@@ -118,7 +118,7 @@ bool LogRelay::send(double timeout)
 {
     if(!_channels_opened)
     {
-        std::cout << "ERROR: Attempting to send log data before Ach channels are opened!"
+        std::cerr << "[LogRelay::send] Attempting to send log data before Ach channels are opened!"
                   << std::endl;
         return false;
     }
@@ -173,8 +173,8 @@ void LogRelay::_read_through_fd(FileHandle& fh)
         s = read(fh.fd, _buffer.contents, LOG_MESSAGE_CONTENT_SIZE);
         if( s < 0 && errno != EINTR )
         {
-            std::cout << "Error in attempting to read log of '" << fh.filename
-                      << "': " << strerror(errno) << std::endl;
+            std::cout << "[LogRelay::_read_through_fd] Error in attempting to read log of '"
+                      << fh.filename << "': " << strerror(errno) << std::endl;
             break;
         }
         else if( s == 0 )
@@ -275,8 +275,8 @@ void LogRelay::_add_file_descriptor(const std::string& directory, const std::str
         }
         else
         {
-            std::cout << "Error while trying to open log file '" << path
-                      << "' (" << strerror(errno) << ") " << errno << std::endl;
+            std::cerr << "[LogRelay::_add_file_descriptor] Error while trying to open log file '"
+                      << path << "' (" << strerror(errno) << ") " << errno << std::endl;
         }
     }
 }

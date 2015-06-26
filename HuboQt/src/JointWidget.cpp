@@ -35,8 +35,16 @@
 
 #include <math.h>
 
+#include <QRadioButton>
+#include <QButtonGroup>
+#include <QSpacerItem>
+
 #include "FlowLayout.h"
 #include "HuboQt/JointWidget.h"
+
+const QString home_text = "Home";
+const QString ctrl_on_text = "Ctrl On";
+const QString ctrl_off_text = "Ctrl Off";
 
 namespace HuboQt {
 
@@ -61,10 +69,11 @@ void JointButton::_purpify()
     setStyleSheet(joint_button_style + color.name() + ")");
 }
 
-JointButton::JointButton(const hubo_joint_info_t& info)
+JointButton::JointButton(const hubo_joint_info_t& info, JointGridWidget* grid)
+    : _degrees(false),
+      _info(info),
+      _grid(grid)
 {
-    _degrees = false;
-    _info = info;
     memset(&_state, 0, sizeof(_state));
     update();
 }
@@ -81,11 +90,13 @@ void JointButton::useRadians()
     update();
 }
 
-void JointButton::update(const hubo_joint_state_t &state)
+void JointButton::update(const hubo_joint_state_t& state)
 {
     _state = state;
     update();
 }
+
+#define REPORT_ERROR( X ) { tip += "\n" #X ; _grid->errorText += " | " #X ; _error = true; }
 
 void JointButton::_setErrorFlags()
 {
@@ -129,53 +140,40 @@ void JointButton::_setErrorFlags()
     tip += "\nErrors:";
     hubo_joint_error_t& err = status.error;
     if(err.jam == 1)
-    {
-        tip += "\nJammed"; _error = true;
-    }
+        REPORT_ERROR( Jammed );
+
     if(err.pwm_saturated == 1)
-    {
-        tip += "\nPWM Saturated"; _error = true;
-    }
+        REPORT_ERROR( PWM Saturated );
+
     if(err.big == 1)
-    {
-        tip += "\nBig Error"; _error = true;
-    }
+        REPORT_ERROR( Big Error );
+
     if(err.encoder == 1)
-    {
-        tip += "\nEncoder Error"; _error = true;
-    }
+        REPORT_ERROR( Encoder Error );
+
     if(err.driver_fault == 1)
-    {
-        tip += "\nDriver Fault"; _error = true;
-    }
+        REPORT_ERROR( Driver Fault );
+
     if(err.motor_fail_0 == 1)
-    {
-        tip += "\nMotor Fail (Channel 0)"; _error = true;
-    }
+        REPORT_ERROR( Motor Fail - Channel 0 );
+
     if(err.motor_fail_1 == 1)
-    {
-        tip += "\nMotor Fail (Channel 1)"; _error = true;
-    }
+        REPORT_ERROR( Motor Fail - Channel 1 );
+
     if(err.min_position == 1)
-    {
-        tip += "\nMinimum Position Violated"; _error = true;
-    }
+        REPORT_ERROR( Minimum Position Violated );
+
     if(err.max_position == 1)
-    {
-        tip += "\nMaximum Position Violaed"; _error = true;
-    }
+        REPORT_ERROR( Maximum Position Violated );
+
     if(err.velocity == 1)
-    {
-        tip += "\nMax Velocity Violation"; _error = true;
-    }
+        REPORT_ERROR( Maximum Velocity Violated );
+
     if(err.acceleration == 1)
-    {
-        tip += "\nMax Acceleration Violation"; _error = true;
-    }
+        REPORT_ERROR( Maximum Acceleration Violated );
+
     if(err.temperature == 1)
-    {
-        tip += "\nTemperature Error"; _error = true;
-    }
+        REPORT_ERROR( Temperature Error );
 
     if(_error)
     {
@@ -207,11 +205,13 @@ void JointButton::update()
 }
 
 
-JointGridWidget::JointGridWidget()
+JointGridWidget::JointGridWidget(QTextEdit* text)
+    : errorBox(text)
 {
     setLayout(new FlowLayout);
     _initialized = false;
     _sptr = NULL;
+    group = new QButtonGroup;
 }
 
 HuboState::State* JointGridWidget::getStatePtr() const
@@ -237,20 +237,21 @@ void JointGridWidget::setStatePtr(HuboState::State* new_state_ptr)
         }
     }
 
-    for(int i=0; i<_buttons.size(); ++i)
+    for(int i=0; i<buttons.size(); ++i)
     {
-        layout()->removeWidget(_buttons[i]);
-        delete _buttons[i];
+        layout()->removeWidget(buttons[i]);
+        delete buttons[i];
     }
-    _buttons.clear();
+    buttons.clear();
 
     for(size_t i=0; i<_sptr->joints.size(); ++i)
     {
         const hubo_joint_info_t& info = _sptr->get_description().getJointInfo(i);
 
-        JointButton* joint = new JointButton(info);
-        _buttons.push_back(joint);
+        JointButton* joint = new JointButton(info, this);
+        buttons.push_back(joint);
         layout()->addWidget(joint);
+        group->addButton(joint, i);
     }
 
     _initialized = true;
@@ -268,27 +269,126 @@ void JointGridWidget::update()
             return;
     }
 
-    for(int i=0; i<_buttons.size(); ++i)
+    errorText.clear();
+    for(int i=0; i<buttons.size(); ++i)
     {
-        _buttons[i]->update(_sptr->joints[i]);
+        buttons[i]->update(_sptr->joints[i]);
     }
+    errorBox->setText(errorText);
 }
 
 JointWidget::JointWidget()
+    : state(NULL)
 {
     setLayout(new QVBoxLayout);
 
-    grid = new JointGridWidget;
+    QTextEdit* errorText = new QTextEdit;
+    errorText->setReadOnly(true);
+
+    grid = new JointGridWidget(errorText);
+    connect(grid->group, SIGNAL(buttonClicked(int)), this, SLOT(handleJointButtonPress(int)));
+
+    layout()->addWidget(_createJointCommandOptions());
     layout()->addWidget(grid);
+    layout()->addWidget(errorText);
+    layout()->addWidget(_createBottomBar());
 }
 
 void JointWidget::initialize()
 {
     if( NULL == state )
     {
-        state = new HuboState::State(0);
-        grid->setStatePtr(state);
+        reinitialize();
     }
+}
+
+void JointWidget::reinitialize()
+{
+    delete state;
+
+    std::cout << "Initializing JointWidget Grid" << std::endl;
+    state = new HuboState::State(0);
+    grid->setStatePtr(state);
+
+    sender = new HuboCmd::AuxSender;
+}
+
+#define CREATE_CMD_BUTTON( X ) QRadioButton* X ## _button = new QRadioButton( X ); \
+                               _commandGroup->addButton( X ## _button );           \
+                               layout->addWidget( X ## _button );
+
+QWidget* JointWidget::_createJointCommandOptions()
+{
+    QWidget* CommandWidget = new QWidget;
+    FlowLayout* layout = new FlowLayout;
+    CommandWidget->setLayout(layout);
+
+    _commandGroup = new QButtonGroup;
+    _commandGroup->setExclusive(true);
+
+    CREATE_CMD_BUTTON( home_text );
+    CREATE_CMD_BUTTON( ctrl_on_text );
+    CREATE_CMD_BUTTON( ctrl_off_text );
+
+    return CommandWidget;
+}
+
+QWidget* JointWidget::_createBottomBar()
+{
+    QWidget* DegRadWidget = new QWidget;
+    QHBoxLayout* layout = new QHBoxLayout;
+    DegRadWidget->setLayout(layout);
+
+    QButtonGroup* radioGroup = new QButtonGroup;
+    radioGroup->setExclusive(true);
+
+    QRadioButton* degrees = new QRadioButton("Degrees");
+    radioGroup->addButton(degrees);
+    connect(degrees, SIGNAL(clicked()), this, SLOT(useDegrees()));
+
+    QRadioButton* radians = new QRadioButton("Radians");
+    radioGroup->addButton(radians);
+    connect(radians, SIGNAL(clicked()), this, SLOT(useRadians()));
+
+    degrees->setChecked(true);
+
+    layout->addWidget(degrees);
+    layout->addWidget(radians);
+    layout->addItem(new QSpacerItem(0,0, QSizePolicy::MinimumExpanding));
+
+    QPushButton* reinitializer = new QPushButton("Reinitialize");
+    connect(reinitializer, SIGNAL(clicked()), this, SLOT(reinitialize()));
+    layout->addWidget(reinitializer);
+
+    return DegRadWidget;
+}
+
+void JointWidget::useDegrees()
+{
+    for(int i=0; i<grid->buttons.size(); ++i)
+        grid->buttons[i]->useDegrees();
+}
+
+void JointWidget::useRadians()
+{
+    for(int i=0; i<grid->buttons.size(); ++i)
+        grid->buttons[i]->useRadians();
+}
+
+void JointWidget::handleJointButtonPress(int joint)
+{
+    if(NULL == state)
+        return;
+
+    if(_commandGroup->checkedButton() == NULL)
+        return;
+
+    if(_commandGroup->checkedButton()->text() == home_text)
+        sender->home_joint(joint);
+    else if(_commandGroup->checkedButton()->text() == ctrl_on_text)
+        sender->joint_ctrl_on(joint);
+    else if(_commandGroup->checkedButton()->text() == ctrl_off_text)
+        sender->joint_ctrl_off(joint);
 }
 
 } // namespace HuboQt

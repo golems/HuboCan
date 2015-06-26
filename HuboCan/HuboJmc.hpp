@@ -119,8 +119,14 @@ protected:
     virtual bool _decode_status_reading(const can_frame_t& frame);
 
     virtual void _handle_auxiliary_command(const hubo_aux_cmd_t& cmd);
+
+    // Joint homing
     virtual void _handle_home_joint(const hubo_aux_cmd_t& cmd);
     virtual void _handle_home_all_joints();
+
+    // Motor ctrl switching
+    virtual void _handle_ctrl_switch(const hubo_aux_cmd_t& cmd);
+
 
     virtual void _handle_rigid_reference_cmd();
 

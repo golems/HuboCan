@@ -128,26 +128,6 @@ bool AuxSender::_send_command()
     return true;
 }
 
-size_t AuxSender::_jmc(size_t joint)
-{
-    if(joint >= _desc.joints.size())
-        return InvalidIndex;
-    return _desc.getJmcIndex(_desc.joints[joint]->info.jmc_name);
-}
-
-size_t AuxSender::_hw_index(size_t joint)
-{
-    if(joint >= _desc.joints.size())
-        return InvalidIndex;
-    return _desc.getJointInfo(joint).hardware_index;
-}
-
-void AuxSender::_set_jmc_info(size_t joint)
-{
-    _cmd.device_id = _jmc(joint);
-    _cmd.component_id = _hw_index(joint);
-}
-
 void AuxSender::home_joint(size_t joint)
 {
     _clear_command();
@@ -159,7 +139,44 @@ void AuxSender::home_joint(size_t joint)
 void AuxSender::home_all_joints()
 {
     _clear_command();
-    _cmd.cmd_id = HOME_ALL_JOINTS;
+    _cmd.cmd_id = HOME_JOINT;
+    _set_all();
+    _send_command();
+}
+
+void AuxSender::joint_ctrl_on(size_t joint)
+{
+    _clear_command();
+    _cmd.cmd_id = JOINT_CTRL_SWITCH;
+    _cmd.params[0] = ENABLE;
+    _set_jmc_info(joint);
+    _send_command();
+}
+
+void AuxSender::all_joint_ctrl_on()
+{
+    _clear_command();
+    _cmd.cmd_id = JOINT_CTRL_SWITCH;
+    _cmd.params[0] = ENABLE;
+    _set_all();
+    _send_command();
+}
+
+void AuxSender::joint_ctrl_off(size_t joint)
+{
+    _clear_command();
+    _cmd.cmd_id = JOINT_CTRL_SWITCH;
+    _cmd.params[0] = DISABLE;
+    _set_jmc_info(joint);
+    _send_command();
+}
+
+void AuxSender::all_joint_ctrl_off()
+{
+    _clear_command();
+    _cmd.cmd_id = JOINT_CTRL_SWITCH;
+    _cmd.params[0] = DISABLE;
+    _set_all();
     _send_command();
 }
 
@@ -174,7 +191,7 @@ void AuxSender::initialize_sensor(size_t sensor)
 void AuxSender::initialize_all_imus()
 {
     _clear_command();
-    _cmd.cmd_id = INIT_ALL_IMUS;
+    _cmd.cmd_id = INIT_SENSOR;
     _send_command();
 }
 
@@ -188,10 +205,37 @@ void AuxSender::initialize_all_fts()
 void AuxSender::initialize_all_sensors()
 {
     _clear_command();
-    _cmd.cmd_id = INIT_ALL_SENSORS;
+    _cmd.cmd_id = INIT_SENSOR;
+    _set_all();
     _send_command();
 }
 
 bool AuxSender::ready() { return _description_loaded && _channels_opened; }
+
+void AuxSender::_set_jmc_info(size_t joint)
+{
+    _cmd.device_id = _jmc(joint);
+    _cmd.component_id = _hw_index(joint);
+}
+
+size_t AuxSender::_jmc(size_t joint)
+{
+    if(joint >= _desc.joints.size())
+        return InvalidIndex;
+    return _desc.getJmcIndex(_desc.joints[joint]->info.jmc_name);
+}
+
+size_t AuxSender::_hw_index(size_t joint)
+{
+    if(joint >= _desc.joints.size())
+        return InvalidIndex;
+    return _desc.getJointInfo(joint).hardware_index;
+}
+
+void AuxSender::_set_all()
+{
+    _cmd.all_devices = 1;
+    _cmd.all_components = 1;
+}
 
 } // namespace HuboCmd

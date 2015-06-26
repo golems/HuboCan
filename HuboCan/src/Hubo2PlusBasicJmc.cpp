@@ -144,20 +144,9 @@ void Hubo2PlusBasicJmc::_handle_rigid_reference_cmd()
         }
         
         _state->joints[joints[i]->info.software_index].reference = cmd.position;
-/*
-        std::cout << joints[i]->info.name << ": " << cmd.position << " -> " << reference
-                  << "\tlast:" << _state->joints[joints[i]->info.software_index].position << std::endl;
-*/
     }
+
     frame.can_dlc = 6;
-/*
-    std::cout << "ID:" << frame.can_id << " Data: ";
-    for(size_t k=0; k<8; ++k)
-    {
-        std::cout << (int)frame.data[k] << " ";
-    }
-    std::cout << " DLC:" << (int)frame.can_dlc << std::endl;
-*/
     _pump->add_frame(frame, info.can_channel);
 }
 
@@ -268,8 +257,8 @@ void Hubo2PlusBasicJmc::_handle_auxiliary_command(const hubo_aux_cmd_t& cmd)
             _handle_home_joint(cmd);
             break;
 
-        case HOME_ALL_JOINTS:
-            _handle_home_all_joints();
+        case JOINT_CTRL_SWITCH:
+            _handle_ctrl_switch(cmd);
             break;
 
         default:
@@ -281,6 +270,12 @@ void Hubo2PlusBasicJmc::_handle_auxiliary_command(const hubo_aux_cmd_t& cmd)
 
 void Hubo2PlusBasicJmc::_handle_home_joint(const hubo_aux_cmd_t& cmd)
 {
+    if(1 == cmd.all_devices)
+    {
+        _handle_home_all_joints();
+        return;
+    }
+
     if(cmd.component_id >= joints.size())
     {
         std::cerr << "Requested homing for invalid joint on " << info.name << " ("
@@ -343,6 +338,43 @@ void Hubo2PlusBasicJmc::_handle_home_all_joints()
     _pump->add_frame(_frame, info.can_channel);
 
     // TODO: Decide what other bookkeeping should be done when a joint gets homed.
+}
+
+void Hubo2PlusBasicJmc::_handle_ctrl_switch(const hubo_aux_cmd_t& cmd)
+{
+    _frame.can_id   = CMD_BYTE;
+
+    _frame.data[0]  = info.hardware_index;
+
+    if(ENABLE == cmd.params[0])
+    {
+        std::cout << "Turning on motor control for joints:";
+        for(size_t i=0; i<joints.size(); ++i)
+            std::cout << " " << joints[i]->info.name;
+        std::cout << std::endl;
+
+        _frame.data[1] = SET_MOTOR_CTRL_ON;
+    }
+    else if(DISABLE == cmd.params[0])
+    {
+        std::cout << "Turning off motor control for joints:";
+        for(size_t i=0; i<joints.size(); ++i)
+            std::cout << " " << joints[i]->info.name;
+        std::cout << std::endl;
+
+        _frame.data[1] = SET_MOTOR_CTRL_OFF;
+    }
+    else
+    {
+        std::cerr << "[Hubo2PlusBasicJmc::_handle_ctrl_switch] Invalid param[0] value for cmd_id ("
+                  << cmd.cmd_id << ": " << cmd.params[0] << "\n Must be equal to "
+                  << ENABLE << " or " << DISABLE << std::endl;
+        return;
+    }
+
+    _frame.can_dlc = 2;
+
+    _pump->add_frame(_frame, info.can_channel);
 }
 
 } // namespace HuboCan

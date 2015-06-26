@@ -41,19 +41,20 @@
 #define HUBO_AUX_CMD_CHANNEL "hubo_aux_cmd"
 
 /*                                123456789012345                       */
-#define HUBO_AUX_CMD_HEADER_CODE "AUXHEADER_V0.01"
+#define HUBO_AUX_CMD_HEADER_CODE "AUXHEADER_V0.02"
 #define HUBO_AUX_CMD_HEADER_CODE_SIZE 16 // including null-terminator \0
 
 typedef enum {
 
     // TODO: Put in all the different kinds of board commands
     HOME_JOINT,
-    HOME_ALL_JOINTS,
 
-    INIT_ALL_SENSORS,
+    JOINT_CTRL_SWITCH,
+
+    // Sensor commands
+    INIT_SENSOR,
     INIT_ALL_IMUS,
-    INIT_ALL_FTS,
-    INIT_SENSOR
+    INIT_ALL_FTS
 
 } hubo_aux_cmd_id_t;
 
@@ -78,8 +79,13 @@ typedef struct hubo_aux_cmd {
 
     char code[HUBO_AUX_CMD_HEADER_CODE_SIZE];
     hubo_aux_cmd_id_t cmd_id;
+
     uint32_t device_id;
+    uint8_t all_devices;
+
     uint32_t component_id;
+    uint8_t all_components;
+
     hubo_aux_cmd_param_t params[8];
     double values[8];
 

@@ -40,10 +40,14 @@
 #include <QPushButton>
 #include <QVector>
 #include <QString>
+#include <QTextEdit>
 
 #include "HuboState/State.hpp"
+#include "HuboCmd/AuxSender.hpp"
 
 namespace HuboQt {
+
+class JointGridWidget;
 
 class JointButton : public QPushButton
 {
@@ -51,7 +55,7 @@ class JointButton : public QPushButton
 
 public:
 
-    JointButton(const hubo_joint_info_t& info);
+    JointButton(const hubo_joint_info_t& info, JointGridWidget* grid);
 
     void useRadians();
     void useDegrees();
@@ -72,6 +76,8 @@ protected:
     hubo_joint_state_t _state;
     hubo_joint_info_t _info;
 
+    JointGridWidget* _grid;
+
 };
 
 class JointGridWidget : public QWidget
@@ -80,19 +86,25 @@ class JointGridWidget : public QWidget
 
 public:
 
-    explicit JointGridWidget();
+    explicit JointGridWidget(QTextEdit* text);
 
     HuboState::State* getStatePtr() const;
     void setStatePtr(HuboState::State* new_state_ptr);
 
     void update();
 
+    QVector<JointButton*> buttons;
+
+    QButtonGroup* group;
+
+    QTextEdit* errorBox;
+
+    QString errorText;
+
 protected:
 
     HuboState::State* _sptr;
     bool _initialized;
-
-    QVector<JointButton*> _buttons;
 
 };
 
@@ -108,10 +120,27 @@ public:
 
     HuboState::State* state;
 
+    HuboCmd::AuxSender* sender;
+
+protected:
+
+    QWidget* _createJointCommandOptions();
+
+    QButtonGroup* _commandGroup;
+
+    QWidget* _createBottomBar();
+
 public Q_SLOTS:
 
     void initialize();
 
+    void reinitialize();
+
+    void useDegrees();
+
+    void useRadians();
+
+    void handleJointButtonPress(int joint);
 };
 
 } // namespace HuboQt

@@ -149,7 +149,6 @@ void Hubo2PlusImu::_handle_auxiliary_command(const hubo_aux_cmd_t& cmd)
 {
     switch(cmd.cmd_id)
     {
-        case INIT_ALL_SENSORS:
         case INIT_ALL_IMUS:
         case INIT_SENSOR:
             _initialize_imu();
@@ -304,7 +303,6 @@ void Hubo2PlusFt::_handle_auxiliary_command(const hubo_aux_cmd_t& cmd)
 {
     switch(cmd.cmd_id)
     {
-        case INIT_ALL_SENSORS:
         case INIT_ALL_FTS:
         case INIT_SENSOR:
             _initialize_ft();

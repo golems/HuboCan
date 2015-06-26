@@ -157,21 +157,6 @@ void AuxReceiver::_register_command()
 {
     switch(_cmd.cmd_id)
     {
-        case HOME_ALL_JOINTS:
-
-            _register_with_all_jmcs();
-            break;
-
-        case HOME_JOINT:
-
-            _desc->jmcs[_cmd.device_id]->auxiliary_command(_cmd);
-            break;
-
-        case INIT_ALL_SENSORS:
-
-            _register_with_all_sensors();
-            break;
-
         case INIT_ALL_IMUS:
 
             _register_with_all_imus();
@@ -184,7 +169,18 @@ void AuxReceiver::_register_command()
 
         case INIT_SENSOR:
 
-            _desc->sensors[_cmd.device_id]->auxiliary_command(_cmd);
+            if(0 == _cmd.all_devices)
+                _register_with_sensor();
+            else
+                _register_with_all_sensors();
+            break;
+
+        default:
+
+            if(0 == _cmd.all_devices)
+                _register_with_jmc();
+            else
+                _register_with_all_jmcs();
             break;
     }
 }
@@ -197,8 +193,10 @@ void AuxReceiver::_register_with_all_jmcs()
     }
 }
 
-void AuxReceiver::_register_with_jmc(size_t index)
+void AuxReceiver::_register_with_jmc()
 {
+    size_t index = _cmd.device_id;
+
     if(index < _desc->jmcs.size())
     {
         _desc->jmcs[index]->auxiliary_command(_cmd);
@@ -227,8 +225,10 @@ void AuxReceiver::_register_with_all_sensors()
     }
 }
 
-void AuxReceiver::_register_with_sensor(size_t index)
+void AuxReceiver::_register_with_sensor()
 {
+    size_t index = _cmd.device_id;
+
     if(index < _desc->sensors.size())
     {
         _desc->sensors[index]->auxiliary_command(_cmd);
