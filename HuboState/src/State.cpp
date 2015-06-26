@@ -102,24 +102,28 @@ void State::_create_memory()
     force_torques.initialize(ft_names, HUBO_FT_SENSOR_CHANNEL);
 }
 
-HuboCan::error_result_t State::update(double timeout_sec)
+HuboCan::error_result_t State::update(double timeout_sec, bool report_sync)
 {
     HuboCan::error_result_t result = HuboCan::OKAY;
     result |= joints.receive_data(timeout_sec);
     result |= imus.receive_data(0);
     result |= force_torques.receive_data(0);
 
-    if( joints.get_time() != imus.get_time()
-     || joints.get_time() != force_torques.get_time())
+    if(report_sync)
     {
-        double  jointTime = joints.get_time(),
-                imuTime = imus.get_time(),
-                ftTime = force_torques.get_time();
+        if( joints.get_time() != imus.get_time()
+         || joints.get_time() != force_torques.get_time())
+        {
+            double  jointTime = joints.get_time(),
+                    imuTime = imus.get_time(),
+                    ftTime = force_torques.get_time();
 
-        std::cout << HuboCan::error_result_t(HuboCan::SYNCH_ERROR)
-                  << " | Published time stamps: Joints " << jointTime
-                  << " | IMU " << imuTime << " (diff " << jointTime - imuTime << ")"
-                  << " | FT " << ftTime << " (diff " << jointTime - ftTime << ")" << std::endl;
+            std::cout << HuboCan::error_result_t(HuboCan::SYNCH_ERROR)
+                      << " | Published time stamps: Joints " << jointTime
+                      << " | IMU " << imuTime << " (diff " << jointTime - imuTime << ")"
+                      << " | FT " << ftTime << " (diff " << jointTime - ftTime << ")"
+                      << std::endl;
+        }
     }
 
     return result;

@@ -128,8 +128,11 @@ public:
      * You can specify how long you want to wait for a new frame to be published before giving up.
      * It is strongly recommended that this time be at least the expected duration of a single
      * control cycle, otherwise your program will probably end up busy-waiting.
+     *
+     * The argument report_sync should be set to false if the channel is communicating over a
+     * network where you cannot reasonably expect the states to be updated in real time.
      */
-    virtual HuboCan::error_result_t update(double timeout_sec=1);
+    virtual HuboCan::error_result_t update(double timeout_sec=1, bool report_sync = true);
 
     /*!
      * \fn publish

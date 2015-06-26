@@ -41,9 +41,12 @@
 #include <QVector>
 #include <QString>
 #include <QTextEdit>
+#include <QTimer>
 
 #include "HuboState/State.hpp"
 #include "HuboCmd/AuxSender.hpp"
+
+class QDoubleSpinBox;
 
 namespace HuboQt {
 
@@ -122,6 +125,10 @@ public:
 
     HuboCmd::AuxSender* sender;
 
+    QDoubleSpinBox* period;
+
+    QTimer* timer;
+
 protected:
 
     QWidget* _createJointCommandOptions();
@@ -141,6 +148,8 @@ public Q_SLOTS:
     void useRadians();
 
     void handleJointButtonPress(int joint);
+
+    void update();
 };
 
 } // namespace HuboQt

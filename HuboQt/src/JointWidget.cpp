@@ -38,6 +38,7 @@
 #include <QRadioButton>
 #include <QButtonGroup>
 #include <QSpacerItem>
+#include <QDoubleSpinBox>
 
 #include "FlowLayout.h"
 #include "HuboQt/JointWidget.h"
@@ -96,7 +97,7 @@ void JointButton::update(const hubo_joint_state_t& state)
     update();
 }
 
-#define REPORT_ERROR( X ) { tip += "\n" #X ; _grid->errorText += " | " #X ; _error = true; }
+#define REPORT_ERROR( X ) { tip += "\n" #X ; errorText += " | " #X ; _error = true; }
 
 void JointButton::_setErrorFlags()
 {
@@ -138,6 +139,7 @@ void JointButton::_setErrorFlags()
 
     _error = false;
     tip += "\nErrors:";
+    QString errorText;
     hubo_joint_error_t& err = status.error;
     if(err.jam == 1)
         REPORT_ERROR( Jammed );
@@ -174,6 +176,14 @@ void JointButton::_setErrorFlags()
 
     if(err.temperature == 1)
         REPORT_ERROR( Temperature Error );
+
+    if(errorText.size() > 0)
+    {
+        errorText.prepend(_info.name);
+        errorText.prepend(" :: ");
+        errorText.append("\n");
+        _grid->errorText += errorText;
+    }
 
     if(_error)
     {
@@ -269,6 +279,8 @@ void JointGridWidget::update()
             return;
     }
 
+    _sptr->update(0, false);
+
     errorText.clear();
     for(int i=0; i<buttons.size(); ++i)
     {
@@ -285,6 +297,8 @@ JointWidget::JointWidget()
     QTextEdit* errorText = new QTextEdit;
     errorText->setReadOnly(true);
 
+    timer = new QTimer;
+
     grid = new JointGridWidget(errorText);
     connect(grid->group, SIGNAL(buttonClicked(int)), this, SLOT(handleJointButtonPress(int)));
 
@@ -292,6 +306,9 @@ JointWidget::JointWidget()
     layout()->addWidget(grid);
     layout()->addWidget(errorText);
     layout()->addWidget(_createBottomBar());
+
+    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
+    timer->start(100*period->value(), false);
 }
 
 void JointWidget::initialize()
@@ -344,16 +361,24 @@ QWidget* JointWidget::_createBottomBar()
 
     QRadioButton* degrees = new QRadioButton("Degrees");
     radioGroup->addButton(degrees);
+    layout->addWidget(degrees);
     connect(degrees, SIGNAL(clicked()), this, SLOT(useDegrees()));
 
     QRadioButton* radians = new QRadioButton("Radians");
     radioGroup->addButton(radians);
+    layout->addWidget(radians);
     connect(radians, SIGNAL(clicked()), this, SLOT(useRadians()));
 
-    degrees->setChecked(true);
+    radians->setChecked(true);
 
-    layout->addWidget(degrees);
-    layout->addWidget(radians);
+    period = new QDoubleSpinBox;
+    period->setToolTip("Set the period (seconds) for refreshing joint data");
+    period->setValue(0.2);
+    period->setSingleStep(0.05);
+    period->setMinimum(0.01);
+    timer->setInterval(100*period->value());
+    layout->addWidget(period);
+
     layout->addItem(new QSpacerItem(0,0, QSizePolicy::MinimumExpanding));
 
     QPushButton* reinitializer = new QPushButton("Reinitialize");
@@ -389,6 +414,20 @@ void JointWidget::handleJointButtonPress(int joint)
         sender->joint_ctrl_on(joint);
     else if(_commandGroup->checkedButton()->text() == ctrl_off_text)
         sender->joint_ctrl_off(joint);
+}
+
+void JointWidget::update()
+{
+    if(NULL == state)
+    {
+        reinitialize();
+    }
+    else
+    {
+        grid->update();
+    }
+
+    timer->setInterval(1000*period->value());
 }
 
 } // namespace HuboQt
