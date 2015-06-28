@@ -264,7 +264,7 @@ void Aggregator::_aggregator_loop()
 
 void Aggregator::_check_hubocan_state()
 {
-    // TODO: Grab the current state and update data structures accordingly
+    // TODO: Grab the current state and do a sanity check
 }
 
 void Aggregator::_collate_input()

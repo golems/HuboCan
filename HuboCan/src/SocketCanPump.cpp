@@ -92,8 +92,6 @@ bool SocketCanPump::initialize_devices(bool virtual_can)
     _can_initialized = false;
     
     size_t channels = channel_count();
-    // TODO: Decide if the interface should be put up here
-    // seems like the best idea
     if(channels > 4)
     {
         std::cout << "Unsupported number of channels for SocketCan (" << channels << ")!\n"
@@ -193,15 +191,12 @@ bool SocketCanPump::_send_frame(const can_frame_t &frame, size_t channel)
     ssize_t bytes_written = send(_sockets[channel], &frame, sizeof(frame), MSG_DONTWAIT);
     if(bytes_written != sizeof(frame))
     {
-//        if( errno != ENOBUFS && errno != EAGAIN ) // Why not report this?
-        {
-            perror("send frame over SocketCan");
-            std::cout << "Error found on CAN bus " << channel << ", we will quit pumping" << std::endl;
-            std::cout << "Check to make sure hardware power is on." << std::endl;
-            std::cout << "If the problem persists, you may need to restart the computer :(" << std::endl;
-            // TODO: Write a print out that explains appropriate usage
-            _can_error = true;
-        }
+        perror("send frame over SocketCan");
+        std::cout << "Error found on CAN bus " << channel << ", we will quit pumping" << std::endl;
+        std::cout << "Check to make sure hardware power is on." << std::endl;
+        std::cout << "If the problem persists, you may need to restart the computer :(" << std::endl;
+        // TODO: Write a print out that explains appropriate usage
+        _can_error = true;
     }
     
     return false;

@@ -180,7 +180,7 @@ bool Player::_receive_incoming_trajectory()
 
     // TODO: Should the trajectory be passed through the controller before evaluating the refs?
     // Almost certainly.
-//    bool all_valid = true;
+
     std::vector<size_t> invalid_joints;
     for(size_t i=0; i<_desc.joints.size(); ++i)
     {
@@ -358,7 +358,7 @@ bool Player::step()
 
     _current_elem = _trajectory[_current_index];
 
-    // TODO: Write a controller skeleton and use a controller class instance here
+    // TODO: Write a controller base class and use a controller class instance here
 
     _send_element_commands(_current_elem);
 
@@ -373,7 +373,7 @@ void Player::_send_element_commands(const hubo_path_element_t& elem)
         if( ((_trajectory.params.bitmap >> i) & 0x01) == 0x01 )
         {
             // TODO: Use different command modes based on the element's control parameters
-            // (which do not exist yet)
+            // (but those do not exist yet)
             set_mode(i, HUBO_CMD_RIGID);
 
             set_position(i, elem.references[i]);
