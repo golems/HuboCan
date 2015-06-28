@@ -1,0 +1,114 @@
+
+
+HuboCan is designed to make it quick and easy to get a new CAN device up and 
+running in a consistent framework with the rest of Hubo's hardware. It is also
+designed to allow device configurations to be modular, because not all Hubos
+have the same types of devices or number of devices.
+
+To allow the same code base to work with arbitrary device configurations,
+HuboCan has "device description (.dd)" files which describe the CAN devices
+that a particular Hubo has. The device description gets loaded at runtime, and
+HuboCan has a class called HuboCan::HuboDescription which acts as an abstract
+factory to run the correct code for the particular types of devices for your
+robot.
+
+This means that implementing a new CAN device in HuboCan consists of three
+steps:
+
+(1) Create a device description for the device
+(2) Write a C++ class that writes and decodes the appropriate CAN frames
+(3) Program HuboDescription to load the class when it shows up in a .dd file
+
+
+
+ --- (1) Create a device description for the device
+
+In the source file HuboCan/DeviceStrings.hpp, you will find the various strings
+that get used to specify device types when parsing a device description. In
+here, add the string that you want to use to indicate the type of device you
+want to implement. If you are implementing a new JMC device, add it to the
+section for JMCs. If it's an IMU or force-torque sensor, add it to the section
+for one of those.
+
+If you intend to implement an entirely new CAN device, you can either reverse
+engineer the HuboCan source code to figure out how to do so, or you can contact
+the original author < greyxmike@gmail.com > for advice on how to proceed. If
+you have a high level of comfort with C++, reverse engineering should not be
+terribly difficult, but you may want to consult the original author anyway for
+a code review.
+
+Once you've decided on the strings you need, add your device to the appropriate
+.dd files in the HuboCan/devices directory. Notice that the .dd file format
+supports an "include" keyword which effectively copy/pastes the content of 
+another .dd file into the current file. Don't hesitate to take advantage of
+this feature; it can make device descriptions much more readable. Also, the
+pound sign # can be used to write comments. The .dd parser will ignore any
+and all the remaining text on a line after a pound sign.
+
+
+
+ --- (2) Write a C++ class that writes and decodes the appropriate CAN frames
+
+HuboCan has a base class called HuboCan::CanDevice. The CanDevice class has
+two virtual functions which should be overwritten:
+
+CanDevice::update()
+CanDevice::decode(const can_frame_t& frame, size_t channel)
+
+The CanDevice::update() function will get called by the CanPump at the start
+of each control cycle. The CanPump is a class which is responsible for
+interfacing directly with the CAN hardware. CanPump keeps the hardware and
+software in sync with each other, it pushes outgoing CAN frames onto the 
+hardware, pulls incoming CAN frames off of the hardware, and talks with the
+HuboCan::CanDevices to deliver frames to and from them.
+
+When CanDevice::update() is called on your device, it should do whatever tasks
+it's meant to do at the start of the control cycle. Usually, this means telling
+the CanPump to send off a specific CAN frame which requests sensor information,
+such as encoder readings, IMU readings, or force-torque readings. Examples for
+how to do this can be found in the HuboCan/HuboCan/src/Hubo2PlusBasicJmc.cpp
+in the function Hubo2PlusBasicJmc::_request_encoder_readings().
+
+If you are implementing a new JMC or IMU/FT sensor type, then ideally you will
+not need to implement a completely new CanDevice from scratch. Instead, look
+for an existing class that is already as similar as possible to the one you
+intend to implement, and then inherit from that class instead of creating a
+brand new one from scratch. For example, if you want to implement a new JMC
+type whose CAN protocol is identical to the basic Hubo2Plus JMC protocol,
+except it has a different protocol for sending reference commands. In that case
+you should create a class that inherits the HuboCan::Hubo2PlusBasicJmc and then
+overrides the virtual function Hubo2PlusBasicJmc::_send_reference_commands().
+This allows you to take advantage of all the work already provided by the
+existing implementations.
+
+
+
+ --- (3) Program HuboDescription to load the class when it shows up in a .dd file
+
+The HuboCan::HuboDescription class is the abstract factory that will produce
+all the device types we need as it loads a .dd file, therefore it needs to be
+programmed to load the correct class for your new device type. As mentioned
+earlier, if you are creating a new JMC, IMU, or FT sensor type, then this is
+very easy, and you can just use the following instructions. Otherwise, you will
+need to either do reverse engineering or consult the original author.
+
+Open the file HuboCan/src/HuboDescription.cpp
+
+For a new JMC type, find the function
+HuboDescription::_constructJMC(const hubo_jmc_info_t&, bool) and look for the
+if-else chain near the top. Add your class to the end of the if-else chain. Be
+sure to test type_string against the const std::string that you defined in the
+header HuboCan/DeviceStrings.hpp, as you were told in part (1) of these
+instructions. Do NOT use a string literal (a bunch of characters surrounded by
+quotes) in the if-else statement, because this makes it very difficult to keep
+track of what the string is supposed to be.
+
+The process is exactly the same for a new IMU, except you should modify the
+if-else chain in the HuboDescription::_constructIMU function instead.
+
+Same thing for force-torque sensors, except modify the if-else chain that's in
+the HuboDescription::_constructForceTorque function.
+
+And that's it! Your new device should be able to operate seamlessly in the 
+HuboCan framework.
+
