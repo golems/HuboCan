@@ -169,5 +169,56 @@ check whether the robot correctly arrived at the desired final waypoint, you
 can compare the joint values of the final waypoint to the joint values that are
 reported in the huboqt_window, under the Joints tab.
 
+You can also run
+
+$ ./read_sensor_test
+
+to get a stream of sensor data printed to the terminal. Note that the sensors 
+will be re-nulled each time the program is called.
 
 
+
+(6) Shut down
+
+After you are done, you will want to safely close all the processes and ach
+channels. Go to the Manager tab of the huboqt_window.
+
+If you only want to close down the processes (i.e. keep the ach channels open),
+then press the
+
+-> Stop All <-
+
+button in the Process Management bubble. Then press
+
+-> Locked <-
+
+to see an updated list of which processes are locked. It might take a second or
+two for all the processes to close, so keep clicking the Locked button if there
+are still a few processes in the list. If there are still processes listed
+after five to ten seconds, then something failed to close down correctly. Press
+
+-> Kill All <-
+
+to forcibly close down all the programs and wipe away the lock files. It is not
+surprising for this to happen occasionally, but if it happens regularly then
+something is wrong and needs to be debugged.
+
+To close down the ach channels, press the 
+
+-> Destroy All <-
+
+button in the Channel Management bubble. NEVER NEVER NEVER destroy the ach
+channels while the processes are still running, because this is very likely
+to cause issues. In most cases, there should be no need to destroy the ach
+channels ever, even if processes need to be rebooted. The processes in
+HuboCan should all be smart about flushing channels before using them.
+
+To shutdown all the processes as well as close all the ach channels, use the
+
+-> Shutdown <-
+
+button in the Standard Options bubble. Note that this does not actually shut
+the computer itself down. To shutdown Hubo's computer, you will need to use
+ssh and run
+
+$ sudo shutdown -h now
