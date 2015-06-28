@@ -336,8 +336,6 @@ bool Aggregator::_resolve_ownership(size_t joint_index)
                  << _desc.getJointName(joint_index) << "' (" << joint_index << ") which is already "
                     << "owned by PID# " << _pids[joint_index] << "! Please resolve this conflict!" << std::endl;
 
-    // TODO: Report this as an error in a channel that goes all the way up to the user
-
     return false;
 }
 
