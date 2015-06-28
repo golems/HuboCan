@@ -48,8 +48,6 @@ void HuboCan::CanDevice::registerPump(CanPump &pump)
     _pump = &pump;
 }
 
-void HuboCan::CanDevice::startup() { }
-
 void HuboCan::CanDevice::update() { }
 
 bool HuboCan::CanDevice::decode(const can_frame_t&, size_t) { return false; }
