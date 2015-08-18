@@ -89,6 +89,15 @@ public:
      * this function.
      */
     HuboCan::error_result_t setJointIndices(const IndexArray&  joint_indices);
+
+    /*!
+     * \fn getIndexMap()
+     * \brief Get the vector that maps your indexing to the Trajectory indexing
+     * \return
+     *
+     * The map will be created when you call setJointIndices
+     */
+    const IndexArray& getIndexMap() const;
     
     /*!
      * \fn setInputFrequency(double frequency);

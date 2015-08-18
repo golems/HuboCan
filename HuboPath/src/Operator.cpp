@@ -217,6 +217,11 @@ HuboCan::error_result_t Operator::setJointIndices(const IndexArray &joint_indice
     return HuboCan::OKAY;
 }
 
+const IndexArray& Operator::getIndexMap() const
+{
+    return _index_map;
+}
+
 bool Operator::_check_mapping_set(std::string calling_function)
 {
     if(!_mapping_set)
