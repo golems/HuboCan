@@ -43,6 +43,7 @@
 #include "FlowLayout.h"
 #include "HuboQt/JointWidget.h"
 
+const QString no_op_text = "Nothing";
 const QString home_text = "Home";
 const QString ctrl_on_text = "Ctrl On";
 const QString ctrl_off_text = "Ctrl Off";
@@ -343,9 +344,13 @@ QWidget* JointWidget::_createJointCommandOptions()
     _commandGroup = new QButtonGroup;
     _commandGroup->setExclusive(true);
 
+    CREATE_CMD_BUTTON( no_op_text );    // Use this button to ensure that nothing will happen when a
+                                        // joint is clicked
     CREATE_CMD_BUTTON( home_text );
     CREATE_CMD_BUTTON( ctrl_on_text );
     CREATE_CMD_BUTTON( ctrl_off_text );
+
+    no_op_text_button->setChecked(true);
 
     return CommandWidget;
 }
@@ -363,6 +368,7 @@ QWidget* JointWidget::_createBottomBar()
     radioGroup->addButton(degrees);
     layout->addWidget(degrees);
     connect(degrees, SIGNAL(clicked()), this, SLOT(useDegrees()));
+
 
     QRadioButton* radians = new QRadioButton("Radians");
     radioGroup->addButton(radians);

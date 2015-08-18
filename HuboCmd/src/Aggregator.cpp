@@ -264,7 +264,7 @@ void Aggregator::_aggregator_loop()
 
 void Aggregator::_check_hubocan_state()
 {
-    // TODO: Grab the current state and update data structures accordingly
+    // TODO: Grab the current state and do a sanity check
 }
 
 void Aggregator::_collate_input()
@@ -335,8 +335,6 @@ bool Aggregator::_resolve_ownership(size_t joint_index)
     std::cerr << "PID# " << header->pid << " is trying to command joint '"
                  << _desc.getJointName(joint_index) << "' (" << joint_index << ") which is already "
                     << "owned by PID# " << _pids[joint_index] << "! Please resolve this conflict!" << std::endl;
-
-    // TODO: Report this as an error in a channel that goes all the way up to the user
 
     return false;
 }

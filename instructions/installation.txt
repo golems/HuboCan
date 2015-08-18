@@ -1,0 +1,224 @@
+
+Note that installation requires internet access
+
+(1) Setup workstation
+
+On your workstation computer (i.e. whichever computer you will operate the
+robot from), use git clone to get a copy of the HuboCan repository on your
+workstation by running this in the terminal:
+
+$ git clone https://github.com/golems/HuboCan
+
+After you have the repo, enter the HuboCan directory and run the setup script:
+
+$ cd HuboCan
+
+$ ./setup workstation
+
+While the setup script is running, you will need to enter your password and say
+yes a few times when prompted.
+
+
+
+(2) Setup robot
+
+From a terminal on your workstation, ssh into the robot.
+
+Like before, clone a copy of the HuboCan repository onto the robot's computer:
+
+$ git clone https://github.com/golems/HuboCan
+
+Like before, enter the HuboCan directory and run the setup script, but this
+time, run the robot version of the script:
+
+$ cd HuboCan
+
+$ ./setup robot Hubo2Plus
+
+If your robot is a DrcHubo rather than a Hubo2Plus, then replace the Hubo2Plus
+argument with "DrcHubo".
+
+
+
+(3) Reboot robot
+
+To make sure everything is in its correct state, it is a good idea to reboot
+the robot computer:
+
+$ sudo reboot
+
+HuboCan uses a service that starts up when the comptuer boots, so rebooting
+will ensure that the service starts up correctly. The service is called hubomgr
+and it is responsible for opening/closing ach channels and starting/stopping
+control processes.
+
+
+
+(4) Connect to robot
+
+If all the above steps worked correctly, the robot should be ready to use. On
+your workstation, run 
+
+$ huboqt_window
+
+to open a GUI application that will let you graphically manage the ach channels
+and processes on the robot. With the huboqt_window open, type in the ip address
+or the hostname of your robot in the "Ach Networking" bubble, then press:
+
+-> Reconnect <-
+
+The ip address / hostname will be automatically saved between runs,
+so you should not have to reenter it after this.
+
+Do not launch the Local Manager when trying to operate the robot, because that
+will interrupt your connection to the robot. The Local Manager is for testing
+purposes only -- it allows you to test the ach channel and process management
+functionalities of hubomgr without needing to be connected to a robot.
+
+If you successfully connected, the Ach Networking bubble should indicate so. If
+it says "Disconnected!" then something has gone wrong, and you should stop here
+to get help.
+
+While connected, use the dongle to turn on power to Hubo's hardware.
+
+Once the hardware power is on, click:
+
+-> Startup <-
+
+in the Standard Options bubble. If successful, you should see the Channel List
+get automatically populated with all the Ach channels that are running (unless
+the list was already populated). Now click:
+
+-> Locked <-
+
+In the Process Management bubble. This will reveal a list of which processes
+are currently "locked". If a process is locked, then it should be running,
+unless something has gone wrong (which can happen, but should be rare). You
+should see the following in the list (in no particular order):
+
+hubo_cmd_aggregator
+socketcan_interface
+log_relay
+player
+
+If any of those are missing, then something is likely wrong and you should stop
+to get help. Otherwise, if everything was succesful you can now press
+
+-> Home All <-
+
+in the Standard Options bubble. Often times, joints on Hubo will not home on
+the first try, so you can switch to the Joints tab at the top of the window.
+
+The Joints tab will display a grid of all the joints in the robot. Joints that
+are a plain gray color have successfully homed. Joint buttons that are colored
+purple are not homed. Joint buttons that are colored red have experienced an
+error. When a joint experiences an error, the details will be printed in the
+text box.
+
+If a joint did not home after using "Home All", you can home it individually
+using the Joints tab. First, select the 
+
+* Home
+
+radio button at the top of the page. Then, click on any joint's button to send
+a Home command exclusively to that joint.
+
+Once everything is homed, it is a good idea to selected the
+
+* Nothing
+
+radio button to ensure that nothing will happen if a joint button is
+accidentally clicked.
+
+
+
+(5) Try some stuff
+
+If everything above was successful, you should be ready to run some tests. In
+the HuboCan/build directory, you should find a process called operator_test.
+This process has a few different open-loop trajectories that move around the
+right arm.
+
+Note that these trajectories are NOT tested for all versions of Hubo, and there
+is no collision detection used before running them. So while running the
+trajectories, be conscientious of possibility of self-collisions, and kill the
+power if the robot starts to collide with itself.
+
+To run the different trajectories, run these from the terminal while in the
+HuboCan/build directory on your workstation:
+
+$ ./operator_test 1
+
+$ ./operator_test 2
+
+$ ./operator_test 3
+
+$ ./operator_test 4
+
+$ ./operator_test 5
+
+
+At any time, you can use
+
+$ ./operator_test 0
+
+to return all the right arm's joints to zero.
+
+Each test that you run will print out all the waypoints of the trajectory. To
+check whether the robot correctly arrived at the desired final waypoint, you
+can compare the joint values of the final waypoint to the joint values that are
+reported in the huboqt_window, under the Joints tab.
+
+You can also run
+
+$ ./read_sensor_test
+
+to get a stream of sensor data printed to the terminal. Note that the sensors 
+will be re-nulled each time the program is called.
+
+
+
+(6) Shut down
+
+After you are done, you will want to safely close all the processes and ach
+channels. Go to the Manager tab of the huboqt_window.
+
+If you only want to close down the processes (i.e. keep the ach channels open),
+then press the
+
+-> Stop All <-
+
+button in the Process Management bubble. Then press
+
+-> Locked <-
+
+to see an updated list of which processes are locked. It might take a second or
+two for all the processes to close, so keep clicking the Locked button if there
+are still a few processes in the list. If there are still processes listed
+after five to ten seconds, then something failed to close down correctly. Press
+
+-> Kill All <-
+
+to forcibly close down all the programs and wipe away the lock files. It is not
+surprising for this to happen occasionally, but if it happens regularly then
+something is wrong and needs to be debugged.
+
+To close down the ach channels, press the 
+
+-> Destroy All <-
+
+button in the Channel Management bubble. NEVER NEVER NEVER destroy the ach
+channels while the processes are still running, because this is very likely
+to cause issues. In most cases, there should be no need to destroy the ach
+channels ever, even if processes need to be rebooted. The processes in
+HuboCan should all be smart about flushing channels before using them.
+
+To shutdown all the processes as well as close all the ach channels, use the
+
+-> Shutdown <-
+
+button in the Standard Options bubble. Note that this does not actually shut
+the computer itself down. To shutdown Hubo's computer, you will need to use
+ssh and run
+
+$ sudo shutdown -h now

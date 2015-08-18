@@ -47,7 +47,7 @@ void Hubo2PlusNckJmc::_send_reference_commands()
 bool Hubo2PlusNckJmc::_decode_encoder_reading(const can_frame_t& /*frame*/)
 {
     // TODO: Implement this
-    return false;
+    return true;
 }
 
 bool Hubo2PlusNckJmc::_decode_status_reading(const can_frame_t& frame)

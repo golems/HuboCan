@@ -1,0 +1,81 @@
+
+This file contains a list of features that are currently incomplete or
+nonexistent in HuboCan, but which may be valuable to implement. When possible,
+the list will provide a brief explanation of what exactly needs to be done and
+a suggestion for what kind of person would be most appropriate to do it.
+
+
+
+ -- Implement finger commands for Hubo2Plus --
+There is a class HuboCan::Hubo2Plus5chJmc that needs to have its virtual
+_send_reference_commands() function overridden so that it writes the correct
+CAN frames for sending out reference commands for the fingers.
+
+
+
+ -- Implement neck commands for Hubo2Plus --
+There is a class HuboCan::Hubo2PlusNckJmc that needs to have its virtual
+_send_reference_commands() function overriden so that it writes the correct
+CAN frames for sending out reference commands for the neck. It also needs to
+have its _decode_encoder_reading() function overridden so that it correctly
+reads incoming encoder messages.
+
+
+
+ -- Implement the various auxiliary commands for JMCs --
+There are many auxiliary commands that can be sent to JMCs which are currently
+not available through HuboCan. All of the commands can be sent using the Hubo-i
+hardware, but it would be nice to be able to send them through HuboCan instead.
+To create new commands, add to the enumeration list of hubo_aux_cmd_id_t, and
+then create a function in HuboCmd::AuxSender for the command that that fills in
+the hubo_aux_cmd_t struct named _cmd and then sends it off to the AuxReceiver.
+Then finally, write functions in the appropriate HuboJmc classes that read the
+auxiliary commands and writes the appropriate CAN frames for them. Be sure to
+increment the HUBO_AUX_CMD_HEADER_CODE version number whenever a change is made
+to this protocol.
+
+
+
+ -- Create a Qt GUI for displaying sensor data --
+Currently there is a Joint widget in HuboQt that will display information for
+joints, including encoder readings and status/error information. There should
+also be a widget for displaying IMU and force-torque data. It should be fairly
+straightforward to reverse engineer the Joint widget and create a procedurally
+generated widget for the sensors. This would be a good task for an undergrad
+who might be interested in learning about GUI design and development.
+
+
+
+ -- Densify trajectories for HuboPath --
+The HuboPath namespace has a Trajectory class which represents joint position
+waypoints for Hubo to follow. The trajectories can be filled in with sparse
+waypoints plus an interpolation scheme. Right now there is a spline interp
+scheme and a time-optimal interp scheme implemented. There is also a 
+HUBO_PATH_DENSIFY option which should just fill in the space between waypoints
+based on the specified frequency of the waypoints. This should be extremely
+straightforward to implement; it just requires some basic algebra.
+
+
+ -- Implement compliance control for DrcHubo --
+There is a HuboCan::DrcHubo2chJmc class which ought to offer compliance (PWM)
+control for the DrcHubo JMCs, but currently this is not implemented. This has
+no bearing on the Hubo2Plus, so it should be implemented by someone who uses
+the DrcHubo. All that needs to be done is the HuboCan::DrcHubo2chJmc class
+should override the virtual _send_reference_commands() function so that when
+cmd.mode is equal to HUBO_CMD_COMPLIANT, it sends out a CAN frame that follows
+the compliance control protocol. The hubo_joint_cmd_t struct also has variables
+for PD gains and a base torque gain, so these terms should factor into a
+compliant PD controller that gets computed by _send_reference_commands()
+
+
+
+ -- Implement the 3-channel wrist/finger JMC ref commands --
+There is a HuboCan::DrcHubo3chJmc class that is used to control the wrist &
+finger JMC boards for the DrcHubo. Encoder readings and status readings are
+implemented for it, but DrcHubo3chJmc::_send_reference_commands() needs to be
+implemented. Simply refer to the CAN protocol for these board types and write
+the necessary frames for sending reference commands. This is only relevant for
+the DrcHubo, so it should be done by someone who uses that platform.
+
+
+

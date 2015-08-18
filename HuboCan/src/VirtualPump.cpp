@@ -84,6 +84,9 @@ bool VirtualPump::_send_frame(const can_frame_t& frame, size_t )
 
 bool VirtualPump::_wait_on_frame(const timespec_t &relative_timeout)
 {
+    // When we're doing a virtual pump, we'll read CAN messages from an Ach channel, so that
+    // a user can simulate incoming messages while running the virtual pump.
+
     timespec_t abs_timeout;
     clock_gettime(ACH_DEFAULT_CLOCK, &abs_timeout);
     clock_add(abs_timeout, relative_timeout);
@@ -101,9 +104,10 @@ bool VirtualPump::_wait_on_frame(const timespec_t &relative_timeout)
 
         if(result == ACH_OK)
             _decode_frame(frame, 0);
-        // TODO: What should I do about the channel number?
-        // Idea: Make a C-Struct for Ach which contains the
-        //       frame data in addition to a channel number
+        // TODO: This method has no way of knowing what channel the incoming message came from,
+        // so the messages cannot always make it to the correct device. Instead, we should make a
+        // C-struct that contains a CAN frame *and* a channel number so the virtual pump can send
+        // messages to the correct devices.
     }
 
     return false;
