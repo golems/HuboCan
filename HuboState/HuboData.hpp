@@ -257,7 +257,7 @@ public:
         {
             if(index == (size_t)(-1))
             {
-                std::cout << "[HuboData::oeprator[]] You have requested an InvalidIndex for "
+                std::cout << "[HuboData::operator[]] You have requested 'InvalidIndex' for "
                           << "channel '" << _channel_name << "'.\n" << "(Data Count: "
                           << get_data_component_count(_raw_data) << ")" << std::endl;
             }
