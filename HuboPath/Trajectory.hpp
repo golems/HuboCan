@@ -113,7 +113,8 @@ public:
     
     bool check_limits() const;
     
-    void get_active_indices(std::vector<size_t>& mapping);
+    void get_active_indices(std::vector<size_t>& mapping) const;
+    std::vector<size_t> get_active_indices() const;
     bool get_active_joint_limits(std::vector<hubo_joint_limits_t>& limits);
 
 protected:
@@ -126,6 +127,9 @@ protected:
                                double frequency);
     bool _densify();
 
+    bool _saturate(const Eigen::VectorXd& max_velocities,
+                   const Eigen::VectorXd& max_accelerations,
+                   double frequency);
 };
 
 } // namespace HuboPath

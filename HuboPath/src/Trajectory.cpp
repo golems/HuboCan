@@ -65,10 +65,14 @@ bool HuboPath::Trajectory::interpolate()
     
     Eigen::VectorXd velocities(joint_mapping.size());
     Eigen::VectorXd accelerations(joint_mapping.size());
+    Eigen::VectorXd max_velocities(joint_mapping.size());
+    Eigen::VectorXd max_accelerations(joint_mapping.size());
     for(size_t j=0; j<joint_mapping.size(); ++j)
     {
         velocities[j] = limits[j].nominal_speed;
+        max_velocities[j] = limits[j].max_speed;
         accelerations[j] = limits[j].nominal_accel;
+        max_accelerations[j] = limits[j].max_accel;
     }
     
     double frequency = desc.okay()? desc.params.frequency : params.frequency;
@@ -90,6 +94,10 @@ bool HuboPath::Trajectory::interpolate()
     else if( HUBO_PATH_DENSIFY == params.interp )
     {
         return _densify();
+    }
+    else if( HUBO_PATH_SATURATE == params.interp )
+    {
+      return _saturate(max_velocities, max_accelerations, frequency);
     }
 
     return false;
@@ -214,7 +222,7 @@ bool HuboPath::Trajectory::check_limits() const
     return limits_okay;
 }
 
-void HuboPath::Trajectory::get_active_indices(std::vector<size_t> &mapping)
+void HuboPath::Trajectory::get_active_indices(std::vector<size_t>& mapping) const
 {
     mapping.clear();
     for(size_t i=0; i<HUBO_PATH_JOINT_MAX_SIZE; ++i)
@@ -224,6 +232,13 @@ void HuboPath::Trajectory::get_active_indices(std::vector<size_t> &mapping)
             mapping.push_back(i);
         }
     }
+}
+
+std::vector<size_t> HuboPath::Trajectory::get_active_indices() const
+{
+  std::vector<size_t> mapping;
+  get_active_indices(mapping);
+  return mapping;
 }
 
 bool HuboPath::Trajectory::get_active_joint_limits(std::vector<hubo_joint_limits_t> &limits)
@@ -362,3 +377,238 @@ bool HuboPath::Trajectory::_densify()
     // FIXME TODO
     return false;
 }
+
+static std::vector<hubo_path_element_t> saturate(
+    const std::vector<hubo_path_element_t>& elements,
+    const Eigen::VectorXd& max_velocities,
+    const Eigen::VectorXd& max_accelerations,
+    double frequency,
+    const std::vector<size_t>& mapping,
+    bool forward_only = false)
+{
+  std::vector<hubo_path_element_t> newElements;
+  if(elements.size() < 2)
+  {
+    newElements.push_back(elements.front());
+    return newElements;
+  }
+
+  newElements.reserve(10*elements.size());
+
+  std::vector<Eigen::VectorXd> original_vels(elements.size(), Eigen::VectorXd(mapping.size()));
+  std::vector<Eigen::VectorXd> original_accels(elements.size(), Eigen::VectorXd(mapping.size()));
+
+  for(size_t i=0; i < elements.size(); ++i)
+  {
+    const hubo_path_element_t& elem = elements[i];
+    const hubo_path_element_t& last_elem =
+        ( i == 0 )? elements[0] : elements[i-1];
+
+    const hubo_path_element_t& next_elem =
+        ( i == elements.size()-1 )? elements.back() : elements[i+1];
+
+    for(size_t j=0; j < mapping.size(); ++j)
+    {
+      const size_t index = mapping[j];
+
+      original_vels[i][j] =
+          std::abs(elem.references[index] - last_elem.references[index]) * frequency;
+
+      original_accels[i][j] =
+          std::abs(next_elem.references[index] - 2*elem.references[index] +last_elem.references[index])
+          * pow(frequency,2);
+    }
+  }
+
+  hubo_path_element_t lastElement = elements.front();
+  hubo_path_element_t target = elements.front();
+  hubo_path_element_t nextElement = elements.front();
+
+  size_t upcomingIndex = 1;
+
+  while(upcomingIndex <= elements.size())
+  {
+    double s = 1.0;
+
+    for(size_t i=0; i < mapping.size(); ++i)
+    {
+      size_t index = mapping[i];
+      double q_last = lastElement.references[index];
+      double q = target.references[index];
+      double v_max = max_velocities[i];
+
+      double speed = std::abs(q-q_last)*frequency;
+      if(speed <= v_max)
+        continue;
+
+      double scale = v_max / speed;
+      if(scale < s)
+        s = scale;
+    }
+
+    if(s < 1.0)
+    {
+      for(size_t i=0; i < mapping.size(); ++i)
+      {
+        size_t index = mapping[i];
+        double& q = target.references[index];
+        double q_last = lastElement.references[index];
+
+        q = s*(q-q_last) + q_last;
+      }
+    }
+
+    newElements.push_back(target);
+
+    if(upcomingIndex < elements.size()+1)
+    {
+      bool skipNext = true;
+
+      if( s < 1.0 )
+      {
+        for(size_t i=0; i < mapping.size(); ++i)
+        {
+          size_t index = mapping[i];
+          double q = target.references[index];
+          double q_next = nextElement.references[index];
+          double v_max = max_velocities[i];
+
+          double speed = std::abs(q_next - q) * frequency;
+          if(speed > v_max)
+          {
+            skipNext = false;
+            break;
+          }
+        }
+      }
+
+      if(skipNext)
+      {
+        nextElement =
+            upcomingIndex < elements.size()? elements[upcomingIndex] : elements.back();
+        ++upcomingIndex;
+      }
+    }
+
+    double a = 1.0;
+    for(size_t i=0; i < mapping.size(); ++i)
+    {
+      size_t index = mapping[i];
+      double q_last = lastElement.references[index];
+      double q = target.references[index];
+      double q_next = nextElement.references[index];
+      double a_max = max_accelerations[i];
+
+      double accel = std::abs(q_next - 2*q + q_last) * pow(frequency, 2);
+      if(accel <= a_max)
+        continue;
+
+      double scale = a_max / accel;
+      if(scale < a)
+        a = scale;
+    }
+
+    bool overshot = false;
+    if(a < 1.0)
+    {
+      hubo_path_element_t potentialNext = nextElement;
+      for(size_t i=0; i < mapping.size(); ++i)
+      {
+        size_t index = mapping[i];
+        double q_last = lastElement.references[index];
+        double q = target.references[index];
+        double& q_next = potentialNext.references[index];
+        double q_next_saved = nextElement.references[index];
+
+        q_next = a * (q_next - 2*q + q_last) + 2*q - q_last;
+
+        double min = std::min(q_next_saved, q);
+        double max = std::max(q_next_saved, q);
+
+        if( forward_only &&
+           !(min <= q_next && q_next <= max) )
+        {
+          overshot = true;
+          break;
+        }
+      }
+
+      if(!overshot)
+        nextElement = potentialNext;
+    }
+
+    lastElement = target;
+    target = nextElement;
+  }
+
+  return newElements;
+}
+
+static std::vector<hubo_path_element_t> forward_saturate(
+    const std::vector<hubo_path_element_t>& elements,
+    const Eigen::VectorXd& max_velocities,
+    const Eigen::VectorXd& max_accelerations,
+    double frequency,
+    const std::vector<size_t>& mapping)
+{
+  return saturate(elements, max_velocities, max_accelerations, frequency,
+                  mapping, true);
+}
+
+bool HuboPath::Trajectory::_saturate(const Eigen::VectorXd& max_velocities,
+                                     const Eigen::VectorXd& max_accelerations,
+                                     double frequency)
+{
+//  std::cout << "original: " << elements.size() << std::endl;
+//  std::vector<hubo_path_element_t> forward =
+//      forward_saturate(elements, max_velocities, max_accelerations,
+//                         frequency, get_active_indices());
+
+//  std::cout << "forward: " << forward.size() << std::endl;
+
+//  std::reverse(forward.begin(), forward.end());
+
+//  elements = forward_saturate(forward, max_velocities, max_accelerations,
+//                                frequency, get_active_indices());
+
+//  std::cout << "reversed: " << elements.size() << std::endl;
+
+//  std::reverse(elements.begin(), elements.end());
+
+//  std::cout << "final: " << elements.size() << std::endl;
+
+  elements = saturate(elements, max_velocities, max_accelerations,
+                      frequency, get_active_indices());
+
+  return true;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
