@@ -14,7 +14,7 @@ jmc_name        EJMC4
 
 min_max_positions       -3.14   3.14 # FIXME
 nominal_and_max_speeds  1       6
-nominal_and_max_accels  0.8     100
+nominal_and_max_accels  0.8     200
 
 end     Joint
 
