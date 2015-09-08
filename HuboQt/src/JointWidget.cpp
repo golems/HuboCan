@@ -104,9 +104,14 @@ void JointButton::_setErrorFlags()
 {
     QString tip = QString::fromLocal8Bit(_info.name) + ": ";
     double value = _state.position;
+    double ref = _state.reference;
     if(_degrees)
+    {
         value = value*180.0/M_PI;
+        ref = ref*180.0/M_PI;
+    }
     tip += QString::number(value, 'f');
+    tip += "\nRef: " + QString::number(ref, 'f');
 
     hubo_joint_status& status = _state.status;
     bool homed = true;

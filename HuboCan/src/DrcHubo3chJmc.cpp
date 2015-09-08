@@ -36,12 +36,20 @@
 #include "HuboCan/HuboJmc.hpp"
 #include "HuboState/State.hpp"
 #include "HuboCan/HuboCanId.hpp"
+#include "HuboCmd/Aggregator.hpp"
 
 namespace HuboCan {
 
 void DrcHubo3chJmc::_send_reference_commands()
 {
     // TODO: Implement this
+
+    for(size_t i=0; i < joints.size(); ++i)
+    {
+        const hubo_joint_cmd_t& cmd = _agg->joint(joints[i]->info.software_index);
+
+        _state->joints[joints[i]->info.software_index].reference = cmd.position;
+    }
 }
 
 bool DrcHubo3chJmc::_decode_encoder_reading(const can_frame_t& frame)
