@@ -111,7 +111,7 @@ public:
     bool interpolate();
     bool interpolate(hubo_path_interp_t type);
     
-    bool check_limits() const;
+    bool check_limits(bool enforceAccelerationLimits = false, bool printWarnings = true) const;
     
     void get_active_indices(std::vector<size_t>& mapping) const;
     std::vector<size_t> get_active_indices() const;

@@ -115,7 +115,7 @@ static void print_limit_violation(const std::string& type,
 }
 
 const double eps = 1e-6;
-bool HuboPath::Trajectory::check_limits() const
+bool HuboPath::Trajectory::check_limits(bool enforceAccelerationLimits, bool printWarnings) const
 {
     if(!desc.okay() && (params.use_custom_limits != 1))
     {
@@ -210,11 +210,15 @@ bool HuboPath::Trajectory::check_limits() const
                                 - 2*elem.references[j]
                                 + last_elem.references[j])
                            * frequency * frequency;
+
             if( accel > limits.max_accel + eps )
             {
-                print_limit_violation("max acceleration", name, j,
-                                      limits.max_accel, accel, i);
-                limits_okay = false;
+                if(printWarnings)
+                    print_limit_violation("max acceleration", name, j,
+                                          limits.max_accel, accel, i);
+
+                if(enforceAccelerationLimits)
+                    limits_okay = false;
             }
         }
     }
