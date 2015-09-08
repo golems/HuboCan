@@ -227,7 +227,10 @@ bool Player::_receive_incoming_trajectory()
     }
     
     if(!_trajectory.check_limits())
+    {
+        std::cerr << "The trajectory was outside of its limits -- we will ignore it!" << std::endl;
         return false;
+    }
 
     send_commands();
     _current_index = 0;
