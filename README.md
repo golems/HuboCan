@@ -3,7 +3,7 @@ HuboCan
 
 :warning: Due to unfortunate circumstances, this project is no longer supported, and its development
 is incomplete in a few respects. If you are interested in continuing the development effort, you are
-welcome to contact the original creator @mxgrey.
+welcome to contact the original creator @mxgrey
 
 A complete framework for real-time operation of Hubo on Linux. This single framework is intended to
 work seamlessly for every version of Hubo which currently exists and which may exist in the future
